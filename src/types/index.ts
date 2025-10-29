@@ -15,6 +15,8 @@ export interface UserProfile {
   lthr?: number;
   maxHr?: number;
   restHr?: number;
+  stravaConnected?: boolean;
+  stravaAthleteId?: string;
   preferences: {
     indoorAllowed: boolean;
     availableDevices: string[];
