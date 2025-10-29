@@ -72,7 +72,7 @@ export class TrainingPlanGenerator {
       weekStartDate,
       adjustedParams,
       currentMetrics,
-      taperGoal
+      taperGoal || undefined
     );
 
     // Calculate plan totals
@@ -343,7 +343,7 @@ export class TrainingPlanGenerator {
   /**
    * Get session subtype
    */
-  private getSessionSubType(type: string): string {
+  private getSessionSubType(type: string): 'endurance' | 'tempo' | 'threshold' | 'vo2max' | 'neuromuscular' | 'recovery' {
     switch (type) {
       case 'HIT':
         return Math.random() > 0.5 ? 'threshold' : 'vo2max';
