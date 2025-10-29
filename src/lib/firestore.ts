@@ -39,9 +39,29 @@ export const createUser = async (user: Partial<User>): Promise<void> => {
 };
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
-  const profileRef = doc(db, 'users', userId, 'profile', 'main');
-  const snapshot = await getDoc(profileRef);
-  return snapshot.exists() ? snapshot.data() as UserProfile : null;
+  const userRef = doc(db, 'users', userId);
+  const snapshot = await getDoc(userRef);
+  if (!snapshot.exists()) return null;
+  
+  const data = snapshot.data();
+  // Return user data as UserProfile (extract relevant fields)
+  return {
+    birthDate: data.birthDate,
+    age: data.age,
+    weight: data.weight,
+    ftp: data.ftp,
+    lthr: data.lthr,
+    maxHr: data.maxHr,
+    restHr: data.restHr,
+    stravaConnected: data.stravaConnected,
+    stravaAthleteId: data.stravaAthleteId,
+    weeklyOverrides: data.weeklyOverrides || {},
+    preferences: data.preferences || {
+      indoorAllowed: true,
+      availableDevices: [],
+      preferredTrainingTimes: []
+    }
+  } as UserProfile;
 };
 
 export const updateUserProfile = async (userId: string, profile: Partial<UserProfile>): Promise<void> => {
