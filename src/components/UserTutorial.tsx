@@ -225,7 +225,7 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
             {/* Left: Previous/Skip */}
             <button
               onClick={currentStep === 0 ? handleSkip : handlePrevious}
-              className="px-4 py-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark font-medium"
+              className="px-4 py-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark font-medium"
             >
               {currentStep === 0 ? 'Skip Tutorial' : '← Previous'}
             </button>
@@ -251,7 +251,7 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
             {/* Right: Next/Finish */}
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-primary dark:bg-primary-dark text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-500 font-medium transition-colors"
+              className="px-6 py-2 bg-primary dark:bg-primary-dark text-text-onDark rounded-md hover:bg-primary-600 dark:hover:bg-secondary-dark font-medium transition-colors"
             >
               {currentStep === TUTORIAL_STEPS.length - 1 ? "Let's Go! 🚀" : 'Next →'}
             </button>

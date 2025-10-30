@@ -98,7 +98,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary dark:bg-primary-dark hover:bg-primary-700 dark:hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-primary-dark disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-text-onDark bg-primary dark:bg-primary-dark hover:bg-primary-600 dark:hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-primary-dark disabled:opacity-50"
           >
             {loading ? 'Processing...' : isSignUp ? 'Sign Up' : 'Sign In'}
           </button>
@@ -107,7 +107,7 @@ export default function LoginPage() {
         <div className="mt-4">
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            className="w-full text-sm text-primary dark:text-primary-dark hover:text-primary-700 dark:hover:text-primary-500"
+            className="w-full text-sm text-primary dark:text-primary-dark hover:text-primary-600 dark:hover:text-secondary-dark"
           >
             {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>

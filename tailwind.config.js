@@ -9,113 +9,107 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Warm Color Scheme - Light & Dark Mode
+        // New Balanced Color Scheme - Light & Dark Mode
+        
+        // Primary: Payne's Gray (Light) / Celadon (Dark)
         primary: {
-          // Amber 600 for light, Orange 400 for dark
-          DEFAULT: '#D97706', // Light mode primary
-          dark: '#FB923C',     // Dark mode primary
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE68A',
-          300: '#FCD34D',
-          400: '#FBBF24',
-          500: '#F59E0B',
-          600: '#D97706',
-          700: '#B45309',
-          800: '#92400E',
-          900: '#78350F',
+          DEFAULT: '#546A76', // Light mode primary (Payne's Gray)
+          dark: '#B4CEB3',     // Dark mode primary (Celadon)
+          50: '#F0F4F6',
+          100: '#D9E2E7',
+          200: '#B3C5CF',
+          300: '#8DA8B7',
+          400: '#678B9F',
+          500: '#546A76',      // Payne's Gray
+          600: '#43555E',
+          700: '#324047',
+          800: '#212A2F',
+          900: '#111518',
         },
+        
+        // Secondary: Cadet Gray (Light) / Timberwolf (Dark)
         secondary: {
-          // Terrakotta for light, Amber 500 for dark
-          DEFAULT: '#C2410C', // Light mode secondary
-          dark: '#F59E0B',     // Dark mode secondary
-          50: '#FFF7ED',
-          100: '#FFEDD5',
-          200: '#FED7AA',
-          300: '#FDBA74',
-          400: '#FB923C',
-          500: '#F97316',
-          600: '#EA580C',
-          700: '#C2410C',
-          800: '#9A3412',
-          900: '#7C2D12',
+          DEFAULT: '#88A0A8', // Light mode secondary (Cadet Gray)
+          dark: '#DBD3C9',     // Dark mode secondary (Timberwolf)
+          50: '#F5F7F8',
+          100: '#E6EBED',
+          200: '#CCD7DB',
+          300: '#B3C3C9',
+          400: '#99AFB7',
+          500: '#88A0A8',      // Cadet Gray
+          600: '#6D8087',
+          700: '#526065',
+          800: '#364044',
+          900: '#1B2022',
         },
+        
+        // Accent: Mimi Pink
         accent: {
-          // Sand for light, Sand light for dark
-          DEFAULT: '#FDE68A',
-          50: '#FEFCE8',
-          100: '#FEF9C3',
-          200: '#FEF08A',
-          300: '#FDE047',
-          400: '#FACC15',
-          500: '#EAB308',
-          600: '#CA8A04',
-          700: '#A16207',
-          800: '#854D0E',
-          900: '#713F12',
+          DEFAULT: '#FAD4D8', // Mimi Pink
+          50: '#FFFBFC',
+          100: '#FEF5F6',
+          200: '#FDEAED',
+          300: '#FBE0E3',
+          400: '#FAD4D8',      // Mimi Pink
+          500: '#F7B5BC',
+          600: '#F396A0',
+          700: '#EF7784',
+          800: '#EB5868',
+          900: '#E7394C',
         },
-        // Success - Orange tone instead of green
-        success: {
-          DEFAULT: '#F97316', // Orange 500
-          light: '#FB923C',   // Orange 400
-          dark: '#EA580C',    // Orange 600
-          50: '#FFF7ED',
-          100: '#FFEDD5',
-          500: '#F97316',
-          600: '#EA580C',
-        },
-        // Warning - Amber
-        warning: {
-          DEFAULT: '#F59E0B',
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          500: '#F59E0B',
-          600: '#D97706',
-        },
-        // Error - Red tones
-        error: {
-          DEFAULT: '#DC2626', // Light mode
-          dark: '#F87171',     // Dark mode
-          50: '#FEF2F2',
-          100: '#FEE2E2',
-          500: '#EF4444',
-          600: '#DC2626',
-          700: '#B91C1C',
-        },
-        // Info - Blue tones
-        info: {
-          DEFAULT: '#38BDF8', // Light mode
-          dark: '#93C5FD',     // Dark mode
-          50: '#F0F9FF',
-          100: '#E0F2FE',
-          500: '#38BDF8',
-          600: '#0EA5E9',
-        },
+        
         // Background colors
         bg: {
-          warm: '#FFF7ED',     // Light mode background
-          'warm-dark': '#0C0A09', // Dark mode background
+          warm: '#DBD3C9',         // Light mode background (Timberwolf)
+          'warm-dark': '#546A76',  // Dark mode background (Payne's Gray)
         },
+        
         // Card/Surface colors
         surface: {
-          warm: '#FFFFFF',     // Light mode cards
-          'warm-dark': '#1C1917', // Dark mode cards
+          warm: '#B4CEB3',         // Light mode cards (Celadon)
+          'warm-dark': '#88A0A8',  // Dark mode cards (Cadet Gray)
         },
-        // Text colors - warm grays
+        
+        // Text colors
         text: {
           primary: {
-            light: '#1C1917',  // Light mode primary text
-            dark: '#E7E5E4',   // Dark mode primary text
+            light: '#546A76',    // Light mode primary text (Payne's Gray)
+            dark: '#DBD3C9',     // Dark mode primary text (Timberwolf)
           },
           secondary: {
-            light: '#57534E',  // Light mode secondary text
-            dark: '#A8A29E',   // Dark mode secondary text
+            light: '#88A0A8',    // Light mode secondary text (Cadet Gray)
+            dark: '#B4CEB3',     // Dark mode secondary text (Celadon)
           },
+          onLight: '#546A76',    // Text on light backgrounds
+          onDark: '#F8F9FA',     // Text on dark backgrounds
         },
-        // Borders - warm grays
+        
+        // Borders
         border: {
-          light: '#E7E5E4',    // Light mode borders
-          dark: '#292524',     // Dark mode borders
+          light: '#B4CEB3',      // Light mode borders (Celadon)
+          dark: '#88A0A8',       // Dark mode borders (Cadet Gray)
+        },
+        
+        // Status colors (keeping functional colors)
+        success: {
+          DEFAULT: '#10B981',
+          light: '#34D399',
+          dark: '#059669',
+        },
+        warning: {
+          DEFAULT: '#F59E0B',
+          light: '#FBBF24',
+          dark: '#D97706',
+        },
+        error: {
+          DEFAULT: '#EF4444',
+          light: '#F87171',
+          dark: '#DC2626',
+        },
+        info: {
+          DEFAULT: '#3B82F6',
+          light: '#60A5FA',
+          dark: '#2563EB',
         },
       },
       fontFamily: {
