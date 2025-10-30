@@ -35,11 +35,23 @@ def load_xgboost_model(input_path: str) -> xgb.Booster:
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Model file not found: {input_path}")
     
-    booster = xgb.Booster()
-    booster.load_model(input_path)
-    
-    print(f"✅ Model loaded successfully")
-    return booster
+    # Try to load as binary format
+    try:
+        booster = xgb.Booster()
+        booster.load_model(input_path)
+        print(f"✅ Model loaded successfully (binary format)")
+        return booster
+    except Exception as e:
+        print(f"⚠️  Binary load failed: {e}")
+        print(f"🔄 Trying JSON format...")
+        
+        # Try JSON format
+        try:
+            booster = xgb.Booster(model_file=input_path)
+            print(f"✅ Model loaded successfully (JSON format)")
+            return booster
+        except Exception as e2:
+            raise Exception(f"Failed to load model in both binary and JSON format: {e}, {e2}")
 
 
 def extract_feature_info(booster: xgb.Booster) -> dict:

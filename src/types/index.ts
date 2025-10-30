@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface UserProfile {
+  email?: string;
   birthDate?: string; // ISO date format (YYYY-MM-DD)
   age?: number; // Deprecated, use birthDate
   weight?: number;
@@ -19,6 +20,7 @@ export interface UserProfile {
   stravaConnected?: boolean;
   stravaAthleteId?: string;
   weeklyOverrides?: Record<string, TimeSlot[]>; // Week-specific time slot overrides
+  autoLogoutMinutes?: number; // 0 = nie, 5, 10, etc.
   preferences: {
     indoorAllowed: boolean;
     availableDevices: string[];

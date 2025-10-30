@@ -1,13 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getUserProfile } from '@/lib/firestore';
 import type { UserProfile, TimeSlot } from '@/types';
 import { Info, Plus, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -262,23 +266,33 @@ export default function SettingsPage() {
     }
   }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides]);
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading settings...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-y-auto">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+    <DashboardLayout
+      userEmail={auth.currentUser?.email || undefined}
+      onSignOut={handleSignOut}
+      onHelp={() => {}}
+    >
+      <div className="max-w-4xl mx-auto px-8 py-8 pb-20">
         <div className="space-y-6">
           {/* Athlete Profile */}
           <div className="bg-white rounded-lg shadow">
@@ -299,7 +313,7 @@ export default function SettingsPage() {
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -308,7 +322,7 @@ export default function SettingsPage() {
                     type="number"
                     value={weight || ''}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     placeholder="70"
                   />
                 </div>
@@ -318,7 +332,7 @@ export default function SettingsPage() {
                     type="number"
                     value={ftp || ''}
                     onChange={(e) => setFtp(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     placeholder="250"
                   />
                 </div>
@@ -338,7 +352,7 @@ export default function SettingsPage() {
                     type="number"
                     value={lthr || ''}
                     onChange={(e) => setLthr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     placeholder="165"
                   />
                   
@@ -428,7 +442,7 @@ export default function SettingsPage() {
                     type="number"
                     value={maxHr || ''}
                     onChange={(e) => setMaxHr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     placeholder="190"
                   />
                 </div>
@@ -438,7 +452,7 @@ export default function SettingsPage() {
                     type="number"
                     value={restHr || ''}
                     onChange={(e) => setRestHr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     placeholder="50"
                   />
                 </div>
@@ -448,7 +462,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSaveProfile}
                   disabled={saving}
-                  className="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save Profile'}
                 </button>
@@ -470,7 +484,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab('standard')}
                   className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === 'standard'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-red-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -480,7 +494,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab('weekly')}
                   className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === 'weekly'
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-red-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -531,7 +545,7 @@ export default function SettingsPage() {
                     <select
                       value={newSlot.day}
                       onChange={(e) => setNewSlot({...newSlot, day: parseInt(e.target.value)})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     >
                       <option value={1}>Montag</option>
                       <option value={2}>Dienstag</option>
@@ -548,7 +562,7 @@ export default function SettingsPage() {
                       type="time"
                       value={newSlot.startTime}
                       onChange={(e) => setNewSlot({...newSlot, startTime: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -557,7 +571,7 @@ export default function SettingsPage() {
                       type="time"
                       value={newSlot.endTime}
                       onChange={(e) => setNewSlot({...newSlot, endTime: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -565,7 +579,7 @@ export default function SettingsPage() {
                     <select
                       value={newSlot.type}
                       onChange={(e) => setNewSlot({...newSlot, type: e.target.value as 'indoor' | 'outdoor' | 'both'})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
                     >
                       <option value="both">Indoor & Outdoor</option>
                       <option value="indoor">Nur Indoor</option>
@@ -681,7 +695,7 @@ export default function SettingsPage() {
                       disabled={timeSlots[slotToCopyIndex].day === day}
                       className={`px-4 py-2 text-sm rounded-md border transition-colors ${
                         selectedDays.includes(day)
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-red-600 text-white border-red-600'
                           : timeSlots[slotToCopyIndex].day === day
                           ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                           : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
@@ -701,7 +715,7 @@ export default function SettingsPage() {
                   <button
                     onClick={handleConfirmCopy}
                     disabled={selectedDays.length === 0}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Kopieren
                   </button>
@@ -710,7 +724,7 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

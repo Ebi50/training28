@@ -1,0 +1,30 @@
+{
+  "version": "v1",
+  "modelType": "xgboost-regressor",
+  "task": "tss-prediction",
+  "features": [
+    "TSS_lag1",
+    "TSS_3d",
+    "TSS_7d",
+    "TSS_14d",
+    "TSS_28d",
+    "TSS_std7",
+    "TSS_zero7",
+    "CTL_42",
+    "ATL_7",
+    "TSB",
+    "ramp_7v42",
+    "dow_sin",
+    "dow_cos",
+    "mon_sin",
+    "mon_cos"
+  ],
+  "inputShape": [
+    null,
+    15
+  ],
+  "outputShape": [
+    null,
+    1
+  ]
+}
