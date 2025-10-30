@@ -1,265 +1,251 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { onAuthStateChanged } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import DashboardLayout from '@/components/DashboardLayout';
 import { getUserProfile } from '@/lib/firestore';
-import { Calendar, Clock, TrendingUp, Activity } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface UserProfile {
   email?: string;
   ftp?: number;
-  weight?: number;
-  age?: number;
-  restingHR?: number;
-  maxHR?: number;
   stravaConnected?: boolean;
-  stravaAthleteId?: string;
 }
 
 export default function TrainingPlanPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [trainingPlan, setTrainingPlan] = useState<any>(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
+  const [currentWeek, setCurrentWeek] = useState(0);
+  const [generatingPlan, setGeneratingPlan] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
+    const loadProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) {
         router.push('/login');
         return;
       }
       
-      setUser(currentUser);
-      const userProfile = await getUserProfile(currentUser.uid);
+      const userProfile = await getUserProfile(user.uid);
       setProfile(userProfile);
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    loadProfile();
   }, [router]);
 
+  useEffect(() => {
+    const loadPlan = async () => {
+      const user = auth.currentUser;
+      if (!user || !profile?.stravaConnected) return;
+
+      setLoadingPlan(true);
+      try {
+        const response = await fetch(`/api/training/plan?userId=${user.uid}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📊 Plan loaded:', data.plan);
+          console.log('📊 Weeks type:', typeof data.plan?.weeks);
+          console.log('📊 Weeks isArray:', Array.isArray(data.plan?.weeks));
+          
+          // Convert weeks object to array if needed
+          let plan = data.plan;
+          if (plan?.weeks && !Array.isArray(plan.weeks)) {
+            console.log('🔄 Converting weeks object to array');
+            plan = {
+              ...plan,
+              weeks: Object.values(plan.weeks)
+            };
+          }
+          
+          console.log('📊 Processed weeks:', plan?.weeks);
+          console.log('📊 First week:', plan?.weeks?.[0]);
+          setTrainingPlan(plan);
+          setCurrentWeek(0); // Reset to first week
+        }
+      } catch (error) {
+        console.error('Error loading plan:', error);
+      } finally {
+        setLoadingPlan(false);
+      }
+    };
+
+    loadPlan();
+  }, [profile?.stravaConnected]);
+
+  const handleGeneratePlan = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    setGeneratingPlan(true);
+    try {
+      const response = await fetch('/api/training/generate-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.uid })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Convert weeks object to array if needed
+        let plan = data.plan;
+        if (plan?.weeks && !Array.isArray(plan.weeks)) {
+          console.log('🔄 Converting weeks object to array on generate');
+          plan = {
+            ...plan,
+            weeks: Object.values(plan.weeks)
+          };
+        }
+        
+        setTrainingPlan(plan);
+        setCurrentWeek(0);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setGeneratingPlan(false);
+    }
+  };
+
   const handleSignOut = async () => {
-    await auth.signOut();
+    await signOut(auth);
     router.push('/login');
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-warm dark:bg-bg-warm-dark flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-primary-dark mx-auto mb-4"></div>
-          <p className="text-text-secondary-light dark:text-text-secondary-dark">Lade Trainingsplan...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  // Sample training plan data (will be replaced with real data later)
-  const weekPlan = [
-    {
-      day: 'Montag',
-      date: '2025-11-03',
-      workout: 'Recovery Ride',
-      type: 'LIT',
-      duration: 60,
-      tss: 45,
-      description: 'Lockeres Regenerationstraining in Zone 1-2',
-      completed: true
-    },
-    {
-      day: 'Dienstag',
-      date: '2025-11-04',
-      workout: 'Sweet Spot Intervals',
-      type: 'HIT',
-      duration: 90,
-      tss: 85,
-      description: '3x10min @ 88-94% FTP, 5min Pause',
-      completed: false
-    },
-    {
-      day: 'Mittwoch',
-      date: '2025-11-05',
-      workout: 'Rest Day',
-      type: 'REST',
-      duration: 0,
-      tss: 0,
-      description: 'Ruhetag - Regeneration',
-      completed: false
-    },
-    {
-      day: 'Donnerstag',
-      date: '2025-11-06',
-      workout: 'Endurance Ride',
-      type: 'LIT',
-      duration: 120,
-      tss: 95,
-      description: 'Grundlagenausdauer Zone 2',
-      completed: false
-    },
-    {
-      day: 'Freitag',
-      date: '2025-11-07',
-      workout: 'VO2max Intervals',
-      type: 'HIT',
-      duration: 75,
-      tss: 90,
-      description: '5x5min @ 106-120% FTP, 5min Pause',
-      completed: false
-    },
-    {
-      day: 'Samstag',
-      date: '2025-11-08',
-      workout: 'Long Ride',
-      type: 'LIT',
-      duration: 180,
-      tss: 140,
-      description: 'Lange Ausfahrt Zone 2-3',
-      completed: false
-    },
-    {
-      day: 'Sonntag',
-      date: '2025-11-09',
-      workout: 'Active Recovery',
-      type: 'LIT',
-      duration: 45,
-      tss: 30,
-      description: 'Aktive Erholung, sehr locker',
-      completed: false
-    }
-  ];
-
-  const weeklyTSS = weekPlan.reduce((sum, day) => sum + day.tss, 0);
-  const completedTSS = weekPlan.filter(d => d.completed).reduce((sum, day) => sum + day.tss, 0);
+  // Ensure weeks is an array
+  const weeksArray = trainingPlan?.weeks 
+    ? (Array.isArray(trainingPlan.weeks) ? trainingPlan.weeks : Object.values(trainingPlan.weeks))
+    : null;
+  
+  const currentWeekData = weeksArray?.[currentWeek];
+  
+  // Debug logging
+  console.log('🔍 Current week index:', currentWeek);
+  console.log('🔍 Weeks array:', weeksArray);
+  console.log('🔍 Current week data:', currentWeekData);
+  console.log('🔍 Total weeks:', weeksArray?.length);
 
   return (
     <DashboardLayout
-      userEmail={user?.email || ''}
-      currentPage="Trainingsplan"
-      pageDescription="Dein wöchentlicher Trainingsplan"
+      userEmail={auth.currentUser?.email || undefined}
       onSignOut={handleSignOut}
-      onHelp={() => {}}
     >
-      <div className="space-y-6">
-        {/* Week Overview */}
-        <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Woche 45 - 2025</h2>
-              <p className="text-text-secondary-light dark:text-text-secondary-dark">3. November - 9. November 2025</p>
-            </div>
-            <div className="flex gap-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary dark:text-primary-dark">{completedTSS}</div>
-                <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">TSS absolviert</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">{weeklyTSS}</div>
-                <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">TSS geplant</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-accent-600 dark:text-accent-400">
-                  {Math.round((completedTSS / weeklyTSS) * 100)}%
-                </div>
-                <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Fortschritt</div>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto px-8 py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Training Plan</h1>
+            <p className="text-gray-600 mt-1">8-week training schedule</p>
           </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-border-light dark:bg-border-dark rounded-full h-3">
-            <div 
-              className="bg-gradient-to-r from-primary via-secondary to-accent-400 dark:from-primary-dark dark:via-secondary-dark dark:to-accent-500 h-3 rounded-full transition-all"
-              style={{ width: `${(completedTSS / weeklyTSS) * 100}%` }}
-            ></div>
-          </div>
+          {profile?.stravaConnected && (
+            <button
+              onClick={handleGeneratePlan}
+              disabled={generatingPlan}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+            >
+              {generatingPlan ? 'Generating...' : 'Generate Plan'}
+            </button>
+          )}
         </div>
 
-        {/* Training Days */}
-        <div className="space-y-4">
-          {weekPlan.map((workout, index) => (
-            <div 
-              key={index}
-              className={`bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border-2 p-6 transition-all ${
-                workout.completed 
-                  ? 'border-success dark:border-success-light bg-success-50/30 dark:bg-success-900/20' 
-                  : workout.type === 'REST' 
-                  ? 'border-border-light dark:border-border-dark bg-bg-warm dark:bg-bg-warm-dark' 
-                  : 'border-border-light dark:border-border-dark hover:border-primary dark:hover:border-primary-dark'
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
+        {loadingPlan ? (
+          <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          </div>
+        ) : !weeksArray || weeksArray.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-12 text-center">
+            <h3 className="text-lg font-semibold text-gray-900">No Plan Yet</h3>
+            <p className="mt-2 text-gray-600">Click Generate Plan to create your schedule</p>
+            {trainingPlan && (
+              <div className="mt-4 p-4 bg-gray-100 rounded text-left text-xs">
+                <p className="font-bold">Debug Info:</p>
+                <pre className="mt-2 whitespace-pre-wrap">{JSON.stringify(trainingPlan, null, 2).substring(0, 500)}</pre>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="bg-white rounded-lg shadow mb-6">
+              <div className="px-6 py-4 flex items-center justify-between border-b">
+                <button
+                  onClick={() => setCurrentWeek(Math.max(0, currentWeek - 1))}
+                  disabled={currentWeek === 0}
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                >
+                  Previous Week
+                </button>
+                <h2 className="text-2xl font-bold">Woche {currentWeek + 1}</h2>
+                <button
+                  onClick={() => setCurrentWeek(Math.min(weeksArray.length - 1, currentWeek + 1))}
+                  disabled={currentWeek >= weeksArray.length - 1}
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                >
+                  Next Week
+                </button>
+              </div>
+              <div className="px-6 py-4 bg-gray-50 border-b">
+                <div className="grid grid-cols-4 gap-6">
+                  <div>
+                    <p className="text-sm text-gray-600">TSS</p>
+                    <p className="text-2xl font-bold">{Math.round(currentWeekData?.totalTss || 0)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Hours</p>
+                    <p className="text-2xl font-bold">{(currentWeekData?.totalHours || 0).toFixed(1)}h</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">HIT</p>
+                    <p className="text-2xl font-bold">{currentWeekData?.hitSessions || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">LIT</p>
+                    <p className="text-2xl font-bold">{Math.round((currentWeekData?.litRatio || 0) * 100)}%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {currentWeekData?.sessions?.map((session: any, idx: number) => (
+                <div key={idx} className="bg-white rounded-lg shadow p-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">{workout.day}</h3>
-                    <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{workout.date}</span>
-                    {workout.completed && (
-                      <span className="bg-success dark:bg-success-light text-white text-xs px-3 py-1 rounded-full font-semibold">
-                        ✓ Abgeschlossen
-                      </span>
-                    )}
-                    {workout.type !== 'REST' && (
-                      <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                        workout.type === 'HIT' 
-                          ? 'bg-secondary-100 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-400' 
-                          : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
-                      }`}>
-                        {workout.type}
+                    <h3 className="text-lg font-semibold">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
+                    </h3>
+                    {session && (
+                      <span className={'px-3 py-1 text-xs rounded-full ' + (session.type === 'HIT' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700')}>
+                        {session.type}
                       </span>
                     )}
                   </div>
-                  
-                  <h4 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">{workout.workout}</h4>
-                  <p className="text-text-secondary-light dark:text-text-secondary-dark mb-4">{workout.description}</p>
-                  
-                  {workout.type !== 'REST' && (
-                    <div className="flex gap-6 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-text-secondary-light dark:text-text-secondary-dark" />
-                        <span className="text-text-primary-light dark:text-text-primary-dark">{workout.duration} min</span>
+                  {session ? (
+                    <>
+                      <p className="font-medium mb-2">{session.name || 'Training'}</p>
+                      {session.description && <p className="text-sm text-gray-600 mb-3">{session.description}</p>}
+                      <div className="flex gap-6 text-sm">
+                        <span>{session.duration} min</span>
+                        <span>{Math.round(session.targetTss)} TSS</span>
+                        {session.targetZone && <span>Zone {session.targetZone}</span>}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-text-secondary-light dark:text-text-secondary-dark" />
-                        <span className="text-text-primary-light dark:text-text-primary-dark">{workout.tss} TSS</span>
-                      </div>
-                    </div>
+                    </>
+                  ) : (
+                    <p className="text-gray-500">Rest Day</p>
                   )}
                 </div>
-
-                {!workout.completed && workout.type !== 'REST' && (
-                  <button className="bg-primary dark:bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-500 transition-colors font-semibold">
-                    Starten
-                  </button>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {/* Week Summary */}
-        <div className="bg-gradient-to-r from-primary via-primary-700 to-primary dark:from-primary-dark dark:via-secondary-dark dark:to-primary-dark text-white rounded-lg shadow-sm p-6">
-          <h3 className="text-xl font-bold mb-4">Wochenzusammenfassung</h3>
-          <div className="grid grid-cols-4 gap-4">
-            <div>
-              <div className="text-3xl font-bold">{weekPlan.filter(w => w.type === 'HIT').length}</div>
-              <div className="text-primary-100 dark:text-primary-200">HIT Sessions</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{weekPlan.filter(w => w.type === 'LIT').length}</div>
-              <div className="text-primary-100 dark:text-primary-200">LIT Sessions</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{Math.round(weekPlan.reduce((sum, w) => sum + w.duration, 0) / 60)}h {weekPlan.reduce((sum, w) => sum + w.duration, 0) % 60}m</div>
-              <div className="text-primary-100 dark:text-primary-200">Gesamtzeit</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{weeklyTSS}</div>
-              <div className="text-primary-100 dark:text-primary-200">Wochen-TSS</div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );

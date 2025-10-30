@@ -90,7 +90,7 @@ export default function SetupCheck() {
           </a>
           <a
             href="/login"
-            className="px-4 py-2 bg-primary dark:bg-primary-dark text-text-onDark rounded hover:bg-primary-600 dark:hover:bg-secondary-dark"
+            className="px-4 py-2 bg-primary dark:bg-primary-dark text-white rounded hover:bg-blue-700"
           >
             Try Login →
           </a>
@@ -131,7 +131,7 @@ function StatusRow({
           href={action.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-1 bg-primary dark:bg-primary-dark text-text-onDark text-sm rounded hover:bg-primary-600 dark:hover:bg-secondary-dark"
+          className="px-3 py-1 bg-primary dark:bg-primary-dark text-white text-sm rounded hover:bg-blue-700"
         >
           {action.text}
         </a>

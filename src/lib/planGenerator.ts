@@ -214,6 +214,11 @@ export class TrainingPlanGenerator {
       const isHitDay = hitDays.includes(dayIndex);
       const availableSlots = this.getAvailableSlots(params.availableTimeSlots, dayIndex);
       
+      // If no slots defined, assume all days available with default slot
+      if (params.availableTimeSlots.length === 0 && availableSlots.length === 0) {
+        availableSlots.push({ day: dayIndex, startTime: '08:00', endTime: '10:00', type: 'both' });
+      }
+      
       if (availableSlots.length === 0) {
         // Rest day - no available slots
         return;

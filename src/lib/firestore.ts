@@ -39,29 +39,34 @@ export const createUser = async (user: Partial<User>): Promise<void> => {
 };
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
+  // Read from main user document
   const userRef = doc(db, 'users', userId);
-  const snapshot = await getDoc(userRef);
-  if (!snapshot.exists()) return null;
+  const userSnapshot = await getDoc(userRef);
+  if (!userSnapshot.exists()) return null;
   
-  const data = snapshot.data();
-  // Return user data as UserProfile (extract relevant fields)
-  return {
-    birthDate: data.birthDate,
-    age: data.age,
-    weight: data.weight,
-    ftp: data.ftp,
-    lthr: data.lthr,
-    maxHr: data.maxHr,
-    restHr: data.restHr,
-    stravaConnected: data.stravaConnected,
-    stravaAthleteId: data.stravaAthleteId,
-    weeklyOverrides: data.weeklyOverrides || {},
-    preferences: data.preferences || {
+  const userData = userSnapshot.data();
+  
+  // ✅ FIXED: Read Strava connection status from main doc (tokens are in integrations/strava)
+  const profile: UserProfile = {
+    birthDate: userData.birthDate,
+    age: userData.age,
+    weight: userData.weight,
+    ftp: userData.ftp,
+    lthr: userData.lthr,
+    maxHr: userData.maxHr,
+    restHr: userData.restHr,
+    // ✅ Read Strava status from main user document
+    stravaConnected: userData.stravaConnected || false,
+    stravaAthleteId: userData.stravaAthleteId,
+    weeklyOverrides: userData.weeklyOverrides || {},
+    preferences: userData.preferences || {
       indoorAllowed: true,
       availableDevices: [],
       preferredTrainingTimes: []
     }
-  } as UserProfile;
+  };
+  
+  return profile;
 };
 
 export const updateUserProfile = async (userId: string, profile: Partial<UserProfile>): Promise<void> => {
