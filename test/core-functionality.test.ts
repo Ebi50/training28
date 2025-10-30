@@ -61,11 +61,25 @@ const previousMetrics: DailyMetrics[] = Array.from({ length: 7 }, (_, i) => ({
   try {
     const weekStart = new Date(2025, 9, 29); // Oct 29, 2025
     
+    // Mock user profile for testing
+    const mockUserProfile = {
+      ftp: 250,
+      lthr: 165,
+      weight: 75,
+      birthDate: '1990-01-01',
+      preferences: {
+        indoorAllowed: true,
+        availableDevices: [],
+        preferredTrainingTimes: []
+      }
+    };
+    
     const plan = await generator.generateWeeklyPlan(
       'test-user-123',
       weekStart,
       testParams,
       previousMetrics,
+      mockUserProfile,
       [],
       undefined
     );

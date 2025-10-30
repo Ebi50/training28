@@ -2,6 +2,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getFunctions, Functions } from 'firebase/functions';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
 
 const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);
 export const functions: Functions = getFunctions(app);
+export const storage: FirebaseStorage = getStorage(app);
 
 // Initialize messaging (only on client side)
 export const getMessagingInstance = async (): Promise<Messaging | null> => {

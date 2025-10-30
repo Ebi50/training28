@@ -6,9 +6,11 @@ import {
   DailyMetrics, 
   SeasonGoal, 
   TrainingCamp,
-  TimeSlot 
+  TimeSlot,
+  UserProfile 
 } from '@/types';
 import { addDays, startOfWeek, format, differenceInDays, isBefore, isAfter } from 'date-fns';
+import { predictTSS, isModelAvailable } from './mlPredictor';
 
 // Default guardrails
 const DEFAULT_GUARDRAILS: Guardrails = {
@@ -32,9 +34,22 @@ const TRAINING_DISTRIBUTION = {
 
 export class TrainingPlanGenerator {
   private guardrails: Guardrails;
+  private useML: boolean = false;
 
   constructor(guardrails: Partial<Guardrails> = {}) {
     this.guardrails = { ...DEFAULT_GUARDRAILS, ...guardrails };
+  }
+
+  /**
+   * Check if ML model is available and enable it
+   */
+  async initialize(): Promise<void> {
+    this.useML = await isModelAvailable();
+    if (this.useML) {
+      console.log('✅ ML model available - using hybrid approach');
+    } else {
+      console.log('⚠️  ML model not available - using heuristic approach');
+    }
   }
 
   /**
@@ -45,6 +60,7 @@ export class TrainingPlanGenerator {
     weekStartDate: Date,
     parameters: PlanningParameters,
     previousMetrics: DailyMetrics[],
+    userProfile: UserProfile,
     upcomingGoals: SeasonGoal[] = [],
     activeCamp?: TrainingCamp
   ): Promise<WeeklyPlan> {
@@ -68,10 +84,12 @@ export class TrainingPlanGenerator {
     }
 
     // Generate training sessions
-    const sessions = this.generateTrainingSessions(
+    const sessions = await this.generateTrainingSessions(
       weekStartDate,
       adjustedParams,
       currentMetrics,
+      userProfile,
+      previousMetrics,
       taperGoal || undefined
     );
 
@@ -163,18 +181,30 @@ export class TrainingPlanGenerator {
   /**
    * Generate training sessions for the week
    */
-  private generateTrainingSessions(
+  private async generateTrainingSessions(
     weekStart: Date,
     params: PlanningParameters,
     currentMetrics: { ctl: number; atl: number; tsb: number },
+    userProfile: UserProfile,
+    previousMetrics: DailyMetrics[],
     taperGoal?: SeasonGoal
-  ): TrainingSession[] {
+  ): Promise<TrainingSession[]> {
     const sessions: TrainingSession[] = [];
     const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
     
     // Calculate daily TSS targets
-    const targetWeeklyTss = params.weeklyHours * 45; // Rough estimate
-    const dailyTssTargets = this.distributeTssAcrossWeek(targetWeeklyTss, params);
+    let dailyTssTargets: number[];
+    
+    if (this.useML) {
+      // Use ML predictions
+      console.log('🤖 Using ML predictions for TSS targets');
+      dailyTssTargets = await this.predictDailyTss(weekDays, userProfile, previousMetrics);
+    } else {
+      // Fall back to heuristic
+      console.log('📊 Using heuristic approach for TSS targets');
+      const targetWeeklyTss = params.weeklyHours * 45; // Rough estimate
+      dailyTssTargets = this.distributeTssAcrossWeek(targetWeeklyTss, params);
+    }
 
     // Determine HIT days (avoid back-to-back)
     const hitDays = this.selectHitDays(params.maxHitDays, currentMetrics.tsb);
@@ -372,6 +402,30 @@ export class TrainingPlanGenerator {
       default:
         return `${timeStr} endurance base training (TSS: ${targetTss})`;
     }
+  }
+
+  /**
+   * Predict daily TSS using ML model
+   */
+  private async predictDailyTss(
+    dates: Date[],
+    userProfile: UserProfile,
+    previousMetrics: DailyMetrics[]
+  ): Promise<number[]> {
+    const predictions: number[] = [];
+    
+    for (const date of dates) {
+      try {
+        const prediction = await predictTSS(userProfile, previousMetrics, date);
+        predictions.push(prediction.predictedTss);
+      } catch (error) {
+        console.error(`ML prediction failed for ${date}, using heuristic:`, error);
+        // Fallback to heuristic
+        predictions.push(45); // Default average TSS per day
+      }
+    }
+    
+    return predictions;
   }
 }
 
