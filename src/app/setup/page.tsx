@@ -33,13 +33,13 @@ export default function SetupCheck() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-bg-warm dark:bg-bg-warm-dark p-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <h1 className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-8">
           Firebase Setup Status
         </h1>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Configuration</h2>
           <div className="space-y-3">
             <StatusRow
@@ -90,7 +90,7 @@ export default function SetupCheck() {
           </a>
           <a
             href="/login"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-primary dark:bg-primary-dark text-white rounded hover:bg-blue-700"
           >
             Try Login →
           </a>
@@ -114,14 +114,14 @@ function StatusRow({
   action?: { text: string; url: string };
 }) {
   return (
-    <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+    <div className="flex items-center justify-between p-3 bg-bg-warm dark:bg-bg-warm-dark rounded">
       <div className="flex items-center gap-3">
         <span className={`text-2xl ${status ? '✅' : '⚠️'}`}>
           {status ? '✅' : '⚠️'}
         </span>
         <div>
-          <p className="font-medium text-gray-900">{label}</p>
-          <p className="text-sm text-gray-600">
+          <p className="font-medium text-text-primary-light dark:text-text-primary-dark">{label}</p>
+          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
             {status ? okText : errorText}
           </p>
         </div>
@@ -131,7 +131,7 @@ function StatusRow({
           href={action.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          className="px-3 py-1 bg-primary dark:bg-primary-dark text-white text-sm rounded hover:bg-blue-700"
         >
           {action.text}
         </a>
@@ -139,3 +139,4 @@ function StatusRow({
     </div>
   );
 }
+

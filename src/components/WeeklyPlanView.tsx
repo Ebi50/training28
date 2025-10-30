@@ -40,7 +40,7 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
 
   if (!plan) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-text-secondary-light dark:text-text-secondary-dark">
         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
@@ -69,30 +69,30 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
       {/* Week Summary */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">
             Week {format(weekStart, 'w, yyyy')}
           </h3>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
             {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d')}
           </span>
         </div>
         
         <div className="grid grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-gray-600">Total Volume</p>
-            <p className="text-2xl font-bold text-gray-900">{totalHours.toFixed(1)}h</p>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total Volume</p>
+            <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalHours.toFixed(1)}h</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Total TSS</p>
-            <p className="text-2xl font-bold text-gray-900">{totalTSS}</p>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Total TSS</p>
+            <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalTSS}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Sessions</p>
-            <p className="text-2xl font-bold text-gray-900">{plan.sessions.length}</p>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Sessions</p>
+            <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{plan.sessions.length}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">LIT/HIT</p>
-            <p className="text-2xl font-bold text-gray-900">{litPercentage}% / {(100 - parseFloat(litPercentage)).toFixed(1)}%</p>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">LIT/HIT</p>
+            <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{litPercentage}% / {(100 - parseFloat(litPercentage)).toFixed(1)}%</p>
           </div>
         </div>
       </div>
@@ -107,27 +107,27 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
             <div
               key={dayIndex}
               className={`border rounded-lg p-4 ${
-                isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'
+                isToday ? 'border-blue-500 bg-blue-50' : 'border-border-light dark:border-border-dark bg-surface-warm dark:bg-surface-warm-dark'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    isToday ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
+                    isToday ? 'bg-blue-600 text-white' : 'bg-gray-100 text-text-secondary-light dark:text-text-secondary-dark'
                   }`}>
                     <span className="font-semibold">{format(day, 'EEE')}</span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{format(day, 'EEEE')}</p>
-                    <p className="text-sm text-gray-500">{format(day, 'MMM d')}</p>
+                    <p className="font-medium text-text-primary-light dark:text-text-primary-dark">{format(day, 'EEEE')}</p>
+                    <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{format(day, 'MMM d')}</p>
                   </div>
                 </div>
                 {sessions.length > 0 && (
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">
                       {(sessions.reduce((sum, s) => sum + s.duration, 0) / 60).toFixed(1)}h
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
                       {sessions.reduce((sum, s) => sum + s.targetTss, 0)} TSS
                     </p>
                   </div>
@@ -169,19 +169,19 @@ function SessionCard({ session }: { session: TrainingSession }) {
             }`}>
               {session.type}
             </span>
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">
               {typeLabel}
             </span>
             {session.indoor && (
-              <span className="text-xs text-gray-500">🏠 Indoor</span>
+              <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">🏠 Indoor</span>
             )}
           </div>
           
           {session.description && (
-            <p className="text-sm text-gray-600 mb-2">{session.description}</p>
+            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-2">{session.description}</p>
           )}
           
-          <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-4 text-xs text-text-secondary-light dark:text-text-secondary-dark">
             <span>⏱️ {(session.duration / 60).toFixed(1)}h</span>
             <span>📊 {session.targetTss} TSS</span>
             {session.actualTss && (
@@ -192,7 +192,7 @@ function SessionCard({ session }: { session: TrainingSession }) {
 
         {session.completed && (
           <div className="ml-4">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 dark:bg-success-900/30 text-green-800">
               ✓ Completed
             </span>
           </div>
@@ -201,3 +201,4 @@ function SessionCard({ session }: { session: TrainingSession }) {
     </div>
   );
 }
+

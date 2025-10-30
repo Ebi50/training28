@@ -1,0 +1,39 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {"actionButtons": {
+		"commands": [{
+			"name": "$(debug-alt)tests",
+			"command": "npm run test",
+			"color": "#ff9d00",
+			"tooltip": "Run all tests using npm"
+		},{
+			"name": "$(debug-alt)start",
+			"command": "npm run start",
+			"color": "#00cc66",
+			"tooltip": "Start the development server"
+		},{
+			"name": "$(callhierarchy-incoming)Commit",
+			"command": "git add . ; git commit -m 'Update changes' ; git push",
+			"color": "#00cc68",
+			"tooltip": "Commit changes to the repository"
+		},{
+			"name": "$(debug-alt)TestBrowser",
+			"command": "npm run dev",
+			"color": "#00cc50",
+			"tooltip": "Start the development server"
+		},{
+			"name": "$(debug-alt)Build",
+			"command": "npm run build",
+			"color": "#00cc10",
+			"tooltip": "Build the project"
+		}
+	],
+		"defaultColor": "white",
+		"reloadButton": "↻",
+		"loadNpmCommands": false
+	}}
+}

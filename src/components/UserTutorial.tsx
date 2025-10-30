@@ -178,14 +178,14 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">Getting Started</h2>
+            <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Getting Started</h2>
             <button
               onClick={handleSkip}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-text-secondary-light dark:text-text-secondary-dark"
               aria-label="Close tutorial"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,13 +196,13 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
           
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+            <div className="flex items-center justify-between text-sm text-text-secondary-light dark:text-text-secondary-dark mb-2">
               <span>Step {currentStep + 1} of {TUTORIAL_STEPS.length}</span>
               <span>{Math.round(progress)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-primary dark:bg-primary-dark h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -211,21 +211,21 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-8">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">
+          <h3 className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-4">
             {step.title}
           </h3>
-          <div className="text-lg text-gray-700 whitespace-pre-line leading-relaxed">
+          <div className="text-lg text-text-primary-light dark:text-text-primary-dark whitespace-pre-line leading-relaxed">
             {step.content}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+        <div className="px-6 py-4 border-t border-border-light dark:border-border-dark bg-gray-50 rounded-b-lg">
           <div className="flex items-center justify-between">
             {/* Left: Previous/Skip */}
             <button
               onClick={currentStep === 0 ? handleSkip : handlePrevious}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
+              className="px-4 py-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark font-medium"
             >
               {currentStep === 0 ? 'Skip Tutorial' : '← Previous'}
             </button>
@@ -238,7 +238,7 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
                   onClick={() => setCurrentStep(index)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     index === currentStep
-                      ? 'bg-blue-600 w-8'
+                      ? 'bg-primary dark:bg-primary-dark w-8'
                       : index < currentStep
                       ? 'bg-blue-300'
                       : 'bg-gray-300'
@@ -251,7 +251,7 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
             {/* Right: Next/Finish */}
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="px-6 py-2 bg-primary dark:bg-primary-dark text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-500 font-medium transition-colors"
             >
               {currentStep === TUTORIAL_STEPS.length - 1 ? "Let's Go! 🚀" : 'Next →'}
             </button>
@@ -261,3 +261,4 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
     </div>
   );
 }
+

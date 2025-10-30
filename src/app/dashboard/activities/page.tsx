@@ -48,10 +48,10 @@ export default function ActivitiesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-warm dark:bg-bg-warm-dark flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Lade Aktivitäten...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-primary-dark mx-auto mb-4"></div>
+          <p className="text-text-secondary-light dark:text-text-secondary-dark">Lade Aktivitäten...</p>
         </div>
       </div>
     );
@@ -151,45 +151,45 @@ export default function ActivitiesPage() {
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Aktivitäten</p>
-                <p className="text-3xl font-bold text-gray-900">{activities.length}</p>
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">Aktivitäten</p>
+                <p className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">{activities.length}</p>
               </div>
-              <Calendar className="w-8 h-8 text-red-600" />
+              <Calendar className="w-8 h-8 text-primary dark:text-primary-dark" />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Gesamtzeit</p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">Gesamtzeit</p>
+                <p className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">
                   {Math.floor(totalTime / 60)}h {totalTime % 60}m
                 </p>
               </div>
-              <Clock className="w-8 h-8 text-red-600" />
+              <Clock className="w-8 h-8 text-primary dark:text-primary-dark" />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Distanz</p>
-                <p className="text-3xl font-bold text-gray-900">{totalDistance.toFixed(1)} km</p>
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">Distanz</p>
+                <p className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalDistance.toFixed(1)} km</p>
               </div>
-              <MapPin className="w-8 h-8 text-red-600" />
+              <MapPin className="w-8 h-8 text-primary dark:text-primary-dark" />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Gesamt TSS</p>
-                <p className="text-3xl font-bold text-gray-900">{totalTSS}</p>
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">Gesamt TSS</p>
+                <p className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalTSS}</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-red-600" />
+              <TrendingUp className="w-8 h-8 text-primary dark:text-primary-dark" />
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function ActivitiesPage() {
                 <h3 className="text-xl font-bold mb-2">Verbinde Strava für automatische Aktivitätssynchronisation</h3>
                 <p className="text-orange-100">Alle deine Trainings werden automatisch importiert und analysiert.</p>
               </div>
-              <button className="bg-white text-orange-600 font-semibold px-6 py-3 rounded-lg hover:bg-orange-50 transition-colors">
+              <button className="bg-surface-warm dark:bg-surface-warm-dark text-orange-600 font-semibold px-6 py-3 rounded-lg hover:bg-orange-50 transition-colors">
                 Mit Strava verbinden
               </button>
             </div>
@@ -211,24 +211,24 @@ export default function ActivitiesPage() {
 
         {/* Activities List */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Letzte Aktivitäten</h2>
+          <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Letzte Aktivitäten</h2>
           
           {activities.map((activity) => (
             <div 
               key={activity.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:border-red-300 transition-all cursor-pointer"
+              className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark p-6 hover:border-primary dark:hover:border-primary-dark transition-all cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold text-gray-900">{activity.name}</h3>
+                    <h3 className="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">{activity.name}</h3>
                     {activity.indoor && (
-                      <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">
+                      <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs px-3 py-1 rounded-full font-semibold">
                         Indoor
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">
                     <span>{activity.date}</span>
                     <span>•</span>
                     <span>{activity.time}</span>
@@ -237,58 +237,58 @@ export default function ActivitiesPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-red-600">{activity.tss}</div>
-                  <div className="text-sm text-gray-600">TSS</div>
+                  <div className="text-3xl font-bold text-primary dark:text-primary-dark">{activity.tss}</div>
+                  <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">TSS</div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <Clock className="w-4 h-4" />
                     <span className="font-medium">Zeit</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.duration} min</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.duration} min</div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <MapPin className="w-4 h-4" />
                     <span className="font-medium">Distanz</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.distance} km</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.distance} km</div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <Zap className="w-4 h-4" />
                     <span className="font-medium">Avg Power</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.avgPower} W</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.avgPower} W</div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <Zap className="w-4 h-4" />
                     <span className="font-medium">NP</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.normalizedPower} W</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.normalizedPower} W</div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <Heart className="w-4 h-4" />
                     <span className="font-medium">Avg HR</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.avgHR} bpm</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.avgHR} bpm</div>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <div className="flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark mb-1">
                     <TrendingUp className="w-4 h-4" />
                     <span className="font-medium">Elevation</span>
                   </div>
-                  <div className="text-gray-900 font-semibold">{activity.elevation} m</div>
+                  <div className="text-text-primary-light dark:text-text-primary-dark font-semibold">{activity.elevation} m</div>
                 </div>
               </div>
             </div>
@@ -298,3 +298,4 @@ export default function ActivitiesPage() {
     </DashboardLayout>
   );
 }
+

@@ -277,10 +277,10 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-bg-warm dark:bg-bg-warm-dark">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <p className="text-text-secondary-light dark:text-text-secondary-dark">Loading settings...</p>
         </div>
       </div>
     );
@@ -295,49 +295,49 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto px-8 py-8 pb-20">
         <div className="space-y-6">
           {/* Athlete Profile */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Athlete Profile</h2>
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
+              <h2 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">Athlete Profile</h2>
             </div>
             <div className="p-6">
               {profileSuccess && (
-                <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
+                <div className="mb-4 bg-success-50 dark:bg-success-900/30 border border-success dark:border-success-dark text-green-700 px-4 py-3 rounded-md text-sm">
                   ✓ Profile saved successfully!
                 </div>
               )}
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Geburtsdatum</label>
+                  <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Geburtsdatum</label>
                   <input
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Weight (kg)</label>
+                  <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Weight (kg)</label>
                   <input
                     type="number"
                     value={weight || ''}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="70"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">FTP (watts)</label>
+                  <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark">FTP (watts)</label>
                   <input
                     type="number"
                     value={ftp || ''}
                     onChange={(e) => setFtp(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="250"
                   />
                 </div>
                 <div className="relative">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary-light dark:text-text-primary-dark">
                     LTHR (bpm)
                     <button
                       type="button"
@@ -352,29 +352,29 @@ export default function SettingsPage() {
                     type="number"
                     value={lthr || ''}
                     onChange={(e) => setLthr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="165"
                   />
                   
                   {showLthrInfo && (
-                    <div className="absolute z-10 mt-2 p-4 bg-white border border-gray-300 rounded-lg shadow-lg max-w-2xl">
+                    <div className="absolute z-10 mt-2 p-4 bg-surface-warm dark:bg-surface-warm-dark border border-border-light dark:border-border-dark rounded-lg shadow-lg max-w-2xl">
                       <button
                         onClick={() => setShowLthrInfo(false)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                        className="absolute top-2 right-2 text-gray-400 hover:text-text-secondary-light dark:text-text-secondary-dark"
                         aria-label="Schließen"
                       >
                         ✕
                       </button>
                       
-                      <h3 className="font-semibold text-gray-900 mb-2">Was ist LTHR?</h3>
-                      <p className="text-sm text-gray-700 mb-3">
+                      <h3 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">Was ist LTHR?</h3>
+                      <p className="text-sm text-text-primary-light dark:text-text-primary-dark mb-3">
                         LTHR steht für „Lactate Threshold Heart Rate" und bezeichnet die Herzfrequenz (Puls), 
                         bei der dein Körper beginnt, Laktat schneller zu produzieren als er es abbauen kann – 
                         also die sogenannte Laktatschwelle.
                       </p>
                       
-                      <h4 className="font-semibold text-gray-900 mb-1 text-sm">Bedeutung und Praxis</h4>
-                      <p className="text-sm text-gray-700 mb-3">
+                      <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-1 text-sm">Bedeutung und Praxis</h4>
+                      <p className="text-sm text-text-primary-light dark:text-text-primary-dark mb-3">
                         Die Laktatschwellenherzfrequenz (LTHR) ist ein individueller Wert und wird meist durch 
                         einen intensiven Belastungstest ermittelt: Du absolvierst einen 20-minütigen maximalen 
                         Belastungstest und misst deinen durchschnittlichen Puls – 5% davon werden abgezogen, 
@@ -382,77 +382,77 @@ export default function SettingsPage() {
                         20 Minuten eines 30-Minuten-All-Out-Tests ein, da der Puls mit der Belastung verzögert ansteigt.
                       </p>
                       
-                      <h4 className="font-semibold text-gray-900 mb-1 text-sm">Anwendung im Training</h4>
-                      <p className="text-sm text-gray-700 mb-3">
+                      <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-1 text-sm">Anwendung im Training</h4>
+                      <p className="text-sm text-text-primary-light dark:text-text-primary-dark mb-3">
                         Die LTHR hilft, präzise Trainingszonen festzulegen – sowohl zum Radfahren als auch zum Laufen. 
                         Typische Trainingszonen werden als Prozentwert der LTHR berechnet und nicht aus dem Maximalpuls 
                         abgeleitet. So kannst du dein Training effektiver steuern und gezielt konditionelle Verbesserungen 
                         erzielen.
                       </p>
                       
-                      <h4 className="font-semibold text-gray-900 mb-2 text-sm">Typische Zonen (Radfahren/Laufen)</h4>
+                      <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 text-sm">Typische Zonen (Radfahren/Laufen)</h4>
                       <div className="overflow-x-auto mb-3">
-                        <table className="min-w-full text-xs border-collapse border border-gray-300">
+                        <table className="min-w-full text-xs border-collapse border border-border-light dark:border-border-dark">
                           <thead>
                             <tr className="bg-gray-100">
-                              <th className="border border-gray-300 px-2 py-1 text-left">Zone</th>
-                              <th className="border border-gray-300 px-2 py-1 text-left">Prozentsatz der LTHR</th>
-                              <th className="border border-gray-300 px-2 py-1 text-left">Beispiel Anwendung</th>
+                              <th className="border border-border-light dark:border-border-dark px-2 py-1 text-left">Zone</th>
+                              <th className="border border-border-light dark:border-border-dark px-2 py-1 text-left">Prozentsatz der LTHR</th>
+                              <th className="border border-border-light dark:border-border-dark px-2 py-1 text-left">Beispiel Anwendung</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
-                              <td className="border border-gray-300 px-2 py-1">1</td>
-                              <td className="border border-gray-300 px-2 py-1">&lt;81% (Rad), &lt;85% (Lauf)</td>
-                              <td className="border border-gray-300 px-2 py-1">Regeneration, Grundlagen</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">1</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">&lt;81% (Rad), &lt;85% (Lauf)</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">Regeneration, Grundlagen</td>
                             </tr>
                             <tr>
-                              <td className="border border-gray-300 px-2 py-1">2</td>
-                              <td className="border border-gray-300 px-2 py-1">81-89% (Rad), 85-89% (Lauf)</td>
-                              <td className="border border-gray-300 px-2 py-1">Grundlagenausdauer</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">2</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">81-89% (Rad), 85-89% (Lauf)</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">Grundlagenausdauer</td>
                             </tr>
                             <tr>
-                              <td className="border border-gray-300 px-2 py-1">3</td>
-                              <td className="border border-gray-300 px-2 py-1">90-93% (Rad), 90-94% (Lauf)</td>
-                              <td className="border border-gray-300 px-2 py-1">Fettstoffwechsel, längere Einheiten</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">3</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">90-93% (Rad), 90-94% (Lauf)</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">Fettstoffwechsel, längere Einheiten</td>
                             </tr>
                             <tr>
-                              <td className="border border-gray-300 px-2 py-1">4</td>
-                              <td className="border border-gray-300 px-2 py-1">94-99% (Rad), 95-99% (Lauf)</td>
-                              <td className="border border-gray-300 px-2 py-1">Schwellenbereich, Intensive Intervalle</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">4</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">94-99% (Rad), 95-99% (Lauf)</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">Schwellenbereich, Intensive Intervalle</td>
                             </tr>
                             <tr>
-                              <td className="border border-gray-300 px-2 py-1">5a-c</td>
-                              <td className="border border-gray-300 px-2 py-1">&gt;100% LTHR</td>
-                              <td className="border border-gray-300 px-2 py-1">Hochintensive Belastungen</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">5a-c</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">&gt;100% LTHR</td>
+                              <td className="border border-border-light dark:border-border-dark px-2 py-1">Hochintensive Belastungen</td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       
-                      <p className="text-xs text-gray-500 italic">
+                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark italic">
                         Quelle: Trainingslehre für Ausdauersportarten
                       </p>
                     </div>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Max HR (bpm)</label>
+                  <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Max HR (bpm)</label>
                   <input
                     type="number"
                     value={maxHr || ''}
                     onChange={(e) => setMaxHr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="190"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Resting HR (bpm)</label>
+                  <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Resting HR (bpm)</label>
                   <input
                     type="number"
                     value={restHr || ''}
                     onChange={(e) => setRestHr(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="50"
                   />
                 </div>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSaveProfile}
                   disabled={saving}
-                  className="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-primary dark:bg-primary-dark text-white font-medium rounded-md hover:bg-primary-700 dark:hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save Profile'}
                 </button>
@@ -471,21 +471,21 @@ export default function SettingsPage() {
           </div>
 
           {/* Time Slots Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Training Time Slots</h2>
-              <p className="text-sm text-gray-600 mt-1">Wann kannst du trainieren?</p>
+          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+            <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
+              <h2 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">Training Time Slots</h2>
+              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Wann kannst du trainieren?</p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="border-b border-gray-200">
+            <div className="border-b border-border-light dark:border-border-dark">
               <div className="flex">
                 <button
                   onClick={() => setActiveTab('standard')}
                   className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === 'standard'
                       ? 'border-red-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark hover:border-border-light dark:border-border-dark'
                   }`}
                 >
                   Standard-Woche
@@ -495,7 +495,7 @@ export default function SettingsPage() {
                   className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === 'weekly'
                       ? 'border-red-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark hover:border-border-light dark:border-border-dark'
                   }`}
                 >
                   Wochen-Planung
@@ -505,7 +505,7 @@ export default function SettingsPage() {
 
             <div className="p-6">
               {slotsSuccess && (
-                <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
+                <div className="mb-4 bg-success-50 dark:bg-success-900/30 border border-success dark:border-success-dark text-green-700 px-4 py-3 rounded-md text-sm">
                   ✓ {activeTab === 'standard' ? 'Standard-Woche gespeichert!' : 'Woche gespeichert!'}
                 </div>
               )}
@@ -537,15 +537,15 @@ export default function SettingsPage() {
               )}
               
               {/* Add New Slot Form */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Neuen Zeitslot hinzufügen</h3>
+              <div className="mb-6 p-4 bg-bg-warm dark:bg-bg-warm-dark rounded-lg border border-border-light dark:border-border-dark">
+                <h3 className="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark mb-3">Neuen Zeitslot hinzufügen</h3>
                 <div className="grid grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Tag</label>
+                    <label className="block text-xs font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Tag</label>
                     <select
                       value={newSlot.day}
                       onChange={(e) => setNewSlot({...newSlot, day: parseInt(e.target.value)})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     >
                       <option value={1}>Montag</option>
                       <option value={2}>Dienstag</option>
@@ -557,29 +557,29 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Von</label>
+                    <label className="block text-xs font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Von</label>
                     <input
                       type="time"
                       value={newSlot.startTime}
                       onChange={(e) => setNewSlot({...newSlot, startTime: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Bis</label>
+                    <label className="block text-xs font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Bis</label>
                     <input
                       type="time"
                       value={newSlot.endTime}
                       onChange={(e) => setNewSlot({...newSlot, endTime: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Typ</label>
+                    <label className="block text-xs font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Typ</label>
                     <select
                       value={newSlot.type}
                       onChange={(e) => setNewSlot({...newSlot, type: e.target.value as 'indoor' | 'outdoor' | 'both'})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-red-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     >
                       <option value="both">Indoor & Outdoor</option>
                       <option value="indoor">Nur Indoor</option>
@@ -599,7 +599,7 @@ export default function SettingsPage() {
               {/* Time Slots List */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900">Deine Zeitslots</h3>
+                  <h3 className="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark">Deine Zeitslots</h3>
                   {timeSlots.length > 0 && (
                     <button
                       onClick={handleCopyWeek}
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                   )}
                 </div>
                 {timeSlots.length === 0 ? (
-                  <p className="text-sm text-gray-500 italic">Noch keine Zeitslots hinzugefügt.</p>
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark italic">Noch keine Zeitslots hinzugefügt.</p>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                     {/* Group slots by day (Monday to Sunday) */}
@@ -625,15 +625,15 @@ export default function SettingsPage() {
                       
                       return (
                         <div key={dayNum} className="border-l-4 border-blue-500 pl-3">
-                          <h4 className="text-sm font-semibold text-gray-900 mb-2">{getDayName(dayNum)}</h4>
+                          <h4 className="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">{getDayName(dayNum)}</h4>
                           <div className="space-y-2">
                             {slotsForDay.map(({ slot, originalIndex }) => (
                               <div
                                 key={originalIndex}
-                                className="flex items-center justify-between p-2 bg-gray-50 border border-gray-200 rounded-md hover:border-gray-300"
+                                className="flex items-center justify-between p-2 bg-bg-warm dark:bg-bg-warm-dark border border-border-light dark:border-border-dark rounded-md hover:border-border-light dark:border-border-dark"
                               >
                                 <div className="flex items-center gap-3 text-sm">
-                                  <span className="text-gray-900 font-medium">{slot.startTime} - {slot.endTime}</span>
+                                  <span className="text-text-primary-light dark:text-text-primary-dark font-medium">{slot.startTime} - {slot.endTime}</span>
                                   <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
                                     {slot.type === 'both' ? 'Indoor & Outdoor' : slot.type === 'indoor' ? 'Indoor' : 'Outdoor'}
                                   </span>
@@ -680,11 +680,11 @@ export default function SettingsPage() {
           {/* Copy Modal */}
           {copyModalOpen && slotToCopyIndex !== null && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark mb-4">
                   Zeitslot kopieren nach:
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">
                   {getDayName(timeSlots[slotToCopyIndex].day)} {timeSlots[slotToCopyIndex].startTime} - {timeSlots[slotToCopyIndex].endTime}
                 </p>
                 <div className="grid grid-cols-2 gap-2 mb-6">
@@ -695,10 +695,10 @@ export default function SettingsPage() {
                       disabled={timeSlots[slotToCopyIndex].day === day}
                       className={`px-4 py-2 text-sm rounded-md border transition-colors ${
                         selectedDays.includes(day)
-                          ? 'bg-red-600 text-white border-red-600'
+                          ? 'bg-primary dark:bg-primary-dark text-white border-red-600'
                           : timeSlots[slotToCopyIndex].day === day
-                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                          ? 'bg-gray-100 text-gray-400 border-border-light dark:border-border-dark cursor-not-allowed'
+                          : 'bg-surface-warm dark:bg-surface-warm-dark text-text-primary-light dark:text-text-primary-dark border-border-light dark:border-border-dark hover:border-blue-500'
                       }`}
                     >
                       {getDayName(day)}
@@ -708,14 +708,14 @@ export default function SettingsPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setCopyModalOpen(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-md hover:bg-gray-300"
+                    className="flex-1 px-4 py-2 bg-gray-200 text-text-primary-light dark:text-text-primary-dark rounded-md hover:bg-gray-300"
                   >
                     Abbrechen
                   </button>
                   <button
                     onClick={handleConfirmCopy}
                     disabled={selectedDays.length === 0}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-primary dark:bg-primary-dark text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Kopieren
                   </button>
@@ -728,3 +728,4 @@ export default function SettingsPage() {
     </DashboardLayout>
   );
 }
+
