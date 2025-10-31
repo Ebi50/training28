@@ -7,6 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { signOut } from 'firebase/auth';
 import { startOfWeek, endOfWeek, addWeeks, subWeeks, format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
 
 interface StravaActivity {
   id: number;
@@ -105,22 +106,22 @@ export default function ActivitiesPage() {
       userEmail={auth.currentUser?.email || undefined}
       onSignOut={handleSignOut}
     >
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">Activities</h1>
+      <div className="w-full">
+        <div className={spacing.contentBlock}>
+          <div className={`${layout.flexRowBetween} ${spacing.contentBlock}`}>
+            <h1 className={`${typography.h1} font-bold text-gray-900`}>Activities</h1>
             <button
               onClick={goToCurrentWeek}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base font-medium"
+              className={`${components.button.primary} ${typography.body} font-medium`}
             >
               Diese Woche
             </button>
           </div>
 
-          <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+          <div className={`${layout.flexRowBetween} ${components.card.base}`}>
             <button
               onClick={goToPreviousWeek}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className={components.button.small}
             >
               <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -128,15 +129,15 @@ export default function ActivitiesPage() {
             </button>
 
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">
+              <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>
                 {format(weekStart, 'd. MMM', { locale: de })} - {format(weekEnd, 'd. MMM yyyy', { locale: de })}
               </h2>
-              <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">KW {format(weekStart, 'I')}</p>
+              <p className={`${typography.body} ${colors.text.secondary}`}>KW {format(weekStart, 'I')}</p>
             </div>
 
             <button
               onClick={goToNextWeek}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className={components.button.small}
             >
               <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -144,58 +145,58 @@ export default function ActivitiesPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-              <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">Distanz</p>
-              <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalDistance.toFixed(1)} km</p>
+          <div className={`${components.grid.cols3} ${spacing.cardGap} ${spacing.tight}`}>
+            <div className={components.card.base}>
+              <p className={`${typography.body} ${colors.text.secondary}`}>Distanz</p>
+              <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{totalDistance.toFixed(1)} km</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-              <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">Zeit</p>
-              <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{formatDuration(totalTime)}</p>
+            <div className={components.card.base}>
+              <p className={`${typography.body} ${colors.text.secondary}`}>Zeit</p>
+              <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{formatDuration(totalTime)}</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-              <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">Höhenmeter</p>
-              <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{totalElevation.toFixed(1)} m</p>
+            <div className={components.card.base}>
+              <p className={`${typography.body} ${colors.text.secondary}`}>Höhenmeter</p>
+              <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{totalElevation.toFixed(1)} m</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">
+        <div className={components.card.base}>
+          <div className={`${components.card.base} ${colors.border.default} border-b`}>
+            <h3 className={`${typography.h3} font-semibold ${colors.text.primary}`}>
               {loading ? 'Lade Activities...' : `${activities.length} Activities`}
             </h3>
           </div>
 
           {loading ? (
-            <div className="p-12 text-center">
+            <div className={`text-center ${spacing.card}`} style={{padding: '3rem'}}>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             </div>
           ) : activities.length === 0 ? (
-            <div className="p-12 text-center text-text-secondary-light dark:text-text-secondary-dark">
+            <div className={`text-center ${colors.text.secondary} ${spacing.card}`} style={{padding: '3rem'}}>
               <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <p className="mt-4">Keine Activities in dieser Woche</p>
+              <p className={spacing.tight}>Keine Activities in dieser Woche</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className={`divide-y ${colors.border.default}`}>
               {activities.map((activity) => (
-                <div key={activity.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div key={activity.id} className={`${spacing.card} hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="text-xl font-medium text-text-primary-light dark:text-text-primary-dark">{activity.name}</h4>
-                        <span className="px-2 py-1 text-sm bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200 rounded">
+                      <div className={`flex items-center ${spacing.cardGap} ${spacing.micro}`}>
+                        <h4 className={`${typography.h3} font-medium ${colors.text.primary}`}>{activity.name}</h4>
+                        <span className={`px-2 py-1 ${typography.bodySmall} bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200 rounded`}>
                           {activity.sport_type || activity.type}
                         </span>
                       </div>
 
-                      <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mb-3">
+                      <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>
                         {format(parseISO(activity.start_date), 'EEEE, d. MMMM yyyy  HH:mm', { locale: de })} Uhr
                       </p>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className={`grid grid-cols-2 md:grid-cols-4 ${spacing.cardGap}`}>
                         <div className="flex items-center gap-2">
                           <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

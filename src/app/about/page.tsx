@@ -1,7 +1,7 @@
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark py-12 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark">
+      <div className="w-full">
         <h1 className="text-4xl font-bold text-text-primary-light dark:text-text-primary-dark mb-8">About Adaptive Training</h1>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8">
           <p className="text-lg text-text-secondary-light dark:text-text-secondary-dark mb-4">

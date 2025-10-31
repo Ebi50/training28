@@ -9,7 +9,8 @@
     "lint": "next lint",
     "emulator": "firebase emulators:start",
     "deploy": "firebase deploy",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "check-design-system": "echo 'Checking Design System usage...' && grep -r \"className=\\\"space-y-\\|className=\\\"gap-\\|className=\\\"p-[0-9]\" src/app src/components --exclude-dir=node_modules || echo '✅ Design System wird korrekt verwendet!'"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.1.0",

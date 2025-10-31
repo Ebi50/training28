@@ -9,6 +9,7 @@ import { getUserProfile } from '@/lib/firestore';
 import type { UserProfile, TimeSlot } from '@/types';
 import { Info, Plus, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -292,47 +293,47 @@ export default function SettingsPage() {
       onSignOut={handleSignOut}
       onHelp={() => {}}
     >
-      <div className="max-w-7xl mx-auto px-4 py-8 pb-20">
-        <div className="space-y-6">
+      <div className="w-full">
+        <div className={spacing.section}>
           {/* Athlete Profile */}
-          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
-              <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">Athlete Profile</h2>
+          <div className={components.card.base}>
+            <div className={`px-4 py-3 border-b ${colors.border.default}`}>
+              <h2 className={typography.h2}>Athlete Profile</h2>
             </div>
-            <div className="p-6">
+            <div className={spacing.card}>
               {profileSuccess && (
-                <div className="mb-4 bg-secondary-50 dark:bg-secondary-900/30 border border-secondary dark:border-secondary-dark text-secondary-700 dark:text-secondary-200 px-4 py-3 rounded-md text-base">
+                <div className={`${components.badge.success} mb-4 w-full justify-center`}>
                   ✓ Profile saved successfully!
                 </div>
               )}
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className={components.grid.cols2}>
                 <div>
-                  <label className="block text-base font-medium text-text-primary-light dark:text-text-primary-dark">Geburtsdatum</label>
+                  <label className={components.label.default}>Geburtsdatum</label>
                   <input
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
+                    className={components.input.base}
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-medium text-text-primary-light dark:text-text-primary-dark">Weight (kg)</label>
+                  <label className={components.label.default}>Weight (kg)</label>
                   <input
                     type="number"
                     value={weight || ''}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 text-base border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
                     placeholder="70"
+                    className={components.input.base}
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-medium text-text-primary-light dark:text-text-primary-dark">FTP (watts)</label>
+                  <label className={components.label.default}>FTP (watts)</label>
                   <input
                     type="number"
                     value={ftp || ''}
                     onChange={(e) => setFtp(parseInt(e.target.value) || 0)}
-                    className="mt-1 block w-full px-3 py-2 text-base border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
+                    className={components.input.base}
                     placeholder="250"
                   />
                 </div>
@@ -458,11 +459,11 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-4">
                 <button
                   onClick={handleSaveProfile}
                   disabled={saving}
-                  className="w-full px-4 py-2 text-base bg-primary dark:bg-primary-dark text-white font-medium rounded-md hover:bg-primary-700 dark:hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`${components.button.primary} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {saving ? 'Saving...' : 'Save Profile'}
                 </button>
@@ -471,22 +472,22 @@ export default function SettingsPage() {
           </div>
 
           {/* Strava Integration Section */}
-          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow">
-            <div className="px-6 py-5 border-b border-border-light dark:border-border-dark">
-              <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">Strava Integration</h2>
+          <div className={components.card.base}>
+            <div className={`${components.card.base} ${colors.border.default} border-b`}>
+              <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>Strava Integration</h2>
             </div>
-            <div className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className={spacing.card}>
+              <div className={`grid grid-cols-1 lg:grid-cols-3 ${spacing.cardGap}`}>
                 {/* Status & Info - Takes up 2 columns */}
                 <div className="lg:col-span-2">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className={`flex items-center ${spacing.cardGap} ${spacing.contentBlock}`}>
                     <div className={`w-4 h-4 rounded-full ${profile?.stravaConnected ? 'bg-primary dark:bg-primary-dark' : 'bg-gray-400'}`}></div>
-                    <span className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">
+                    <span className={`${typography.bodyLarge} font-semibold ${colors.text.primary}`}>
                       {profile?.stravaConnected ? 'Verbunden' : 'Nicht verbunden'}
                     </span>
                   </div>
                   {profile?.stravaAthleteId && (
-                    <div className="mb-4 p-3 bg-bg-light dark:bg-bg-dark rounded-md border border-border-light dark:border-border-dark">
+                    <div className={`${spacing.contentBlock} ${components.card.base} ${colors.bg.secondary} ${colors.border.default} border`}>
                       <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Athlete ID</p>
                       <p className="text-base font-mono text-text-primary-light dark:text-text-primary-dark">{profile.stravaAthleteId}</p>
                     </div>
@@ -553,10 +554,10 @@ export default function SettingsPage() {
           </div>
 
           {/* Time Slots Section */}
-          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark">
-            <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
-              <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">Training Time Slots</h2>
-              <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">Wann kannst du trainieren?</p>
+          <div className={`${components.card.base} ${colors.border.default} border`}>
+            <div className={`${components.card.base} ${colors.border.default} border-b`}>
+              <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>Training Time Slots</h2>
+              <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>Wann kannst du trainieren?</p>
             </div>
 
             {/* Tab Navigation */}
@@ -567,7 +568,7 @@ export default function SettingsPage() {
                   className={`px-6 py-3 text-base font-medium border-b-2 transition-colors ${
                     activeTab === 'standard'
                       ? 'border-red-600 text-blue-600'
-                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark hover:border-border-light dark:border-border-dark'
+                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-border-light dark:hover:border-border-dark'
                   }`}
                 >
                   Standard-Woche
@@ -577,7 +578,7 @@ export default function SettingsPage() {
                   className={`px-6 py-3 text-base font-medium border-b-2 transition-colors ${
                     activeTab === 'weekly'
                       ? 'border-red-600 text-blue-600'
-                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:text-text-primary-dark hover:border-border-light dark:border-border-dark'
+                      : 'border-transparent text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-border-light dark:hover:border-border-dark'
                   }`}
                 >
                   Wochen-Planung
@@ -619,11 +620,11 @@ export default function SettingsPage() {
               )}
               
               {/* Add New Slot Form */}
-              <div className="mb-6 p-4 bg-bg-light dark:bg-bg-dark rounded-lg border border-border-light dark:border-border-dark">
-                <h3 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-3">Neuen Zeitslot hinzufügen</h3>
-                <div className="grid grid-cols-4 gap-3">
+              <div className={`${spacing.contentBlock} ${components.card.base} ${colors.bg.secondary} ${colors.border.default} border`}>
+                <h3 className={`${typography.body} font-semibold ${colors.text.primary} ${spacing.tight}`}>Neuen Zeitslot hinzufügen</h3>
+                <div className={`${components.grid.cols4} ${spacing.tight}`}>
                   <div>
-                    <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Tag</label>
+                    <label className={`block ${typography.bodySmall} font-medium ${colors.text.primary} ${spacing.micro}`}>Tag</label>
                     <select
                       value={newSlot.day}
                       onChange={(e) => setNewSlot({...newSlot, day: parseInt(e.target.value)})}
@@ -639,29 +640,29 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Von</label>
+                    <label className={`block ${typography.bodySmall} font-medium ${colors.text.primary} ${spacing.micro}`}>Von</label>
                     <input
                       type="time"
                       value={newSlot.startTime}
                       onChange={(e) => setNewSlot({...newSlot, startTime: e.target.value})}
-                      className="w-full px-3 py-2 text-base border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
+                      className={components.input.base}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Bis</label>
+                    <label className={`block ${typography.bodySmall} font-medium ${colors.text.primary} ${spacing.micro}`}>Bis</label>
                     <input
                       type="time"
                       value={newSlot.endTime}
                       onChange={(e) => setNewSlot({...newSlot, endTime: e.target.value})}
-                      className="w-full px-3 py-2 text-base border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
+                      className={components.input.base}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text-primary-light dark:text-text-primary-dark mb-1">Typ</label>
+                    <label className={`block ${typography.bodySmall} font-medium ${colors.text.primary} ${spacing.micro}`}>Typ</label>
                     <select
                       value={newSlot.type}
                       onChange={(e) => setNewSlot({...newSlot, type: e.target.value as 'indoor' | 'outdoor' | 'both'})}
-                      className="w-full px-3 py-2 text-base border border-border-light dark:border-border-dark rounded-md focus:ring-red-500 focus:border-primary dark:focus:border-primary-dark"
+                      className={components.input.base}
                     >
                       <option value="both">Indoor & Outdoor</option>
                       <option value="indoor">Nur Indoor</option>
@@ -671,7 +672,7 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={handleAddSlot}
-                  className="mt-3 flex items-center gap-2 px-4 py-2 bg-primary dark:bg-primary-dark text-white text-base font-medium rounded-md hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className={`${spacing.tight} flex items-center ${spacing.cardGap} ${components.button.primary} ${typography.body} font-medium`}
                 >
                   <Plus size={18} />
                   Zeitslot hinzufügen
@@ -712,7 +713,7 @@ export default function SettingsPage() {
                             {slotsForDay.map(({ slot, originalIndex }) => (
                               <div
                                 key={originalIndex}
-                                className="flex items-center justify-between p-2 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark rounded-md hover:border-border-light dark:border-border-dark"
+                                className="flex items-center justify-between p-2 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark rounded-md hover:border-primary-light dark:hover:border-primary-dark"
                               >
                                 <div className="flex items-center gap-3 text-base">
                                   <span className="text-text-primary-light dark:text-text-primary-dark font-medium">{slot.startTime} - {slot.endTime}</span>

@@ -18,7 +18,7 @@ export default function InformationPage() {
       userEmail={auth.currentUser?.email || undefined}
       onSignOut={handleSignOut}
     >
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full">
         <h1 className="text-4xl font-bold text-text-primary-light dark:text-text-primary-dark mb-8">Informationen</h1>
         
         {/* FEATURES */}

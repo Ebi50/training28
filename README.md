@@ -2,6 +2,24 @@
 
 An intelligent cycling training platform that generates personalized, adaptive training plans based on Strava data, wearable metrics, and ML-driven insights.
 
+## ⚠️ WICHTIG: Design System
+
+**🎨 ZENTRALES DESIGN SYSTEM IN VERWENDUNG!**
+
+- **Alle neuen Komponenten MÜSSEN** das Design System verwenden
+- **Datei:** `src/styles/designSystem.ts`
+- **Quick Start:** Siehe `DESIGN_SYSTEM_QUICK_START.md`
+- **Vollständige Doku:** Siehe `DESIGN_SYSTEM_MASTER.md`
+
+```typescript
+// In jeder Komponente/Seite:
+import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
+```
+
+**NIEMALS manuelle px/gap/p-Werte!** Nutze `spacing.*` und `components.*`
+
+---
+
 ## 🚀 Features
 
 - **Strava Integration**: Automatic activity sync and analysis

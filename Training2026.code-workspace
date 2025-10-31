@@ -1,39 +1,132 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {"actionButtons": {
-		"commands": [{
-			"name": "$(debug-alt)tests",
-			"command": "npm run test",
-			"color": "#ff9d00",
-			"tooltip": "Run all tests using npm"
-		},{
-			"name": "$(debug-alt)start",
-			"command": "npm run start",
-			"color": "#00cc66",
-			"tooltip": "Start the development server"
-		},{
-			"name": "$(callhierarchy-incoming)Commit",
-			"command": "git add . ; git commit -m 'Update changes' ; git push",
-			"color": "#00cc68",
-			"tooltip": "Commit changes to the repository"
-		},{
-			"name": "$(debug-alt)TestBrowser",
-			"command": "npm run dev",
-			"color": "#00cc50",
-			"tooltip": "Start the development server"
-		},{
-			"name": "$(debug-alt)Build",
-			"command": "npm run build",
-			"color": "#00cc10",
-			"tooltip": "Build the project"
-		}
-	],
-		"defaultColor": "white",
-		"reloadButton": "↻",
-		"loadNpmCommands": false
-	}}
+  "folders": [{ "path": "." }],
+  "settings": {
+    "actionButtons": {
+      "defaultColor": "white",
+      "reloadButton": "↻",
+      "loadNpmCommands": false,
+      "commands": [
+        /* 🔧 BUILD / RUN / TEST --------------------------------------------- */
+        {
+          "name": "$(beaker) Tests",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run test\"",
+          "color": "#F59E0B",
+          "tooltip": "npm run test",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(play) Start",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run start\"",
+          "color": "#10B981",
+          "tooltip": "npm run start",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(browser) Dev",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run dev\"",
+          "color": "#3B82F6",
+          "tooltip": "npm run dev",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(tools) Build",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run build\"",
+          "color": "#8B5CF6",
+          "tooltip": "npm run build",
+          "runIn": "terminal"
+        },
+
+        /* 🧹 MAINTENANCE / TOOLS ------------------------------------------- */
+        {
+          "name": "$(trash) Clean",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"rm -r -fo .next, dist, build, node_modules/.cache\"",
+          "color": "#F87171",
+          "tooltip": "rm -r -fo .next, dist, build, node_modules/.cache",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(sync) Install",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm install\"",
+          "color": "#FACC15",
+          "tooltip": "npm install",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(zap) Lint",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run lint\"",
+          "color": "#60A5FA",
+          "tooltip": "npm run lint",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(check) Format",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npx prettier --write .\"",
+          "color": "#34D399",
+          "tooltip": "npx prettier --write .",
+          "runIn": "terminal"
+        },
+
+        /* 🧭 GIT / VERSION CONTROL ----------------------------------------- */
+        {
+          "name": "$(git-commit) Commit",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"git add .; git commit -m 'Update changes'; git push\"",
+          "color": "#EF4444",
+          "tooltip": "git add .; git commit -m 'Update changes'; git push",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(git-branch) Status",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"git status\"",
+          "color": "#22D3EE",
+          "tooltip": "git status",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(git-merge) Pull",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"git pull\"",
+          "color": "#4ADE80",
+          "tooltip": "git pull",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(git-pull-request) Stash",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"git stash push -m 'Temp changes'\"",
+          "color": "#F472B6",
+          "tooltip": "git stash push -m 'Temp changes'",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(debug-alt) Logs",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"git log --oneline -n 10\"",
+          "color": "#A78BFA",
+          "tooltip": "git log --oneline -n 10",
+          "runIn": "terminal"
+        },
+
+        /* 🚀 DEPLOY / UTILITY --------------------------------------------- */
+        {
+          "name": "$(rocket) Deploy",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run deploy\"",
+          "color": "#FB923C",
+          "tooltip": "npm run deploy",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(folder-opened) Open Folder",
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"ii .\"",
+          "color": "#818CF8",
+          "tooltip": "Öffnet den Projektordner im Explorer (ii .)",
+          "runIn": "terminal"
+        },
+        {
+          "name": "$(terminal) Restart Terminal",
+          "command": "workbench.action.terminal.killAll",
+          "color": "#EAB308",
+          "tooltip": "Alle Terminals schließen",
+          "runIn": "terminal"
+        }
+      ]
+    }
+  }
 }
+

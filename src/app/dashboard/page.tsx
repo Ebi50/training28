@@ -8,8 +8,10 @@ import { getUserProfile } from '@/lib/firestore';
 import type { UserProfile } from '@/types';
 import UserTutorial from '@/components/UserTutorial';
 import DashboardLayout from '@/components/DashboardLayout';
+import Tooltip from '@/components/Tooltip';
 import { useAutoLogout } from '@/hooks/useAutoLogout';
 import { calculateTSS, calculateFitnessMetrics, interpretTSB } from '@/lib/fitnessMetrics';
+import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
 
 interface StravaActivity {
   id: number;
@@ -222,10 +224,10 @@ export default function DashboardPage() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full">
         {/* Strava Status Message */}
         {stravaMessage && (
-          <div className={`mb-6 p-4 rounded-lg text-base ${
+          <div className={`${spacing.contentBlock} ${components.card.base} text-base ${
             stravaMessage.includes('✓') 
               ? 'bg-secondary-50 dark:bg-secondary-900/30 border border-secondary-200 dark:border-secondary-700 text-secondary-800 dark:text-secondary-200' 
               : 'bg-coral-50 dark:bg-coral-900/30 border border-coral-200 dark:border-coral-700 text-coral-800 dark:text-coral-200'
@@ -235,7 +237,7 @@ export default function DashboardPage() {
         )}
 
         {!profile?.stravaConnected ? (
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-6 mb-8">
+          <div className={`bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg ${components.card.base} ${spacing.contentBlock}`}>
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="w-12 h-12" viewBox="0 0 24 24" fill="#FC4C02">
@@ -243,15 +245,15 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4 flex-1">
-                <h3 className="text-2xl font-semibold text-gray-900">
+                <h3 className={`${typography.h2} text-gray-900`}>
                   🚀 Connect Your Strava Account
                 </h3>
-                <p className="mt-2 text-base text-gray-700">
+                <p className={`${spacing.tight} text-base text-gray-700`}>
                   Unlock the full power of adaptive training! Connect Strava to automatically sync your rides and get personalized plans.
                 </p>
                 
                 {/* Benefits */}
-                <div className="mt-3 grid grid-cols-2 gap-2 text-base text-gray-600 dark:text-gray-300">
+                <div className={`${spacing.tight} ${components.grid.cols2} text-base text-gray-600 dark:text-gray-300`}>
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-1 text-secondary dark:text-secondary-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -279,11 +281,11 @@ export default function DashboardPage() {
                 </div>
 
                 {/* How it works */}
-                <details className="mt-4 text-sm text-gray-600">
+                <details className={`${spacing.tight} text-sm text-gray-600`}>
                   <summary className="cursor-pointer font-medium text-base text-gray-700 hover:text-gray-900">
                     📖 How does it work? (Click to expand)
                   </summary>
-                  <div className="mt-2 pl-4 space-y-2 text-base">
+                  <div className={`${spacing.micro} pl-4 text-base`}>
                     <p>
                       <strong>Step 1:</strong> Click the button below
                     </p>
@@ -314,7 +316,7 @@ export default function DashboardPage() {
                     const userId = auth.currentUser?.uid || '';
                     window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${userId}&approval_prompt=auto`;
                   }}
-                  className="mt-4 px-6 py-3 bg-orange dark:bg-orange-dark text-white rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600 text-base font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2"
+                  className={`${spacing.tight} ${components.button.primary} flex items-center ${spacing.cardGap} text-base font-medium`}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
@@ -327,89 +329,110 @@ export default function DashboardPage() {
         ) : null}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
-            title="Form zeigt dein aktuelles Erholungs- und Leistungsniveau an. Ein positiver Wert bedeutet, dass du erholt bist und bereit für intensive Einheiten oder Wettkämpfe. Ein negativer Wert weist auf Ermüdung hin – ideal für Trainingsphasen mit höherem Umfang."
+        <div className={`grid grid-cols-1 md:grid-cols-3 ${spacing.cardGap} ${spacing.contentBlock}`}>
+          <Tooltip
+            title="Form (TSB)"
+            items={[
+              'Zeigt dein aktuelles Erholungs- und Leistungsniveau',
+              'Positiver Wert: Du bist erholt und bereit für intensive Einheiten oder Wettkämpfe',
+              'Negativer Wert: Du bist ermüdet – ideal für Trainingsphasen mit höherem Umfang',
+              'TSB = CTL - ATL (Langfristige Fitness minus kurzfristige Ermüdung)'
+            ]}
           >
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                  fitnessMetrics.tsb > 25 ? 'bg-secondary-100 dark:bg-secondary-900' :
-                  fitnessMetrics.tsb >= -10 ? 'bg-primary-100 dark:bg-primary-900' :
-                  fitnessMetrics.tsb >= -30 ? 'bg-orange-100 dark:bg-orange-900' : 'bg-coral-100 dark:bg-coral-900'
-                }`}>
-                  <svg className={`w-6 h-6 ${
-                    fitnessMetrics.tsb > 25 ? 'text-secondary-600 dark:text-secondary-300' :
-                    fitnessMetrics.tsb >= -10 ? 'text-primary-600 dark:text-primary-300' :
-                    fitnessMetrics.tsb >= -30 ? 'text-orange-600 dark:text-orange-300' : 'text-coral-600 dark:text-coral-300'
-                  }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                    fitnessMetrics.tsb > 25 ? 'bg-secondary-100 dark:bg-secondary-900' :
+                    fitnessMetrics.tsb >= -10 ? 'bg-primary-100 dark:bg-primary-900' :
+                    fitnessMetrics.tsb >= -30 ? 'bg-orange-100 dark:bg-orange-900' : 'bg-coral-100 dark:bg-coral-900'
+                  }`}>
+                    <svg className={`w-6 h-6 ${
+                      fitnessMetrics.tsb > 25 ? 'text-secondary-600 dark:text-secondary-300' :
+                      fitnessMetrics.tsb >= -10 ? 'text-primary-600 dark:text-primary-300' :
+                      fitnessMetrics.tsb >= -30 ? 'text-orange-600 dark:text-orange-300' : 'text-coral-600 dark:text-coral-300'
+                    }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-4">
-                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Form (TSB)</p>
-                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
-                  {profile?.stravaConnected ? fitnessMetrics.tsb.toFixed(1) : '--'}
-                </p>
-                {profile?.stravaConnected && (
-                  <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">
-                    {interpretTSB(fitnessMetrics.tsb).message.split('-')[0].trim()}
+                <div className="ml-4">
+                  <p className={`${typography.body} font-medium ${colors.text.secondary}`}>Form (TSB)</p>
+                  <p className={`${typography.h2} font-semibold ${colors.text.primary}`}>
+                    {profile?.stravaConnected ? fitnessMetrics.tsb.toFixed(1) : '--'}
                   </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
-            title="Fitness spiegelt deine langfristige Trainingsbelastung wider. Sie basiert auf dem Durchschnitt deiner letzten Trainingswochen. Ein höherer CTL-Wert zeigt eine bessere Ausdauerbasis und Anpassung an regelmäßiges Training."
-          >
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-olive-100 dark:bg-olive-900 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-olive-600 dark:text-olive-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  {profile?.stravaConnected && (
+                    <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>
+                      {interpretTSB(fitnessMetrics.tsb).message.split('-')[0].trim()}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Fitness (CTL)</p>
-                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
-                  {profile?.stravaConnected ? fitnessMetrics.ctl.toFixed(1) : '--'}
-                </p>
-                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">42-Tage Ø</p>
-              </div>
             </div>
-          </div>
+          </Tooltip>
 
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
-            title="Fatigue misst deine kurzfristige Ermüdung durch die letzten Trainingstage. Hohe ATL-Werte bedeuten, dass du dich aktuell stark belastet hast. Sie helfen, Übertraining zu vermeiden und die Regeneration zu steuern."
+          <Tooltip
+            title="Fitness (CTL)"
+            items={[
+              'Spiegelt deine langfristige Trainingsbelastung wider',
+              'Basiert auf dem Durchschnitt deiner letzten 42 Trainingstage',
+              'Höherer CTL-Wert = bessere Ausdauerbasis',
+              'Zeigt deine Anpassung an regelmäßiges Training'
+            ]}
           >
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-coral-100 dark:bg-coral-900 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-coral-600 dark:text-coral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-olive-100 dark:bg-olive-900 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-olive-600 dark:text-olive-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className={`${typography.body} font-medium ${colors.text.secondary}`}>Fitness (CTL)</p>
+                  <p className={`${typography.h2} font-semibold ${colors.text.primary}`}>
+                    {profile?.stravaConnected ? fitnessMetrics.ctl.toFixed(1) : '--'}
+                  </p>
+                  <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>42-Tage Ø</p>
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Fatigue (ATL)</p>
-                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
-                  {profile?.stravaConnected ? fitnessMetrics.atl.toFixed(1) : '--'}
-                </p>
-                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">7-Tage Ø</p>
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title="Fatigue (ATL)"
+            items={[
+              'Misst deine kurzfristige Ermüdung durch die letzten 7 Trainingstage',
+              'Hohe ATL-Werte bedeuten aktuelle starke Belastung',
+              'Hilft Übertraining zu vermeiden',
+              'Wichtig für die Steuerung der Regeneration'
+            ]}
+          >
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-coral-100 dark:bg-coral-900 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-coral-600 dark:text-coral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className={`${typography.body} font-medium ${colors.text.secondary}`}>Fatigue (ATL)</p>
+                  <p className={`${typography.h2} font-semibold ${colors.text.primary}`}>
+                    {profile?.stravaConnected ? fitnessMetrics.atl.toFixed(1) : '--'}
+                  </p>
+                  <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>7-Tage Ø</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Tooltip>
         </div>
 
         {/* This Week's Plan */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className={`${components.card.base} ${spacing.contentBlock}`}>
+          <div className={`${components.card.base} ${colors.border.default} flex items-center justify-between border-b`}>
             <h2 className="text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark">This Week's Training Plan</h2>
             {profile?.stravaConnected && (
               <button
@@ -445,26 +468,26 @@ export default function DashboardPage() {
                   }
                 }}
                 disabled={generatingPlan}
-                className="px-6 py-3 bg-primary dark:bg-primary-dark text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className={`${components.button.primary} text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {generatingPlan ? 'Generating...' : 'Generate Plan'}
               </button>
             )}
           </div>
-          <div className="p-6">
+          <div>
             {loadingPlan ? (
-              <div className="text-center py-12">
+              <div className={`text-center ${spacing.card}`}>
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-500">Loading plan...</p>
+                <p className={`${spacing.micro} text-gray-500`}>Loading plan...</p>
               </div>
             ) : trainingPlan && trainingPlan.weeks && trainingPlan.weeks.length > 0 ? (
-              <div className="space-y-4">
+              <div className={spacing.section}>
                 {/* Week Navigation */}
-                <div className="flex items-center justify-between">
+                <div className={layout.flexRowBetween}>
                   <button
                     onClick={() => setCurrentPlanWeek(Math.max(0, currentPlanWeek - 1))}
                     disabled={currentPlanWeek === 0}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`${components.button.small} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -472,14 +495,14 @@ export default function DashboardPage() {
                   </button>
                   
                   <div className="text-center">
-                    <h3 className="font-bold text-text-primary-light dark:text-text-primary-dark text-3xl">Week {trainingPlan.weeks[currentPlanWeek]?.weekNumber || 1}</h3>
-                    <p className="text-xl text-text-secondary-light dark:text-text-secondary-dark mt-1">{currentPlanWeek === 0 ? 'This Week' : `+${currentPlanWeek} weeks`}</p>
+                    <h3 className={`${typography.h1} font-bold ${colors.text.primary}`}>Week {trainingPlan.weeks[currentPlanWeek]?.weekNumber || 1}</h3>
+                    <p className={`${typography.bodyLarge} ${colors.text.secondary} ${spacing.micro}`}>{currentPlanWeek === 0 ? 'This Week' : `+${currentPlanWeek} weeks`}</p>
                   </div>
                   
                   <button
                     onClick={() => setCurrentPlanWeek(Math.min(trainingPlan.weeks.length - 1, currentPlanWeek + 1))}
                     disabled={currentPlanWeek >= trainingPlan.weeks.length - 1}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`${components.button.small} disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -494,47 +517,47 @@ export default function DashboardPage() {
                   
                   return (
                     <>
-                      <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
-                        <div className="grid grid-cols-7 gap-2">
+                      <div className={`bg-blue-50 dark:bg-blue-900/30 rounded-lg ${components.card.base} border border-blue-200 dark:border-blue-700`}>
+                        <div className={`grid grid-cols-7 ${spacing.cardGap}`}>
                           {week.sessions?.map((session: any, idx: number) => (
-                            <div key={idx} className="bg-white dark:bg-gray-800 rounded p-3 text-center border border-gray-200 dark:border-gray-700">
-                              <p className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">
+                            <div key={idx} className={`${components.card.base} text-center ${colors.border.default} border`}>
+                              <p className={`${typography.bodySmall} font-medium ${colors.text.secondary} ${spacing.micro}`}>
                                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
                               </p>
                               {session ? (
                                 <>
-                                  <p className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark">{session.type}</p>
-                                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">{formatHoursToTime(session.duration / 60)}</p>
-                                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{session.targetTss.toFixed(1)} TSS</p>
+                                  <p className={`${typography.body} font-semibold ${colors.text.primary}`}>{session.type}</p>
+                                  <p className={`${typography.bodySmall} ${colors.text.secondary} ${spacing.micro}`}>{formatHoursToTime(session.duration / 60)}</p>
+                                  <p className={`${typography.bodySmall} ${colors.text.secondary}`}>{session.targetTss.toFixed(1)} TSS</p>
                                 </>
                               ) : (
-                                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Rest</p>
+                                <p className={`${typography.bodySmall} ${colors.text.secondary}`}>Rest</p>
                               )}
                             </div>
                           ))}
                         </div>
-                        <div className="mt-3 flex justify-between text-base">
-                          <span className="text-text-secondary-light dark:text-text-secondary-dark">Weekly TSS: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.totalTss.toFixed(1)}</strong></span>
-                          <span className="text-text-secondary-light dark:text-text-secondary-dark">Total Time: <strong className="text-text-primary-light dark:text-text-primary-dark">{formatHoursToTime(week.totalHours || 0)}</strong></span>
-                          <span className="text-text-secondary-light dark:text-text-secondary-dark">HIT Sessions: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.hitSessions || 0}</strong></span>
+                        <div className={`${spacing.tight} flex justify-between ${typography.body}`}>
+                          <span className={colors.text.secondary}>Weekly TSS: <strong className={colors.text.primary}>{week.totalTss.toFixed(1)}</strong></span>
+                          <span className={colors.text.secondary}>Total Time: <strong className={colors.text.primary}>{formatHoursToTime(week.totalHours || 0)}</strong></span>
+                          <span className={colors.text.secondary}>HIT Sessions: <strong className={colors.text.primary}>{week.hitSessions || 0}</strong></span>
                         </div>
                       </div>
 
                       {/* Plan Summary */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                          <h4 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">Training Load</h4>
-                          <div className="space-y-1 text-base text-text-secondary-light dark:text-text-secondary-dark">
-                            <p>LIT Ratio: <strong className="text-text-primary-light dark:text-text-primary-dark">{((week.litRatio || 0) * 100).toFixed(1)}%</strong></p>
-                            <p>Total Hours: <strong className="text-text-primary-light dark:text-text-primary-dark">{formatHoursToTime(week.totalHours || 0)}</strong></p>
-                            <p>Sessions: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.sessions?.filter((s: any) => s).length || 0}</strong></p>
+                      <div className={`${components.grid.cols2} ${spacing.cardGap}`}>
+                        <div className={`${components.card.base} ${colors.border.default} border`}>
+                          <h4 className={`${typography.body} font-semibold ${colors.text.primary} ${spacing.micro}`}>Training Load</h4>
+                          <div className={`${spacing.micro} ${typography.body} ${colors.text.secondary}`}>
+                            <p>LIT Ratio: <strong className={colors.text.primary}>{((week.litRatio || 0) * 100).toFixed(1)}%</strong></p>
+                            <p>Total Hours: <strong className={colors.text.primary}>{formatHoursToTime(week.totalHours || 0)}</strong></p>
+                            <p>Sessions: <strong className={colors.text.primary}>{week.sessions?.filter((s: any) => s).length || 0}</strong></p>
                           </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                          <h4 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">Fitness Projection</h4>
-                          <div className="space-y-1 text-base text-text-secondary-light dark:text-text-secondary-dark">
-                            <p>Projected CTL: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.ctl || 0).toFixed(1)}</strong></p>
-                            <p>Projected ATL: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.atl || 0).toFixed(1)}</strong></p>
+                        <div className={`${components.card.base} ${colors.border.default} border`}>
+                          <h4 className={`${typography.body} font-semibold ${colors.text.primary} ${spacing.micro}`}>Fitness Projection</h4>
+                          <div className={`${spacing.micro} ${typography.body} ${colors.text.secondary}`}>
+                            <p>Projected CTL: <strong className={colors.text.primary}>{(week.projectedFitness?.ctl || 0).toFixed(1)}</strong></p>
+                            <p>Projected ATL: <strong className={colors.text.primary}>{(week.projectedFitness?.atl || 0).toFixed(1)}</strong></p>
                             <p>Projected TSB: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.tsb || 0).toFixed(1)}</strong></p>
                           </div>
                         </div>
@@ -544,11 +567,11 @@ export default function DashboardPage() {
                 })()}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-1 text-gray-500">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p className="mt-2 text-base">No training plan generated yet</p>
+                <p className="mt-1 text-base">No training plan generated yet</p>
                 <p className="text-base text-gray-400 mt-1">
                   {profile?.stravaConnected 
                     ? 'Click "Generate Plan" to create your personalized training plan'
