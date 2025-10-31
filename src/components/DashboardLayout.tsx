@@ -6,6 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
 import { Moon, Sun } from 'lucide-react';
 import NotificationBell from './NotificationBell';
+import CyclonaLogo from './CyclonaLogo';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -74,19 +75,9 @@ export default function DashboardLayout({
       <aside className="w-64 bg-gradient-to-b from-primary via-secondary to-coral dark:from-primary-dark dark:via-secondary-dark dark:to-coral-dark text-white flex flex-col flex-shrink-0 shadow-2xl fixed h-screen overflow-y-auto">
         {/* Logo Section */}
         <div className="p-6 border-b border-white/10">
-          <div className="flex items-center justify-center mb-2">
-            <div className="w-16 h-16 bg-white dark:bg-surface-dark rounded-full flex items-center justify-center shadow-xl">
-              <svg className="w-10 h-10 text-primary dark:text-primary-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
+          <div className="flex items-center justify-center">
+            <CyclonaLogo className="w-40 h-40" />
           </div>
-          <h1 className="text-xl font-bold text-center">
-            ADAPTIVE TRAINING
-          </h1>
-          <p className="text-xs text-center opacity-90 mt-1">
-            Smart Cycling Plans
-          </p>
         </div>
 
         {/* Navigation */}
