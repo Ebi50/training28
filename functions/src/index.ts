@@ -15,13 +15,14 @@ const corsHandler = cors({ origin: true });
 const secretClient = new SecretManagerServiceClient();
 
 // Strava OAuth callback
-export const stravaOAuthCallback = functions.https.onRequest(async (req, res) => {
-  return corsHandler(req, res, async () => {
+export const stravaOAuthCallback = functions.https.onRequest((req, res) => {
+  void corsHandler(req, res, async () => {
     try {
       const { code, state } = req.query;
       
       if (!code || !state) {
-        return res.status(400).json({ error: 'Missing code or state parameter' });
+        res.status(400).json({ error: 'Missing code or state parameter' });
+        return;
       }
 
       // Get Strava client secret from Secret Manager
@@ -61,14 +62,15 @@ export const stravaOAuthCallback = functions.https.onRequest(async (req, res) =>
 
       // Update user profile with athlete info
       await db.collection('users').doc(userId).update({
+        stravaConnected: true,
         stravaAthleteId: athlete.id.toString(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       // Redirect back to app
       const redirectUrl = process.env.NODE_ENV === 'production' 
-        ? `https://${process.env.GCLOUD_PROJECT}.web.app/dashboard?connected=true`
-        : `http://localhost:3000/dashboard?connected=true`;
+        ? `https://${process.env.GCLOUD_PROJECT}.web.app/dashboard?strava_connected=true`
+        : `http://localhost:3001/dashboard?strava_connected=true`;
         
       res.redirect(redirectUrl);
       
@@ -266,8 +268,7 @@ function calculateTss(activity: any): number {
   } else if (activity.average_heartrate) {
     // HR-based TSS estimation
     const avgHr = activity.average_heartrate;
-    const maxHr = 190; // This should come from user profile
-    const lthr = 170; // This should come from user profile
+    const maxHr = 190; // TODO: Get from user profile
     const hrRatio = (avgHr - 50) / (maxHr - 50);
     return Math.round(duration * hrRatio * hrRatio * 100);
   } else {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -15,25 +15,13 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Auto-login with Strava custom token
+  // Show error message if redirected from Strava with error
   useEffect(() => {
-    const token = searchParams.get('token');
-    const stravaLogin = searchParams.get('strava_login');
-    
-    if (token && stravaLogin === 'true') {
-      setLoading(true);
-      signInWithCustomToken(auth, token)
-        .then(() => {
-          console.log('✅ Logged in with Strava');
-          router.push('/dashboard?strava_connected=true');
-        })
-        .catch((err) => {
-          console.error('Custom token login failed:', err);
-          setError('Strava login failed. Please try again.');
-          setLoading(false);
-        });
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'please_login_first') {
+      setError('Bitte melden Sie sich zuerst an, bevor Sie Strava verbinden.');
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,15 +51,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleStravaConnect = () => {
-    // Redirect to Strava OAuth (login flow - no userId yet)
-    const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/api/auth/strava/callback`;
-    const scope = 'read,activity:read_all,profile:read_all';
-    
-    // Use "login" as state to indicate this is a login flow
-    window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=login&approval_prompt=auto`;
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -88,10 +68,12 @@ export default function LoginPage() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -102,11 +84,13 @@ export default function LoginPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -135,25 +119,10 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleStravaConnect}
-            className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="#FC4C02">
-              <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
-            </svg>
-            Connect with Strava
-          </button>
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>💡 Tipp:</strong> Nach dem Login können Sie Ihr Strava-Konto im Dashboard verbinden, um automatisch Trainings zu synchronisieren.
+          </p>
         </div>
 
         <p className="mt-8 text-center text-xs text-gray-500">

@@ -178,7 +178,7 @@ export default function UserTutorial({ onClose, onComplete }: UserTutorialProps)
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
           <div className="flex items-center justify-between">

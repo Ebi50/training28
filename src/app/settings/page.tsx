@@ -277,7 +277,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-warm dark:bg-bg-warm-dark">
+      <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
           <p className="text-text-secondary-light dark:text-text-secondary-dark">Loading settings...</p>
@@ -292,10 +292,10 @@ export default function SettingsPage() {
       onSignOut={handleSignOut}
       onHelp={() => {}}
     >
-      <div className="max-w-4xl mx-auto px-8 py-8 pb-20">
+      <div className="max-w-7xl mx-auto px-8 py-8 pb-20">
         <div className="space-y-6">
           {/* Athlete Profile */}
-          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow">
+          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow">
             <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
               <h2 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">Athlete Profile</h2>
             </div>
@@ -357,7 +357,7 @@ export default function SettingsPage() {
                   />
                   
                   {showLthrInfo && (
-                    <div className="absolute z-10 mt-2 p-4 bg-surface-warm dark:bg-surface-warm-dark border border-border-light dark:border-border-dark rounded-lg shadow-lg max-w-2xl">
+                    <div className="absolute z-10 mt-2 p-4 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg shadow-lg max-w-2xl">
                       <button
                         onClick={() => setShowLthrInfo(false)}
                         className="absolute top-2 right-2 text-gray-400 hover:text-text-secondary-light dark:text-text-secondary-dark"
@@ -470,8 +470,90 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          {/* Strava Integration Section */}
+          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow">
+            <div className="px-6 py-5 border-b border-border-light dark:border-border-dark">
+              <h2 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">Strava Integration</h2>
+            </div>
+            <div className="p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Status & Info - Takes up 2 columns */}
+                <div className="lg:col-span-2">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-4 h-4 rounded-full ${profile?.stravaConnected ? 'bg-primary dark:bg-primary-dark' : 'bg-gray-400'}`}></div>
+                    <span className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">
+                      {profile?.stravaConnected ? 'Verbunden' : 'Nicht verbunden'}
+                    </span>
+                  </div>
+                  {profile?.stravaAthleteId && (
+                    <div className="mb-4 p-3 bg-bg-light dark:bg-bg-dark rounded-md border border-border-light dark:border-border-dark">
+                      <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Athlete ID</p>
+                      <p className="text-base font-mono text-text-primary-light dark:text-text-primary-dark">{profile.stravaAthleteId}</p>
+                    </div>
+                  )}
+                  <p className="text-base text-text-primary-light dark:text-text-primary-dark leading-relaxed">
+                    {profile?.stravaConnected 
+                      ? 'Deine Strava-Aktivitäten werden automatisch synchronisiert. Du kannst jederzeit manuell synchronisieren oder die Verbindung erneuern.'
+                      : 'Verbinde dein Strava-Konto, um deine Aktivitäten automatisch zu importieren und deine Trainingspläne basierend auf echten Daten zu optimieren.'}
+                  </p>
+                </div>
+
+                {/* Action Buttons - Takes up 1 column */}
+                <div className="lg:col-span-1 flex flex-col justify-center">
+                  {profile?.stravaConnected ? (
+                    <div className="space-y-3">
+                      <button
+                        onClick={async () => {
+                          const user = auth.currentUser;
+                          if (!user) return;
+                          try {
+                            const response = await fetch(`/api/strava/activities?userId=${user.uid}&per_page=50`);
+                            if (response.ok) {
+                              alert('✓ Synchronisation erfolgreich!');
+                            } else {
+                              alert('❌ Synchronisation fehlgeschlagen. Bitte versuche es erneut.');
+                            }
+                          } catch (error) {
+                            console.error('Sync error:', error);
+                            alert('❌ Synchronisation fehlgeschlagen.');
+                          }
+                        }}
+                        className="w-full px-6 py-3 bg-orange dark:bg-orange-dark text-white text-base font-medium rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all"
+                      >
+                        🔄 Jetzt synchronisieren
+                      </button>
+                      <button
+                        onClick={() => {
+                          const user = auth.currentUser;
+                          if (!user) return;
+                          const state = Buffer.from(user.uid).toString('base64');
+                          window.location.href = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI!)}&approval_prompt=force&scope=activity:read_all,activity:write&state=${state}`;
+                        }}
+                        className="w-full px-6 py-3 bg-coral dark:bg-coral-dark text-white text-base font-medium rounded-lg hover:bg-coral-700 dark:hover:bg-coral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-500 transition-all"
+                      >
+                        🔗 Neu verbinden
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        const user = auth.currentUser;
+                        if (!user) return;
+                        const state = Buffer.from(user.uid).toString('base64');
+                        window.location.href = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI!)}&approval_prompt=force&scope=activity:read_all,activity:write&state=${state}`;
+                      }}
+                      className="w-full px-8 py-4 bg-coral dark:bg-coral-dark text-white text-lg font-semibold rounded-lg hover:bg-coral-700 dark:hover:bg-coral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-500 transition-all shadow-md hover:shadow-lg"
+                    >
+                      Mit Strava verbinden
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Time Slots Section */}
-          <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+          <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark">
             <div className="px-6 py-4 border-b border-border-light dark:border-border-dark">
               <h2 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">Training Time Slots</h2>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Wann kannst du trainieren?</p>
@@ -537,7 +619,7 @@ export default function SettingsPage() {
               )}
               
               {/* Add New Slot Form */}
-              <div className="mb-6 p-4 bg-bg-warm dark:bg-bg-warm-dark rounded-lg border border-border-light dark:border-border-dark">
+              <div className="mb-6 p-4 bg-bg-light dark:bg-bg-dark rounded-lg border border-border-light dark:border-border-dark">
                 <h3 className="text-sm font-semibold text-text-primary-light dark:text-text-primary-dark mb-3">Neuen Zeitslot hinzufügen</h3>
                 <div className="grid grid-cols-4 gap-3">
                   <div>
@@ -589,7 +671,7 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={handleAddSlot}
-                  className="mt-3 flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="mt-3 flex items-center gap-2 px-4 py-2 bg-primary dark:bg-primary-dark text-white text-sm font-medium rounded-md hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 >
                   <Plus size={16} />
                   Zeitslot hinzufügen
@@ -630,7 +712,7 @@ export default function SettingsPage() {
                             {slotsForDay.map(({ slot, originalIndex }) => (
                               <div
                                 key={originalIndex}
-                                className="flex items-center justify-between p-2 bg-bg-warm dark:bg-bg-warm-dark border border-border-light dark:border-border-dark rounded-md hover:border-border-light dark:border-border-dark"
+                                className="flex items-center justify-between p-2 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark rounded-md hover:border-border-light dark:border-border-dark"
                               >
                                 <div className="flex items-center gap-3 text-sm">
                                   <span className="text-text-primary-light dark:text-text-primary-dark font-medium">{slot.startTime} - {slot.endTime}</span>
@@ -669,7 +751,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSaveTimeSlots}
                   disabled={saving}
-                  className="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-primary dark:bg-primary-dark text-white font-medium rounded-md hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save Time Slots'}
                 </button>
@@ -680,7 +762,7 @@ export default function SettingsPage() {
           {/* Copy Modal */}
           {copyModalOpen && slotToCopyIndex !== null && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg p-6 max-w-md w-full mx-4">
+              <div className="bg-surface-light dark:bg-surface-dark rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 className="text-lg font-semibold text-text-primary-light dark:text-text-primary-dark mb-4">
                   Zeitslot kopieren nach:
                 </h3>
@@ -698,7 +780,7 @@ export default function SettingsPage() {
                           ? 'bg-primary dark:bg-primary-dark text-white border-red-600'
                           : timeSlots[slotToCopyIndex].day === day
                           ? 'bg-gray-100 text-gray-400 border-border-light dark:border-border-dark cursor-not-allowed'
-                          : 'bg-surface-warm dark:bg-surface-warm-dark text-text-primary-light dark:text-text-primary-dark border-border-light dark:border-border-dark hover:border-blue-500'
+                          : 'bg-surface-light dark:bg-surface-dark text-text-primary-light dark:text-text-primary-dark border-border-light dark:border-border-dark hover:border-blue-500'
                       }`}
                     >
                       {getDayName(day)}

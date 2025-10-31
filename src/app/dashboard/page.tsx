@@ -234,15 +234,15 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4 flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-2xl font-semibold text-gray-900">
                   🚀 Connect Your Strava Account
                 </h3>
-                <p className="mt-2 text-sm text-gray-700">
+                <p className="mt-2 text-base text-gray-700">
                   Unlock the full power of adaptive training! Connect Strava to automatically sync your rides and get personalized plans.
                 </p>
                 
                 {/* Benefits */}
-                <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600">
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-600">
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                     const userId = auth.currentUser?.uid || '';
                     window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${userId}&approval_prompt=auto`;
                   }}
-                  className="mt-4 px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium shadow-sm transition-colors flex items-center gap-2"
+                  className="mt-4 px-6 py-3 bg-orange dark:bg-orange-dark text-white rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600 text-base font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
@@ -337,12 +337,12 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Form (TSB)</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {profile?.stravaConnected ? fitnessMetrics.tsb : '--'}
+                <p className="text-base font-medium text-gray-500">Form (TSB)</p>
+                <p className="text-3xl font-semibold text-gray-900">
+                  {profile?.stravaConnected ? fitnessMetrics.tsb.toFixed(1) : '--'}
                 </p>
                 {profile?.stravaConnected && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 mt-1">
                     {interpretTSB(fitnessMetrics.tsb).message.split('-')[0].trim()}
                   </p>
                 )}
@@ -360,11 +360,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Fitness (CTL)</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {profile?.stravaConnected ? fitnessMetrics.ctl : '--'}
+                <p className="text-base font-medium text-gray-500">Fitness (CTL)</p>
+                <p className="text-3xl font-semibold text-gray-900">
+                  {profile?.stravaConnected ? fitnessMetrics.ctl.toFixed(1) : '--'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">42-Tage Ø</p>
+                <p className="text-sm text-gray-500 mt-1">42-Tage Ø</p>
               </div>
             </div>
           </div>
@@ -379,11 +379,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Fatigue (ATL)</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {profile?.stravaConnected ? fitnessMetrics.atl : '--'}
+                <p className="text-base font-medium text-gray-500">Fatigue (ATL)</p>
+                <p className="text-3xl font-semibold text-gray-900">
+                  {profile?.stravaConnected ? fitnessMetrics.atl.toFixed(1) : '--'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">7-Tage Ø</p>
+                <p className="text-sm text-gray-500 mt-1">7-Tage Ø</p>
               </div>
             </div>
           </div>
@@ -392,7 +392,7 @@ export default function DashboardPage() {
         {/* This Week's Plan */}
         <div className="bg-white rounded-lg shadow mb-8">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">This Week's Training Plan</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">This Week's Training Plan</h2>
             {profile?.stravaConnected && (
               <button
                 onClick={async () => {
@@ -427,7 +427,7 @@ export default function DashboardPage() {
                   }
                 }}
                 disabled={generatingPlan}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-primary dark:bg-primary-dark text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {generatingPlan ? 'Generating...' : 'Generate Plan'}
               </button>

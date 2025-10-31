@@ -54,49 +54,18 @@ export async function GET(request: NextRequest) {
       expiresAt: expires_at 
     });
 
-    // Check if this is a login flow or connect flow
-    let userId: string;
+    // CONNECT FLOW: Use userId from state (state should contain the Firebase UID)
+    const userId = state || '';
     
-    if (state === 'login') {
-      // LOGIN FLOW: Create/find user by Strava athlete ID
-      console.log('🔑 Login flow detected - creating/finding user by Strava ID');
-      
-      // Search for existing user with this Strava athlete ID
-      const usersQuery = await adminDb.collection('users')
-        .where('stravaAthleteId', '==', athlete.id.toString())
-        .limit(1)
-        .get();
-      
-      if (!usersQuery.empty) {
-        // Existing user found
-        userId = usersQuery.docs[0].id;
-        console.log('✅ Existing user found:', userId);
-      } else {
-        // Create new user with Strava athlete ID as base
-        const newUserRef = adminDb.collection('users').doc();
-        userId = newUserRef.id;
-        
-        await newUserRef.set({
-          email: athlete.email || `strava-${athlete.id}@temp.local`,
-          displayName: `${athlete.firstname} ${athlete.lastname}`,
-          stravaAthleteId: athlete.id.toString(),
-          stravaConnected: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-        
-        console.log('✅ New user created:', userId);
-      }
-    } else {
-      // CONNECT FLOW: Use userId from state
-      userId = state || '';
-      if (!userId) {
-        return NextResponse.redirect(
-          new URL('/dashboard?strava_error=invalid_state', request.url)
-        );
-      }
-      console.log('🔗 Connect flow detected - updating existing user:', userId);
+    if (!userId || userId === 'login') {
+      // Old "login" flow or missing state - redirect to login with error
+      console.error('❌ Invalid state - user must login first, then connect Strava');
+      return NextResponse.redirect(
+        new URL('/login?error=please_login_first', request.url)
+      );
     }
+    
+    console.log('🔗 Connect flow - updating existing user:', userId);
 
     // ✅ CRITICAL: Store tokens in integrations/strava subcollection (NOT profile/data)
     const stravaRef = adminDb.collection('users').doc(userId).collection('integrations').doc('strava');
@@ -120,25 +89,10 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Tokens stored in Firestore:', userId);
 
-    // Success - redirect based on flow type
-    if (state === 'login') {
-      // LOGIN FLOW: Create Firebase custom token and redirect to login page
-      const { getAuth } = await import('firebase-admin/auth');
-      const adminAuth = getAuth();
-      const customToken = await adminAuth.createCustomToken(userId);
-      
-      console.log('✅ Custom token created for login');
-      
-      // Redirect to login page with custom token
-      return NextResponse.redirect(
-        new URL(`/login?token=${customToken}&strava_login=true`, request.url)
-      );
-    } else {
-      // CONNECT FLOW: Just redirect to dashboard
-      return NextResponse.redirect(
-        new URL('/dashboard?strava_connected=true', request.url)
-      );
-    }
+    // Success - redirect to dashboard (user is already logged in)
+    return NextResponse.redirect(
+      new URL('/dashboard?strava_connected=true', request.url)
+    );
   } catch (error) {
     console.error('Strava OAuth callback error:', error);
     return NextResponse.redirect(

@@ -32,7 +32,17 @@ cd Training2026
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. ⚠️ Important: Port Configuration
+
+**The dev server MUST run on port 3001 (not 3000)!**
+
+This is required for Strava OAuth integration, as the callback URL `http://localhost:3001/api/auth/strava/callback` is registered in the Strava API settings.
+
+**Always access the app at: http://localhost:3001**
+
+See [PORT_CONFIG.md](./PORT_CONFIG.md) for details.
+
+### 3. Configure Environment Variables
 
 Copy `.env.local.example` to `.env.local` and fill in your credentials:
 
@@ -84,10 +94,14 @@ firebase deploy --only functions
 ### 6. Run Locally
 
 ```bash
-# Start Firebase emulators
+# Start Firebase emulators (optional)
 npm run emulator
 
 # In another terminal, start Next.js dev server
+# ⚠️ IMPORTANT: Server runs on PORT 3001 (for Strava OAuth)
+npm run dev
+
+# Open browser at: http://localhost:3001
 npm run dev
 ```
 

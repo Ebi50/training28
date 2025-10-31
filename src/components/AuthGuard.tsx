@@ -29,7 +29,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-warm dark:bg-bg-warm-dark">
+      <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-primary-dark mx-auto"></div>
           <p className="mt-4 text-text-secondary-light dark:text-text-secondary-dark">Loading...</p>

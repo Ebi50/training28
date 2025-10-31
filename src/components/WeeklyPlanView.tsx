@@ -107,7 +107,7 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
             <div
               key={dayIndex}
               className={`border rounded-lg p-4 ${
-                isToday ? 'border-blue-500 bg-blue-50' : 'border-border-light dark:border-border-dark bg-surface-warm dark:bg-surface-warm-dark'
+                isToday ? 'border-blue-500 bg-blue-50' : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
               }`}
             >
               <div className="flex items-center justify-between mb-3">

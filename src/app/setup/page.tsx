@@ -33,13 +33,13 @@ export default function SetupCheck() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-warm dark:bg-bg-warm-dark p-8">
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-8">
           Firebase Setup Status
         </h1>
 
-        <div className="bg-surface-warm dark:bg-surface-warm-dark rounded-lg shadow p-6 mb-6">
+        <div className="bg-surface-light dark:bg-surface-dark rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Configuration</h2>
           <div className="space-y-3">
             <StatusRow
@@ -114,7 +114,7 @@ function StatusRow({
   action?: { text: string; url: string };
 }) {
   return (
-    <div className="flex items-center justify-between p-3 bg-bg-warm dark:bg-bg-warm-dark rounded">
+    <div className="flex items-center justify-between p-3 bg-bg-light dark:bg-bg-dark rounded">
       <div className="flex items-center gap-3">
         <span className={`text-2xl ${status ? '✅' : '⚠️'}`}>
           {status ? '✅' : '⚠️'}

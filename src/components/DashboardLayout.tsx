@@ -67,13 +67,13 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-bg-warm dark:bg-bg-warm-dark flex transition-colors">
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex transition-colors">
       {/* Sidebar */}
-      <aside className="w-64 bg-gradient-to-b from-primary via-secondary to-primary-600 dark:from-primary-dark dark:via-surface-warm-dark dark:to-secondary-dark text-text-onDark flex flex-col flex-shrink-0 shadow-xl fixed h-screen overflow-y-auto">
+      <aside className="w-64 bg-gradient-to-b from-primary via-secondary to-coral dark:from-primary-dark dark:via-secondary-dark dark:to-coral-dark text-white flex flex-col flex-shrink-0 shadow-2xl fixed h-screen overflow-y-auto">
         {/* Logo Section */}
-        <div className="p-6 border-b border-white/10 dark:border-white/10">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-16 h-16 bg-white dark:bg-surface-warm-dark rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-white dark:bg-surface-dark rounded-full flex items-center justify-center shadow-xl">
               <svg className="w-10 h-10 text-primary dark:text-primary-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -82,7 +82,7 @@ export default function DashboardLayout({
           <h1 className="text-xl font-bold text-center">
             ADAPTIVE TRAINING
           </h1>
-          <p className="text-xs text-center opacity-80 mt-1">
+          <p className="text-xs text-center opacity-90 mt-1">
             Smart Cycling Plans
           </p>
         </div>
@@ -97,10 +97,10 @@ export default function DashboardLayout({
                   key={item.name}
                   onClick={() => router.push(item.href)}
                   className={`
-                    w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all
+                    w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
                     ${isActive 
-                      ? 'bg-accent text-primary shadow-lg shadow-accent/30 font-bold' 
-                      : 'hover:bg-white/10 dark:hover:bg-white/5'
+                      ? 'bg-white dark:bg-surface-dark text-primary dark:text-primary-dark shadow-lg font-bold scale-105' 
+                      : 'hover:bg-white/15 dark:hover:bg-white/10'
                     }
                   `}
                 >
@@ -122,7 +122,7 @@ export default function DashboardLayout({
           <div className="space-y-1">
             <button
               onClick={() => router.push('/features')}
-              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -131,7 +131,7 @@ export default function DashboardLayout({
             </button>
             <button
               onClick={() => router.push('/how-it-works')}
-              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -140,7 +140,7 @@ export default function DashboardLayout({
             </button>
             <button
               onClick={() => router.push('/science')}
-              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -149,7 +149,7 @@ export default function DashboardLayout({
             </button>
             <button
               onClick={() => router.push('/about')}
-              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -184,7 +184,7 @@ export default function DashboardLayout({
             {/* Help Button */}
             <button
               onClick={onHelp}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -195,7 +195,7 @@ export default function DashboardLayout({
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium hover:bg-white/10 dark:hover:bg-white/5 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
               aria-label="Toggle theme"
             >
               {theme === 'light' ? (
@@ -214,7 +214,7 @@ export default function DashboardLayout({
             {/* Logout Button */}
             <button
               onClick={onSignOut}
-              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-error hover:bg-error-dark rounded-lg transition-colors"
+              className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-coral dark:bg-coral-dark hover:bg-coral-700 dark:hover:bg-coral-800 rounded-lg transition-all duration-200 shadow-md"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -228,7 +228,7 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col ml-64">
         {/* Top Header Bar */}
-        <header className="bg-surface-warm dark:bg-surface-warm-dark shadow-sm border-b border-border-light dark:border-border-dark">
+        <header className="bg-surface-light dark:bg-surface-dark shadow-md border-b border-border-light dark:border-border-dark">
           <div className="px-8 py-4">
             <div className="flex items-center justify-between">
               <div>
@@ -243,7 +243,7 @@ export default function DashboardLayout({
               {/* Season Selector */}
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Season:</span>
-                <select className="px-4 py-2 border border-border-light dark:border-border-dark rounded-lg text-sm font-medium text-text-primary-light dark:text-text-primary-dark bg-surface-warm dark:bg-surface-warm-dark hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark">
+                <select className="input py-2 text-sm font-medium hover:border-primary dark:hover:border-primary-dark cursor-pointer">
                   <option>2025</option>
                   <option>2024</option>
                 </select>
