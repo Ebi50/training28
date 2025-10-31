@@ -55,13 +55,34 @@ export function calculateTSS(params: {
 }
 
 /**
- * Calculate exponential moving average
+ * Calculate exponential moving average (EMA)
+ * 
+ * FORMEL: EMA_neu = EMA_alt + α × (Wert_heute - EMA_alt)
+ * 
+ * Wobei α (Alpha) = 2 / (N + 1)
+ * - Für CTL (42 Tage): α = 2/43 ≈ 0.0465 (langsame Änderung, Fitness)
+ * - Für ATL (7 Tage):  α = 2/8  = 0.25   (schnelle Änderung, Fatigue)
+ * 
+ * Beispiel CTL:
+ *   CTL_alt = 60, TSS_heute = 100
+ *   CTL_neu = 60 + 0.0465 × (100 - 60) = 60 + 1.86 = 61.86
+ * 
+ * Beispiel ATL:
+ *   ATL_alt = 50, TSS_heute = 100
+ *   ATL_neu = 50 + 0.25 × (100 - 50) = 50 + 12.5 = 62.5
+ * 
+ * 📚 Ausführliche Erklärung siehe: EMA_FORMEL_ERKLAERUNG.md
+ * 
  * @param previousEMA Previous EMA value
- * @param currentValue Current day's value
+ * @param currentValue Current day's value (TSS)
  * @param days Time constant (42 for CTL, 7 for ATL)
+ * @returns New EMA value
  */
 function calculateEMA(previousEMA: number, currentValue: number, days: number): number {
+  // Glättungsfaktor berechnen: α = 2 / (N + 1)
   const alpha = 2 / (days + 1);
+  
+  // EMA-Formel anwenden: EMA_neu = EMA_alt + α × (Wert_heute - EMA_alt)
   return previousEMA + alpha * (currentValue - previousEMA);
 }
 
@@ -153,4 +174,97 @@ export function interpretTSB(tsb: number): {
       color: 'red'
     };
   }
+}
+
+/**
+ * Forecast fitness metrics based on planned training
+ * Projects CTL/ATL/TSB into the future
+ */
+export function forecastFitnessMetrics(params: {
+  currentCTL: number;
+  currentATL: number;
+  plannedActivities: ActivityMetrics[]; // Future planned sessions with TSS
+}): {
+  date: string;
+  ctl: number;
+  atl: number;
+  tsb: number;
+}[] {
+  const { currentCTL, currentATL, plannedActivities } = params;
+
+  if (plannedActivities.length === 0) {
+    return [];
+  }
+
+  // Sort by date (oldest first)
+  const sortedActivities = [...plannedActivities].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  // Create daily TSS map
+  const dailyTSS = new Map<string, number>();
+  sortedActivities.forEach(activity => {
+    const date = activity.date.split('T')[0];
+    dailyTSS.set(date, (dailyTSS.get(date) || 0) + activity.tss);
+  });
+
+  // Start with current values
+  let ctl = currentCTL;
+  let atl = currentATL;
+  const forecast: { date: string; ctl: number; atl: number; tsb: number }[] = [];
+
+  // Project day by day
+  const startDate = new Date(sortedActivities[0].date);
+  const endDate = new Date(sortedActivities[sortedActivities.length - 1].date);
+
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split('T')[0];
+    const todayTSS = dailyTSS.get(dateStr) || 0;
+
+    // Update CTL (42-day EMA)
+    ctl = calculateEMA(ctl, todayTSS, 42);
+
+    // Update ATL (7-day EMA)
+    atl = calculateEMA(atl, todayTSS, 7);
+
+    // Calculate TSB
+    const tsb = ctl - atl;
+
+    forecast.push({
+      date: dateStr,
+      ctl: Math.round(ctl * 10) / 10,
+      atl: Math.round(atl * 10) / 10,
+      tsb: Math.round(tsb * 10) / 10,
+    });
+  }
+
+  return forecast;
+}
+
+/**
+ * Get current metrics from past activities + forecast from planned training
+ * Combines historical data with future projections
+ */
+export function getCombinedFitnessMetrics(params: {
+  pastActivities: ActivityMetrics[];
+  plannedActivities: ActivityMetrics[];
+  initialCTL?: number;
+  initialATL?: number;
+}): {
+  current: FitnessMetrics;
+  forecast: { date: string; ctl: number; atl: number; tsb: number }[];
+} {
+  const { pastActivities, plannedActivities, initialCTL = 0, initialATL = 0 } = params;
+
+  // Calculate current metrics from past
+  const current = calculateFitnessMetrics(pastActivities, initialCTL, initialATL);
+
+  // Forecast future metrics from planned training
+  const forecast = forecastFitnessMetrics({
+    currentCTL: current.ctl,
+    currentATL: current.atl,
+    plannedActivities,
+  });
+
+  return { current, forecast };
 }

@@ -202,7 +202,24 @@ const activeCamp = CampSeasonManager.getActiveCamp(date, camps);
 const { shouldTaper, goal } = CampSeasonManager.shouldTaper(date, goals);
 ```
 
-## 📊 Data Model
+## � Documentation
+
+### Quick References
+- **`EMA_QUICK_REF.md`** - EMA Formel auf einen Blick
+- **`EMA_FORMEL_ERKLAERUNG.md`** - Ausführliche Mathematik-Erklärung mit Beispielen
+- **`FITNESS_FORECAST.md`** - Fitness-Prognose System
+- **`TESTING_GUIDE.md`** - Testing & Validation Guide
+- **`DESIGN_SYSTEM_QUICK_START.md`** - Design System Quick Start
+- **`PROJECT_SUMMARY.md`** - Projekt-Übersicht
+- **`SETUP_GUIDE.md`** - Setup-Anleitung
+
+### Core Concepts
+- **CTL/ATL/TSB**: EMA-basierte Fitness-Metriken (siehe `EMA_FORMEL_ERKLAERUNG.md`)
+- **Forecast**: Prognose zukünftiger Metriken (siehe `FITNESS_FORECAST.md`)
+- **Morning Check**: Tägliche Readiness-Bewertung mit automatischer Plan-Anpassung
+- **Session Adaptation**: Dynamische Trainingsanpassung basierend auf Zustand
+
+## �📊 Data Model
 
 ### Collections
 

@@ -167,6 +167,26 @@ export default function MorningCheckPage() {
       console.log('✅ setDoc completed, result:', result);
       console.log('✅ Morning Check saved successfully to Firestore!');
       
+      // Trigger plan adaptation
+      console.log('🎯 Triggering plan adaptation...');
+      try {
+        const adaptResponse = await fetch('/api/adapt-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.uid, date: today }),
+        });
+        
+        if (adaptResponse.ok) {
+          const adaptResult = await adaptResponse.json();
+          console.log('✅ Plan adaptation result:', adaptResult);
+        } else {
+          console.warn('⚠️ Plan adaptation failed:', await adaptResponse.text());
+        }
+      } catch (adaptError) {
+        console.error('❌ Error adapting plan:', adaptError);
+        // Continue anyway - don't block user flow
+      }
+      
       // Redirect to dashboard
       console.log('🔄 Redirecting to dashboard...');
       router.push('/dashboard?morning_check=complete');

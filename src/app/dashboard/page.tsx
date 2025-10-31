@@ -226,7 +226,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="w-full">
         {/* Morning Check Banner */}
-        <div className={`${spacing.contentBlock} bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-6`}>
+        <div className={`${spacing.contentBlock} bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-lg ${spacing.card}`}>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div className="text-4xl">☀️</div>
@@ -264,7 +264,7 @@ export default function DashboardPage() {
         )}
 
         {!profile?.stravaConnected ? (
-          <div className={`bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg ${components.card.base} ${spacing.contentBlock}`}>
+          <div className={`bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/30 dark:to-yellow-900/30 border border-orange-200 dark:border-orange-700 rounded-lg ${spacing.card} ${spacing.contentBlock}`}>
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="w-12 h-12" viewBox="0 0 24 24" fill="#FC4C02">
@@ -356,7 +356,7 @@ export default function DashboardPage() {
         ) : null}
 
         {/* Quick Stats */}
-        <div className={`grid grid-cols-1 md:grid-cols-3 ${spacing.cardGap} ${spacing.contentBlock}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-8`}>
           <Tooltip
             title="Form (TSB)"
             items={[
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               'TSB = CTL - ATL (Langfristige Fitness minus kurzfristige Ermüdung)'
             ]}
           >
-            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105 p-6`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
@@ -407,7 +407,7 @@ export default function DashboardPage() {
               'Zeigt deine Anpassung an regelmäßiges Training'
             ]}
           >
-            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105 p-6`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-olive-100 dark:bg-olive-900 rounded-lg flex items-center justify-center">
@@ -436,7 +436,7 @@ export default function DashboardPage() {
               'Wichtig für die Steuerung der Regeneration'
             ]}
           >
-            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105`}>
+            <div className={`${components.card.hover} cursor-help transition-transform hover:scale-105 p-6`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-coral-100 dark:bg-coral-900 rounded-lg flex items-center justify-center">

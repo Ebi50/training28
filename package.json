@@ -10,12 +10,14 @@
     "emulator": "firebase emulators:start",
     "deploy": "firebase deploy",
     "type-check": "tsc --noEmit",
-    "check-design-system": "echo 'Checking Design System usage...' && grep -r \"className=\\\"space-y-\\|className=\\\"gap-\\|className=\\\"p-[0-9]\" src/app src/components --exclude-dir=node_modules || echo '✅ Design System wird korrekt verwendet!'"
+    "check-design-system": "echo 'Checking Design System usage...' && grep -r \"className=\\\"space-y-\\|className=\\\"gap-\\|className=\\\"p-[0-9]\" src/app src/components --exclude-dir=node_modules || echo '✅ Design System wird korrekt verwendet!'",
+    "test:forecast": "tsx test/fitness-forecast.test.ts"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.1.0",
     "@google-cloud/secret-manager": "^5.0.1",
     "axios": "^1.6.2",
+    "chart.js": "^4.5.1",
     "date-fns": "^2.30.0",
     "firebase": "^10.7.1",
     "firebase-admin": "^11.11.1",
@@ -25,6 +27,7 @@
     "next": "^15.1.3",
     "onnxruntime-node": "^1.23.0",
     "react": "^19.2.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.48.2",
     "react-query": "^3.39.3",
@@ -41,6 +44,7 @@
     "ignore-loader": "^0.1.2",
     "node-loader": "^2.1.0",
     "postcss": "^8",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }

@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Optimize page transitions
+  experimental: {
+    optimizeCss: true,
+  },
+  
   serverExternalPackages: [
     'firebase-admin', 
     '@google-cloud/firestore', 
