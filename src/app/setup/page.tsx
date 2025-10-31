@@ -33,7 +33,7 @@ export default function SetupCheck() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-8">
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-8">
           Firebase Setup Status
@@ -72,8 +72,8 @@ export default function SetupCheck() {
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="font-semibold text-blue-900 mb-3">Next Steps:</h3>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
+          <h3 className="font-semibold text-blue-900 mb-3 text-base">Next Steps:</h3>
+          <ol className="list-decimal list-inside space-y-2 text-base text-blue-800">
             <li>Click "Enable Auth" above to activate Email/Password authentication</li>
             <li>Click "Create Database" to set up Firestore (choose eur3 region)</li>
             <li>Run <code className="bg-blue-100 px-2 py-1 rounded">firebase deploy --only firestore:rules</code> in terminal</li>
@@ -84,13 +84,13 @@ export default function SetupCheck() {
         <div className="mt-6 flex gap-4">
           <a
             href="/"
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-4 py-2 text-base bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
           >
             ← Back to Home
           </a>
           <a
             href="/login"
-            className="px-4 py-2 bg-primary dark:bg-primary-dark text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 text-base bg-primary dark:bg-primary-dark text-white rounded hover:bg-blue-700"
           >
             Try Login →
           </a>
@@ -120,8 +120,8 @@ function StatusRow({
           {status ? '✅' : '⚠️'}
         </span>
         <div>
-          <p className="font-medium text-text-primary-light dark:text-text-primary-dark">{label}</p>
-          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+          <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-base">{label}</p>
+          <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">
             {status ? okText : errorText}
           </p>
         </div>
@@ -131,7 +131,7 @@ function StatusRow({
           href={action.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-1 bg-primary dark:bg-primary-dark text-white text-sm rounded hover:bg-blue-700"
+          className="px-3 py-1 bg-primary dark:bg-primary-dark text-white text-base rounded hover:bg-blue-700"
         >
           {action.text}
         </a>

@@ -25,6 +25,15 @@ interface StravaActivity {
   kilojoules?: number;
 }
 
+// Helper function to format hours to "h:mm h" (rounded to 5min)
+const formatHoursToTime = (hours: number): string => {
+  const totalMinutes = Math.round(hours * 60);
+  const roundedMinutes = Math.round(totalMinutes / 5) * 5; // Round to nearest 5 minutes
+  const h = Math.floor(roundedMinutes / 60);
+  const m = roundedMinutes % 60;
+  return `${h}:${String(m).padStart(2, '0')} h`;
+};
+
 export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -213,13 +222,13 @@ export default function DashboardPage() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Strava Status Message */}
         {stravaMessage && (
-          <div className={`mb-6 p-4 rounded-lg ${
+          <div className={`mb-6 p-4 rounded-lg text-base ${
             stravaMessage.includes('✓') 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-red-50 border border-red-200 text-red-800'
+              ? 'bg-secondary-50 dark:bg-secondary-900/30 border border-secondary-200 dark:border-secondary-700 text-secondary-800 dark:text-secondary-200' 
+              : 'bg-coral-50 dark:bg-coral-900/30 border border-coral-200 dark:border-coral-700 text-coral-800 dark:text-coral-200'
           }`}>
             {stravaMessage}
           </div>
@@ -242,27 +251,27 @@ export default function DashboardPage() {
                 </p>
                 
                 {/* Benefits */}
-                <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-600">
+                <div className="mt-3 grid grid-cols-2 gap-2 text-base text-gray-600 dark:text-gray-300">
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 mr-1 text-secondary dark:text-secondary-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     Auto-sync activities
                   </div>
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 mr-1 text-secondary dark:text-secondary-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     Better predictions
                   </div>
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 mr-1 text-secondary dark:text-secondary-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     Real-time fitness tracking
                   </div>
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 mr-1 text-secondary dark:text-secondary-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     No manual entry
@@ -270,11 +279,11 @@ export default function DashboardPage() {
                 </div>
 
                 {/* How it works */}
-                <details className="mt-4 text-xs text-gray-600">
-                  <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
+                <details className="mt-4 text-sm text-gray-600">
+                  <summary className="cursor-pointer font-medium text-base text-gray-700 hover:text-gray-900">
                     📖 How does it work? (Click to expand)
                   </summary>
-                  <div className="mt-2 pl-4 space-y-2">
+                  <div className="mt-2 pl-4 space-y-2 text-base">
                     <p>
                       <strong>Step 1:</strong> Click the button below
                     </p>
@@ -287,10 +296,10 @@ export default function DashboardPage() {
                     <p>
                       <strong>Step 4:</strong> Done! You'll be redirected back automatically
                     </p>
-                    <p className="text-green-600 font-medium">
+                    <p className="text-secondary dark:text-secondary-dark font-medium">
                       ✓ You don't need to create any API account - just use your regular Strava login!
                     </p>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       <strong>Safe & Secure:</strong> We only read your activities, never post or modify anything. 
                       You can disconnect anytime in Settings.
                     </p>
@@ -319,30 +328,33 @@ export default function DashboardPage() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
+            title="Form zeigt dein aktuelles Erholungs- und Leistungsniveau an. Ein positiver Wert bedeutet, dass du erholt bist und bereit für intensive Einheiten oder Wettkämpfe. Ein negativer Wert weist auf Ermüdung hin – ideal für Trainingsphasen mit höherem Umfang."
+          >
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                  fitnessMetrics.tsb > 25 ? 'bg-green-100' :
-                  fitnessMetrics.tsb >= -10 ? 'bg-blue-100' :
-                  fitnessMetrics.tsb >= -30 ? 'bg-yellow-100' : 'bg-red-100'
+                  fitnessMetrics.tsb > 25 ? 'bg-secondary-100 dark:bg-secondary-900' :
+                  fitnessMetrics.tsb >= -10 ? 'bg-primary-100 dark:bg-primary-900' :
+                  fitnessMetrics.tsb >= -30 ? 'bg-orange-100 dark:bg-orange-900' : 'bg-coral-100 dark:bg-coral-900'
                 }`}>
                   <svg className={`w-6 h-6 ${
-                    fitnessMetrics.tsb > 25 ? 'text-green-600' :
-                    fitnessMetrics.tsb >= -10 ? 'text-blue-600' :
-                    fitnessMetrics.tsb >= -30 ? 'text-yellow-600' : 'text-red-600'
+                    fitnessMetrics.tsb > 25 ? 'text-secondary-600 dark:text-secondary-300' :
+                    fitnessMetrics.tsb >= -10 ? 'text-primary-600 dark:text-primary-300' :
+                    fitnessMetrics.tsb >= -30 ? 'text-orange-600 dark:text-orange-300' : 'text-coral-600 dark:text-coral-300'
                   }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-base font-medium text-gray-500">Form (TSB)</p>
-                <p className="text-3xl font-semibold text-gray-900">
+                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Form (TSB)</p>
+                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
                   {profile?.stravaConnected ? fitnessMetrics.tsb.toFixed(1) : '--'}
                 </p>
                 {profile?.stravaConnected && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">
                     {interpretTSB(fitnessMetrics.tsb).message.split('-')[0].trim()}
                   </p>
                 )}
@@ -350,49 +362,55 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
+            title="Fitness spiegelt deine langfristige Trainingsbelastung wider. Sie basiert auf dem Durchschnitt deiner letzten Trainingswochen. Ein höherer CTL-Wert zeigt eine bessere Ausdauerbasis und Anpassung an regelmäßiges Training."
+          >
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-olive-100 dark:bg-olive-900 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-olive-600 dark:text-olive-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-base font-medium text-gray-500">Fitness (CTL)</p>
-                <p className="text-3xl font-semibold text-gray-900">
+                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Fitness (CTL)</p>
+                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
                   {profile?.stravaConnected ? fitnessMetrics.ctl.toFixed(1) : '--'}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">42-Tage Ø</p>
+                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">42-Tage Ø</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 cursor-help transition-transform hover:scale-105"
+            title="Fatigue misst deine kurzfristige Ermüdung durch die letzten Trainingstage. Hohe ATL-Werte bedeuten, dass du dich aktuell stark belastet hast. Sie helfen, Übertraining zu vermeiden und die Regeneration zu steuern."
+          >
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-coral-100 dark:bg-coral-900 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-coral-600 dark:text-coral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-base font-medium text-gray-500">Fatigue (ATL)</p>
-                <p className="text-3xl font-semibold text-gray-900">
+                <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark">Fatigue (ATL)</p>
+                <p className="text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark">
                   {profile?.stravaConnected ? fitnessMetrics.atl.toFixed(1) : '--'}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">7-Tage Ø</p>
+                <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mt-1">7-Tage Ø</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* This Week's Plan */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-gray-900">This Week's Training Plan</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark">This Week's Training Plan</h2>
             {profile?.stravaConnected && (
               <button
                 onClick={async () => {
@@ -454,8 +472,8 @@ export default function DashboardPage() {
                   </button>
                   
                   <div className="text-center">
-                    <h3 className="font-semibold text-gray-900">Week {trainingPlan.weeks[currentPlanWeek]?.weekNumber || 1}</h3>
-                    <p className="text-xs text-gray-500">{currentPlanWeek === 0 ? 'This Week' : `+${currentPlanWeek} weeks`}</p>
+                    <h3 className="font-bold text-text-primary-light dark:text-text-primary-dark text-3xl">Week {trainingPlan.weeks[currentPlanWeek]?.weekNumber || 1}</h3>
+                    <p className="text-xl text-text-secondary-light dark:text-text-secondary-dark mt-1">{currentPlanWeek === 0 ? 'This Week' : `+${currentPlanWeek} weeks`}</p>
                   </div>
                   
                   <button
@@ -476,48 +494,48 @@ export default function DashboardPage() {
                   
                   return (
                     <>
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
                         <div className="grid grid-cols-7 gap-2">
                           {week.sessions?.map((session: any, idx: number) => (
-                            <div key={idx} className="bg-white rounded p-3 text-center border border-gray-200">
-                              <p className="text-xs font-medium text-gray-500 mb-1">
+                            <div key={idx} className="bg-white dark:bg-gray-800 rounded p-3 text-center border border-gray-200 dark:border-gray-700">
+                              <p className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">
                                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
                               </p>
                               {session ? (
                                 <>
-                                  <p className="text-sm font-semibold text-gray-900">{session.type}</p>
-                                  <p className="text-xs text-gray-600 mt-1">{session.duration} min</p>
-                                  <p className="text-xs text-gray-500">{Math.round(session.targetTss)} TSS</p>
+                                  <p className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark">{session.type}</p>
+                                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">{formatHoursToTime(session.duration / 60)}</p>
+                                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{session.targetTss.toFixed(1)} TSS</p>
                                 </>
                               ) : (
-                                <p className="text-xs text-gray-400">Rest</p>
+                                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Rest</p>
                               )}
                             </div>
                           ))}
                         </div>
-                        <div className="mt-3 flex justify-between text-sm">
-                          <span className="text-gray-600">Weekly TSS: <strong>{Math.round(week.totalTss || 0)}</strong></span>
-                          <span className="text-gray-600">Total Time: <strong>{Math.round((week.totalHours || 0) * 60)} min</strong></span>
-                          <span className="text-gray-600">HIT Sessions: <strong>{week.hitSessions || 0}</strong></span>
+                        <div className="mt-3 flex justify-between text-base">
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark">Weekly TSS: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.totalTss.toFixed(1)}</strong></span>
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark">Total Time: <strong className="text-text-primary-light dark:text-text-primary-dark">{formatHoursToTime(week.totalHours || 0)}</strong></span>
+                          <span className="text-text-secondary-light dark:text-text-secondary-dark">HIT Sessions: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.hitSessions || 0}</strong></span>
                         </div>
                       </div>
 
                       {/* Plan Summary */}
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                          <h4 className="text-sm font-semibold text-gray-900 mb-2">Training Load</h4>
-                          <div className="space-y-1 text-xs text-gray-600">
-                            <p>LIT Ratio: <strong>{Math.round((week.litRatio || 0) * 100)}%</strong></p>
-                            <p>Total Hours: <strong>{(week.totalHours || 0).toFixed(1)} h</strong></p>
-                            <p>Sessions: <strong>{week.sessions?.filter((s: any) => s).length || 0}</strong></p>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                          <h4 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">Training Load</h4>
+                          <div className="space-y-1 text-base text-text-secondary-light dark:text-text-secondary-dark">
+                            <p>LIT Ratio: <strong className="text-text-primary-light dark:text-text-primary-dark">{((week.litRatio || 0) * 100).toFixed(1)}%</strong></p>
+                            <p>Total Hours: <strong className="text-text-primary-light dark:text-text-primary-dark">{formatHoursToTime(week.totalHours || 0)}</strong></p>
+                            <p>Sessions: <strong className="text-text-primary-light dark:text-text-primary-dark">{week.sessions?.filter((s: any) => s).length || 0}</strong></p>
                           </div>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                          <h4 className="text-sm font-semibold text-gray-900 mb-2">Fitness Projection</h4>
-                          <div className="space-y-1 text-xs text-gray-600">
-                            <p>Projected CTL: <strong>{Math.round(week.projectedFitness?.ctl || 0)}</strong></p>
-                            <p>Projected ATL: <strong>{Math.round(week.projectedFitness?.atl || 0)}</strong></p>
-                            <p>Projected TSB: <strong>{Math.round(week.projectedFitness?.tsb || 0)}</strong></p>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                          <h4 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">Fitness Projection</h4>
+                          <div className="space-y-1 text-base text-text-secondary-light dark:text-text-secondary-dark">
+                            <p>Projected CTL: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.ctl || 0).toFixed(1)}</strong></p>
+                            <p>Projected ATL: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.atl || 0).toFixed(1)}</strong></p>
+                            <p>Projected TSB: <strong className="text-text-primary-light dark:text-text-primary-dark">{(week.projectedFitness?.tsb || 0).toFixed(1)}</strong></p>
                           </div>
                         </div>
                       </div>
@@ -530,8 +548,8 @@ export default function DashboardPage() {
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p className="mt-2">No training plan generated yet</p>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="mt-2 text-base">No training plan generated yet</p>
+                <p className="text-base text-gray-400 mt-1">
                   {profile?.stravaConnected 
                     ? 'Click "Generate Plan" to create your personalized training plan'
                     : 'Connect Strava and configure your settings to get started'

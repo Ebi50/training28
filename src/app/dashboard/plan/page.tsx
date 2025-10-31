@@ -9,6 +9,15 @@ import { getUserProfile } from '@/lib/firestore';
 import { format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';
 
+// Helper function to format hours to "h:mm h" (rounded to 5min)
+const formatHoursToTime = (hours: number): string => {
+  const totalMinutes = Math.round(hours * 60);
+  const roundedMinutes = Math.round(totalMinutes / 5) * 5; // Round to nearest 5 minutes
+  const h = Math.floor(roundedMinutes / 60);
+  const m = roundedMinutes % 60;
+  return `${h}:${String(m).padStart(2, '0')} h`;
+};
+
 interface UserProfile {
   email?: string;
   ftp?: number;
@@ -141,17 +150,17 @@ export default function TrainingPlanPage() {
       userEmail={auth.currentUser?.email || undefined}
       onSignOut={handleSignOut}
     >
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Training Plan</h1>
-            <p className="text-gray-600 mt-1">8-week training schedule</p>
+            <h1 className="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">Training Plan</h1>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1 text-base">8-week training schedule</p>
           </div>
           {profile?.stravaConnected && (
             <button
               onClick={handleGeneratePlan}
               disabled={generatingPlan}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+              className="px-6 py-3 bg-blue-600 text-white text-base rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
             >
               {generatingPlan ? 'Generating...' : 'Generate Plan'}
             </button>
@@ -159,15 +168,15 @@ export default function TrainingPlanPage() {
         </div>
 
         {loadingPlan ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           </div>
         ) : !weeksArray || weeksArray.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <h3 className="text-lg font-semibold text-gray-900">No Plan Yet</h3>
-            <p className="mt-2 text-gray-600">Click Generate Plan to create your schedule</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+            <h3 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">No Plan Yet</h3>
+            <p className="mt-2 text-text-secondary-light dark:text-text-secondary-dark text-base">Click Generate Plan to create your schedule</p>
             {trainingPlan && (
-              <div className="mt-4 p-4 bg-gray-100 rounded text-left text-xs">
+              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded text-left text-sm">
                 <p className="font-bold">Debug Info:</p>
                 <pre className="mt-2 whitespace-pre-wrap">{JSON.stringify(trainingPlan, null, 2).substring(0, 500)}</pre>
               </div>
@@ -175,41 +184,41 @@ export default function TrainingPlanPage() {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow mb-6">
-              <div className="px-6 py-4 flex items-center justify-between border-b">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6">
+              <div className="px-6 py-4 flex items-center justify-between border-b dark:border-gray-700">
                 <button
                   onClick={() => setCurrentWeek(Math.max(0, currentWeek - 1))}
                   disabled={currentWeek === 0}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 text-text-primary-light dark:text-text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-50"
                 >
                   Previous Week
                 </button>
-                <h2 className="text-2xl font-bold">Woche {currentWeek + 1}</h2>
+                <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Woche {currentWeek + 1}</h2>
                 <button
                   onClick={() => setCurrentWeek(Math.min(weeksArray.length - 1, currentWeek + 1))}
                   disabled={currentWeek >= weeksArray.length - 1}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 text-text-primary-light dark:text-text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg disabled:opacity-50"
                 >
                   Next Week
                 </button>
               </div>
-              <div className="px-6 py-4 bg-gray-50 border-b">
+              <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
                 <div className="grid grid-cols-4 gap-6">
                   <div>
-                    <p className="text-sm text-gray-600">TSS</p>
-                    <p className="text-2xl font-bold">{Math.round(currentWeekData?.totalTss || 0)}</p>
+                    <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">TSS</p>
+                    <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{(currentWeekData?.totalTss || 0).toFixed(1)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Hours</p>
-                    <p className="text-2xl font-bold">{(currentWeekData?.totalHours || 0).toFixed(1)}h</p>
+                    <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">Hours</p>
+                    <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{formatHoursToTime(currentWeekData?.totalHours || 0)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">HIT</p>
-                    <p className="text-2xl font-bold">{currentWeekData?.hitSessions || 0}</p>
+                    <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">HIT</p>
+                    <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{currentWeekData?.hitSessions || 0}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">LIT</p>
-                    <p className="text-2xl font-bold">{Math.round((currentWeekData?.litRatio || 0) * 100)}%</p>
+                    <p className="text-base text-text-secondary-light dark:text-text-secondary-dark">LIT</p>
+                    <p className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">{((currentWeekData?.litRatio || 0) * 100).toFixed(1)}%</p>
                   </div>
                 </div>
               </div>
@@ -217,29 +226,58 @@ export default function TrainingPlanPage() {
 
             <div className="space-y-4">
               {currentWeekData?.sessions?.map((session: any, idx: number) => (
-                <div key={idx} className="bg-white rounded-lg shadow p-6">
+                <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">
                       {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
                     </h3>
                     {session && (
-                      <span className={'px-3 py-1 text-xs rounded-full ' + (session.type === 'HIT' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700')}>
+                      <span className={'px-3 py-1 text-sm rounded-full ' + (
+                        session.type === 'HIT' ? 'bg-coral-100 dark:bg-coral-900 text-coral-700 dark:text-coral-200' : 
+                        session.type === 'LIT' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' :
+                        'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-200'
+                      )}>
                         {session.type}
                       </span>
                     )}
                   </div>
                   {session ? (
                     <>
-                      <p className="font-medium mb-2">{session.name || 'Training'}</p>
-                      {session.description && <p className="text-sm text-gray-600 mb-3">{session.description}</p>}
-                      <div className="flex gap-6 text-sm">
-                        <span>{session.duration} min</span>
-                        <span>{Math.round(session.targetTss)} TSS</span>
+                      <p className="font-medium mb-2 text-base text-text-primary-light dark:text-text-primary-dark">{session.name || 'Training'}</p>
+                      {session.description && (
+                        <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mb-3">
+                          {session.description
+                            // First handle "Xh Ym" patterns (e.g., "1h 48m" -> "1:48h")
+                            .replace(/(\d+\.?\d*)h\s*(\d+)m/g, (match: string, h: string, m: string) => {
+                              const totalHours = parseFloat(h) + parseFloat(m) / 60;
+                              return formatHoursToTime(totalHours);
+                            })
+                            // Then handle standalone "Xh" patterns
+                            .replace(/(\d+\.?\d*)h/g, (match: string) => {
+                              const hours = parseFloat(match.replace('h', ''));
+                              return formatHoursToTime(hours);
+                            })
+                            // Handle standalone minutes (e.g., "101.25min" -> "105min")
+                            .replace(/(\d+\.?\d*)min/g, (match: string) => {
+                              const mins = parseFloat(match.replace('min', ''));
+                              const rounded = Math.round(mins / 5) * 5;
+                              return `${rounded}min`;
+                            })
+                            // TSS formatting
+                            .replace(/TSS:\s*[\d.]+/g, (match: string) => {
+                              const tss = parseFloat(match.replace('TSS:', '').trim());
+                              return 'TSS: ' + tss.toFixed(1);
+                            })
+                          }
+                        </p>
+                      )}
+                      <div className="flex gap-6 text-base text-text-secondary-light dark:text-text-secondary-dark">
+                        <span>{session.targetTss.toFixed(1)} TSS</span>
                         {session.targetZone && <span>Zone {session.targetZone}</span>}
                       </div>
                     </>
                   ) : (
-                    <p className="text-gray-500">Rest Day</p>
+                    <p className="text-text-secondary-light dark:text-text-secondary-dark">Rest Day</p>
                   )}
                 </div>
               ))}

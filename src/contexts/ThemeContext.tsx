@@ -26,16 +26,20 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [theme, setThemeState] = useState<Theme>('dark'); // Default to dark
   const [mounted, setMounted] = useState(false);
 
-  // Set mounted flag
+  // Set mounted flag and load saved theme
   useEffect(() => {
+    const savedTheme = getInitialTheme();
+    setThemeState(savedTheme);
     setMounted(true);
   }, []);
 
   // Apply theme to document and save to localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const root = document.documentElement;
     
     // Remove both classes first
@@ -55,11 +59,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
   };
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

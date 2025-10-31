@@ -121,7 +121,7 @@ export default function DashboardLayout({
           </h3>
           <div className="space-y-1">
             <button
-              onClick={() => router.push('/features')}
+              onClick={() => router.push('/features#features')}
               className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export default function DashboardLayout({
               <span>Features</span>
             </button>
             <button
-              onClick={() => router.push('/how-it-works')}
+              onClick={() => router.push('/features#how-it-works')}
               className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ export default function DashboardLayout({
               <span>Wie es funktioniert</span>
             </button>
             <button
-              onClick={() => router.push('/science')}
+              onClick={() => router.push('/features#science')}
               className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +148,7 @@ export default function DashboardLayout({
               <span>Wissenschaft</span>
             </button>
             <button
-              onClick={() => router.push('/about')}
+              onClick={() => router.push('/features#about')}
               className="w-full flex items-center px-4 py-2.5 text-sm hover:bg-white/15 dark:hover:bg-white/10 rounded-lg transition-all duration-200"
             >
               <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

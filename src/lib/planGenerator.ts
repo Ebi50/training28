@@ -391,21 +391,29 @@ export class TrainingPlanGenerator {
   }
 
   /**
-   * Generate session description
+   * Generate session description with formatted time (rounded to 5min)
    */
   private generateSessionDescription(type: string, duration: number, targetTss: number): string {
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
-    const timeStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    // Round to nearest 5 minutes
+    const roundedMinutes = Math.round(duration / 5) * 5;
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+    
+    // Format as "h:mm h" or "Xmin"
+    const timeStr = hours > 0 
+      ? `${hours}:${String(minutes).padStart(2, '0')} h` 
+      : `${minutes}min`;
+    
+    const tssStr = targetTss.toFixed(1);
 
     switch (type) {
       case 'HIT':
-        return `${timeStr} threshold/VO2 intervals (TSS: ${targetTss})`;
+        return `${timeStr} threshold/VO2 intervals (TSS: ${tssStr})`;
       case 'REC':
-        return `${timeStr} easy recovery ride (TSS: ${targetTss})`;
+        return `${timeStr} easy recovery ride (TSS: ${tssStr})`;
       case 'LIT':
       default:
-        return `${timeStr} endurance base training (TSS: ${targetTss})`;
+        return `${timeStr} endurance base training (TSS: ${tssStr})`;
     }
   }
 
