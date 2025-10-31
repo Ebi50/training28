@@ -8,6 +8,9 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 admin.initializeApp();
 const db = admin.firestore();
 
+// Import scheduled functions
+export { dailyPlanUpdate } from './scheduledPlanUpdate';
+
 // Initialize CORS
 const corsHandler = cors({ origin: true });
 

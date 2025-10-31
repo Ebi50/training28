@@ -89,6 +89,7 @@ async function loadModel(): Promise<ort.InferenceSession> {
 
 /**
  * Extract features from user data for ML prediction
+ * Features match model_features.json: 15 features exactly
  */
 function extractFeatures(
   profile: UserProfile,
@@ -103,7 +104,8 @@ function extractFeatures(
   // Get latest metrics
   const latest = sortedMetrics[0] || { ctl: 0, atl: 0, tsb: 0, tss: 0 };
   
-  // Calculate rolling averages
+  // Calculate rolling sums
+  const tss_3d = sortedMetrics.slice(0, 3).reduce((sum, m) => sum + (m.tss || 0), 0);
   const tss_7d = sortedMetrics.slice(0, 7).reduce((sum, m) => sum + (m.tss || 0), 0);
   const tss_14d = sortedMetrics.slice(0, 14).reduce((sum, m) => sum + (m.tss || 0), 0);
   const tss_28d = sortedMetrics.slice(0, 28).reduce((sum, m) => sum + (m.tss || 0), 0);
@@ -127,44 +129,29 @@ function extractFeatures(
   
   // Cyclical time features (day of week, month)
   const dow = targetDate.getDay(); // 0-6
-  const month = targetDate.getMonth(); // 0-11
+  const month = targetDate.getMonth() + 1; // 1-12 (not 0-11)
   const dow_sin = Math.sin(2 * Math.PI * dow / 7);
   const dow_cos = Math.cos(2 * Math.PI * dow / 7);
   const mon_sin = Math.sin(2 * Math.PI * month / 12);
   const mon_cos = Math.cos(2 * Math.PI * month / 12);
   
-  // Calculate age from birthdate
-  const age = profile.birthDate 
-    ? new Date().getFullYear() - new Date(profile.birthDate).getFullYear()
-    : profile.age || 35;
-  
+  // EXACT 15 features matching model_features.json
   const features: ModelFeatures = {
-    // Recent TSS
-    tss_lag1: sortedMetrics[0]?.tss || 0,
-    tss_3d: sortedMetrics.slice(0, 3).reduce((sum, m) => sum + (m.tss || 0), 0),
-    tss_7d,
-    tss_14d,
-    tss_28d,
-    tss_std7,
-    tss_zero7,
-    
-    // Fitness metrics
-    ctl_42: latest.ctl || 0,
-    atl_7: latest.atl || 0,
-    tsb: latest.tsb || 0,
-    ramp_7v42,
-    
-    // Time features
-    dow_sin,
-    dow_cos,
-    mon_sin,
-    mon_cos,
-    
-    // Athlete features (normalized)
-    ftp: (profile.ftp || 250) / 300, // Normalize around 300W
-    lthr: (profile.lthr || 165) / 180, // Normalize around 180bpm
-    weight: (profile.weight || 75) / 80, // Normalize around 80kg
-    age: age / 50, // Normalize around 50 years
+    TSS_lag1: sortedMetrics[0]?.tss || 0,
+    TSS_3d: tss_3d,
+    TSS_7d: tss_7d,
+    TSS_14d: tss_14d,
+    TSS_28d: tss_28d,
+    TSS_std7: tss_std7,
+    TSS_zero7: tss_zero7,
+    CTL_42: latest.ctl || 0,
+    ATL_7: latest.atl || 0,
+    TSB: latest.tsb || 0,
+    ramp_7v42: ramp_7v42,
+    dow_sin: dow_sin,
+    dow_cos: dow_cos,
+    mon_sin: mon_sin,
+    mon_cos: mon_cos,
   };
   
   return features;
@@ -172,35 +159,19 @@ function extractFeatures(
 
 /**
  * Convert features object to ordered array based on model metadata
+ * Order MUST match model_features.json exactly
  */
 function featuresToArray(features: ModelFeatures, featureNames?: string[]): number[] {
-  if (!featureNames || featureNames.length === 0) {
-    // Default feature order
-    return [
-      features.tss_lag1,
-      features.tss_3d,
-      features.tss_7d,
-      features.tss_14d,
-      features.tss_28d,
-      features.tss_std7,
-      features.tss_zero7,
-      features.ctl_42,
-      features.atl_7,
-      features.tsb,
-      features.ramp_7v42,
-      features.dow_sin,
-      features.dow_cos,
-      features.mon_sin,
-      features.mon_cos,
-      features.ftp,
-      features.lthr,
-      features.weight,
-      features.age,
-    ];
-  }
+  // Feature order from model_features.json
+  const defaultOrder = [
+    'TSS_lag1', 'TSS_3d', 'TSS_7d', 'TSS_14d', 'TSS_28d',
+    'TSS_std7', 'TSS_zero7', 'CTL_42', 'ATL_7', 'TSB',
+    'ramp_7v42', 'dow_sin', 'dow_cos', 'mon_sin', 'mon_cos'
+  ];
   
-  // Use feature names from metadata
-  return featureNames.map(name => features[name as keyof ModelFeatures] || 0);
+  const orderedNames = featureNames && featureNames.length > 0 ? featureNames : defaultOrder;
+  
+  return orderedNames.map(name => features[name as keyof ModelFeatures] || 0);
 }
 
 /**

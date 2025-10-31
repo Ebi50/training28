@@ -7,10 +7,12 @@ import {
   SeasonGoal, 
   TrainingCamp,
   TimeSlot,
-  UserProfile 
+  UserProfile,
+  MorningCheck 
 } from '@/types';
 import { addDays, startOfWeek, format, differenceInDays, isBefore, isAfter } from 'date-fns';
 import { predictTSS, isModelAvailable } from './mlPredictor';
+import { adaptSession } from './sessionAdapter';
 
 // Default guardrails
 const DEFAULT_GUARDRAILS: Guardrails = {
@@ -120,6 +122,61 @@ export class TrainingPlanGenerator {
     };
 
     return plan;
+  }
+
+  /**
+   * Adjust today's sessions based on Morning Check
+   * This should be called daily after user completes Morning Check
+   */
+  async adjustTodaysSessions(
+    userId: string,
+    todayDate: Date,
+    morningCheck: MorningCheck,
+    currentPlan: WeeklyPlan,
+    recentMetrics: DailyMetrics[]
+  ): Promise<{
+    adjustedSessions: TrainingSession[];
+    changed: boolean;
+    reasons: string[];
+  }> {
+    const todayStr = format(todayDate, 'yyyy-MM-dd');
+    
+    // Find today's sessions in current plan
+    const todaysSessions = currentPlan.sessions.filter(s => s.date === todayStr);
+    
+    if (todaysSessions.length === 0) {
+      return {
+        adjustedSessions: [],
+        changed: false,
+        reasons: ['Keine Sessions für heute geplant'],
+      };
+    }
+    
+    // Adapt each session based on readiness
+    const adaptedSessions: TrainingSession[] = [];
+    const reasons: string[] = [];
+    let changed = false;
+    
+    for (const session of todaysSessions) {
+      const result = adaptSession(session, morningCheck, recentMetrics);
+      adaptedSessions.push(result.adaptedSession);
+      
+      if (result.changed) {
+        changed = true;
+        reasons.push(result.reason);
+        console.log('🔄 Session adapted:', {
+          original: `${session.type} ${session.duration}min ${session.targetTss}TSS`,
+          adapted: `${result.adaptedSession.type} ${result.adaptedSession.duration}min ${result.adaptedSession.targetTss}TSS`,
+          reason: result.reason,
+        });
+      }
+    }
+    
+    return {
+      adjustedSessions: adaptedSessions,
+      changed,
+      reasons,
+    };
   }
 
   /**

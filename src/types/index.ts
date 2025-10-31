@@ -96,6 +96,21 @@ export interface DailyMetrics {
   indoor: boolean;
   tags?: string[];
   notes?: string;
+  // Morning Check (subjective metrics)
+  morningCheck?: MorningCheck;
+}
+
+// Morning Check - Subjektive tägliche Bewertung
+export interface MorningCheck {
+  date: string; // YYYY-MM-DD
+  sleepQuality: number; // 1-5 (1=schlecht, 5=excellent)
+  fatigue: number; // 1-5 (1=frisch, 5=kaputt)
+  motivation: number; // 1-5 (1=keine, 5=top)
+  soreness: number; // 1-5 (1=keine, 5=stark)
+  stress: number; // 1-5 (1=niedrig, 5=hoch)
+  readinessScore?: number; // 0-1 (calculated)
+  notes?: string;
+  submittedAt: Date;
 }
 
 export interface Activity {
@@ -189,17 +204,18 @@ export interface Guardrails {
 }
 
 // ML and Analytics types
+// Feature names MUST match model_features.json exactly
 export interface ModelFeatures {
-  tss_lag1: number;
-  tss_3d: number;
-  tss_7d: number;
-  tss_14d: number;
-  tss_28d: number;
-  tss_std7: number;
-  tss_zero7: number;
-  ctl_42: number;
-  atl_7: number;
-  tsb: number;
+  TSS_lag1: number;
+  TSS_3d: number;
+  TSS_7d: number;
+  TSS_14d: number;
+  TSS_28d: number;
+  TSS_std7: number;
+  TSS_zero7: number;
+  CTL_42: number;
+  ATL_7: number;
+  TSB: number;
   ramp_7v42: number;
   dow_sin: number;
   dow_cos: number;

@@ -225,6 +225,33 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="w-full">
+        {/* Morning Check Banner */}
+        <div className={`${spacing.contentBlock} bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-6`}>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="text-4xl">☀️</div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  Guten Morgen! Wie fühlst du dich heute?
+                </h3>
+                <p className="text-base text-gray-600 dark:text-gray-300 mt-1">
+                  Beantworte 5 schnelle Fragen und wir passen dein Training optimal an
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                console.log('🎯 Morning Check Button clicked!');
+                router.push('/dashboard/morning-check');
+              }}
+              className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-base flex items-center space-x-2 whitespace-nowrap transition-colors shadow-md hover:shadow-lg"
+            >
+              <span>🎯</span>
+              <span>Morning Check starten</span>
+            </button>
+          </div>
+        </div>
+
         {/* Strava Status Message */}
         {stravaMessage && (
           <div className={`${spacing.contentBlock} ${components.card.base} text-base ${
