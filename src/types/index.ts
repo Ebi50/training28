@@ -148,7 +148,8 @@ export interface TrainingSession {
   actualTss?: number;
   indoor: boolean;
   description: string;
-  notes?: string;
+  notes?: string; // User notes/comments
+  rpe?: number; // Rate of Perceived Exertion (1-10 scale)
   completed: boolean;
   activityId?: string; // Link to actual activity
   timeSlot?: {

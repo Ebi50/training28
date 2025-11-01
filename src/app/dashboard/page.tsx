@@ -4,15 +4,18 @@ import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/lib/firebase';
-import { getUserProfile } from '@/lib/firestore';
-import type { UserProfile, WeeklyPlan } from '@/types';
+import { getUserProfile, updateTrainingSession } from '@/lib/firestore';
+import type { UserProfile, WeeklyPlan, TrainingSession } from '@/types';
 import UserTutorial from '@/components/UserTutorial';
 import DashboardLayout from '@/components/DashboardLayout';
 import Tooltip from '@/components/Tooltip';
 import PlanQualityBanner from '@/components/PlanQualityBanner';
+import SessionNotes from '@/components/SessionNotes';
 import { useAutoLogout } from '@/hooks/useAutoLogout';
-import { calculateTSS, calculateFitnessMetrics, interpretTSB } from '@/lib/fitnessMetrics';
+import { calculateTSS, calculateFitnessMetrics, calculateFitnessMetricsHistory, interpretTSB, getCombinedFitnessMetrics, forecastFitnessMetrics } from '@/lib/fitnessMetrics';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
+import FitnessChart from '@/components/FitnessChart';
+import { generateZWOFromSession, generateZWOFilename } from '@/lib/zwoGenerator';
 
 interface StravaActivity {
   id: number;
@@ -45,6 +48,8 @@ export default function DashboardPage() {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [fitnessMetrics, setFitnessMetrics] = useState({ ctl: 0, atl: 0, tsb: 0 });
+  const [fitnessHistory, setFitnessHistory] = useState<Array<{ date: string; ctl: number; atl: number; tsb: number }>>([]);
+  const [fitnessForecast, setFitnessForecast] = useState<Array<{ date: string; ctl: number; atl: number; tsb: number }>>([]);
   const [trainingPlan, setTrainingPlan] = useState<any>(null);
   const [currentWeekPlan, setCurrentWeekPlan] = useState<WeeklyPlan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
@@ -181,6 +186,31 @@ export default function DashboardPage() {
           const metrics = calculateFitnessMetrics(activitiesWithTSS);
           console.log('📊 Fitness metrics:', metrics);
           setFitnessMetrics(metrics);
+
+          // Calculate fitness history for chart (last 42 days)
+          const history = calculateFitnessMetricsHistory(activitiesWithTSS, 0, 0, 42);
+          console.log('📈 Fitness history:', history.length, 'days');
+          setFitnessHistory(history);
+
+          // Calculate forecast if we have a training plan
+          if (trainingPlan?.weeks && trainingPlan.weeks.length > 0) {
+            const plannedActivities = trainingPlan.weeks.flatMap((week: any) =>
+              week.sessions?.map((session: any) => ({
+                date: session.date,
+                tss: session.targetTss || 0
+              })) || []
+            );
+            
+            if (plannedActivities.length > 0) {
+              const forecast = forecastFitnessMetrics({
+                currentCTL: metrics.ctl,
+                currentATL: metrics.atl,
+                plannedActivities
+              });
+              console.log('🔮 Fitness forecast:', forecast.length, 'days');
+              setFitnessForecast(forecast);
+            }
+          }
         } else {
           console.error('❌ Failed to fetch activities:', response.status, await response.text());
         }
@@ -485,6 +515,23 @@ export default function DashboardPage() {
           </Tooltip>
         </div>
 
+        {/* Fitness Chart */}
+        {profile?.stravaConnected && fitnessHistory.length > 0 && (
+          <div className={`${components.card.base} ${spacing.contentBlock}`}>
+            <h2 className="text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-6">
+              Fitness Verlauf & Prognose
+            </h2>
+            <p className="text-base text-text-secondary-light dark:text-text-secondary-dark mb-6">
+              Deine letzten 42 Trainingstage und zukünftige Entwicklung basierend auf deinem Trainingsplan
+            </p>
+            <FitnessChart 
+              historicalData={fitnessHistory}
+              forecastData={fitnessForecast}
+              isDarkMode={false}
+            />
+          </div>
+        )}
+
         {/* This Week's Plan */}
         <div className={`${components.card.base} ${spacing.contentBlock}`}>
           <div className={`${components.card.base} ${colors.border.default} flex items-center justify-between border-b`}>
@@ -591,15 +638,160 @@ export default function DashboardPage() {
                             </div>
                           ))}
                         </div>
-                        <div className={`${spacing.tight} flex justify-between ${typography.body}`}>
-                          <span className={colors.text.secondary}>Weekly TSS: <strong className={colors.text.primary}>{week.totalTss.toFixed(1)}</strong></span>
-                          <span className={colors.text.secondary}>Total Time: <strong className={colors.text.primary}>{formatHoursToTime(week.totalHours || 0)}</strong></span>
-                          <span className={colors.text.secondary}>HIT Sessions: <strong className={colors.text.primary}>{week.hitSessions || 0}</strong></span>
+                        {/* Week Summary - Horizontal Layout */}
+                        <div className={`${spacing.tight} grid grid-cols-4 gap-4 ${typography.body} text-center`}>
+                          <div>
+                            <p className={`${colors.text.secondary} text-sm`}>TSS</p>
+                            <p className={`${colors.text.primary} font-bold text-lg`}>{week.totalTss.toFixed(1)}</p>
+                          </div>
+                          <div>
+                            <p className={`${colors.text.secondary} text-sm`}>Hours</p>
+                            <p className={`${colors.text.primary} font-bold text-lg`}>{formatHoursToTime(week.totalHours || 0)}</p>
+                          </div>
+                          <div>
+                            <p className={`${colors.text.secondary} text-sm`}>LIT</p>
+                            <p className={`${colors.text.primary} font-bold text-lg`}>{((week.litRatio || 0) * 100).toFixed(0)}%</p>
+                          </div>
+                          <div>
+                            <p className={`${colors.text.secondary} text-sm`}>HIT</p>
+                            <p className={`${colors.text.primary} font-bold text-lg`}>{week.hitSessions || 0}</p>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Plan Summary */}
-                      <div className={`${components.grid.cols2} ${spacing.cardGap}`}>
+                      {/* Link to detailed Training Plan */}
+                      <div className="mt-6 text-center">
+                        <button
+                          onClick={() => router.push('/dashboard/plan')}
+                          className={`${components.button.primary} text-base`}
+                        >
+                          📋 View Full Training Plan & Export Workouts
+                        </button>
+                      </div>
+
+                      {/* REMOVED: Detailed Session View - Now on Training Plan page */}
+                      <div className="mt-6 space-y-3 hidden">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">📋 Training Sessions Details</h3>
+                        {week.sessions && week.sessions.length > 0 ? (
+                          week.sessions.filter((s: TrainingSession) => s).map((session: TrainingSession, idx: number) => {
+                            return (
+                            <div key={session.id || idx} className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow hidden">
+                              {/* Session Header */}
+                              <div className={`flex items-start justify-between ${spacing.micro}`}>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <h4 className={`${typography.bodyLarge} font-semibold ${colors.text.primary}`}>
+                                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][idx]}
+                                    </h4>
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                      session.type === 'LIT' 
+                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                        : session.type === 'HIT'
+                                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                        : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                    }`}>
+                                      {session.type}
+                                    </span>
+                                  </div>
+                                  <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>
+                                    Training
+                                  </p>
+                                  <p className={`${typography.bodySmall} ${colors.text.secondary}`}>
+                                    {session.description || 'No description'}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className={`${typography.body} font-semibold ${colors.text.primary}`}>
+                                    {session.targetTss.toFixed(1)} TSS
+                                  </p>
+                                  <p className={`${typography.bodySmall} ${colors.text.secondary}`}>
+                                    {formatHoursToTime(session.duration / 60)}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Export Buttons */}
+                              <div className={`${spacing.tight} flex gap-2`}>
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      const zwoXML = generateZWOFromSession(session, profile?.ftp || 200);
+                                      const filename = generateZWOFilename(session);
+                                      const blob = new Blob([zwoXML], { type: 'application/xml' });
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = filename;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } catch (error) {
+                                      console.error('Export error:', error);
+                                      alert('Error exporting workout');
+                                    }
+                                  }}
+                                  className={`${components.button.secondary} text-sm`}
+                                >
+                                  📥 Export to Zwift
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      const zwoXML = generateZWOFromSession(session, profile?.ftp || 200);
+                                      const filename = generateZWOFilename(session);
+                                      const blob = new Blob([zwoXML], { type: 'application/xml' });
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = filename;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } catch (error) {
+                                      console.error('Export error:', error);
+                                      alert('Error exporting workout');
+                                    }
+                                  }}
+                                  className={`${components.button.secondary} text-sm`}
+                                >
+                                  📥 Export to MyWhoosh
+                                </button>
+                              </div>
+
+                              {/* Session Notes */}
+                              {trainingPlan && (
+                                <SessionNotes
+                                  session={session}
+                                  onSave={async (updates) => {
+                                    const user = auth.currentUser;
+                                    if (!user) return;
+                                    try {
+                                      await updateTrainingSession(user.uid, trainingPlan.id, session.id, updates);
+                                      // Reload plan
+                                      const planRes = await fetch(`/api/training/plan?userId=${user.uid}`);
+                                      if (planRes.ok) {
+                                        const planData = await planRes.json();
+                                        setTrainingPlan(planData.plan);
+                                      }
+                                    } catch (error) {
+                                      console.error('Error saving notes:', error);
+                                      alert('Error saving notes');
+                                    }
+                                  }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })
+                        ) : (
+                          <p className="text-gray-500 text-center py-4">No training sessions for this week</p>
+                        )}
+                      </div>
+
+                      {/* Plan Summary - REMOVED, redundant with week summary above */}
+                      <div className={`${components.grid.cols2} ${spacing.cardGap} hidden`}>
                         <div className={`${components.card.base} ${colors.border.default} border`}>
                           <h4 className={`${typography.body} font-semibold ${colors.text.primary} ${spacing.micro}`}>Training Load</h4>
                           <div className={`${spacing.micro} ${typography.body} ${colors.text.secondary}`}>

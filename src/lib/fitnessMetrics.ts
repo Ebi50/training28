@@ -142,6 +142,69 @@ export function calculateFitnessMetrics(
 }
 
 /**
+ * Calculate fitness metrics history (day-by-day CTL, ATL, TSB)
+ * Returns array of daily metrics for charting
+ * @param activities Array of activities with TSS values
+ * @param initialCTL Starting CTL value (default 0)
+ * @param initialATL Starting ATL value (default 0)
+ * @param daysToShow Number of recent days to return (default 42)
+ */
+export function calculateFitnessMetricsHistory(
+  activities: ActivityMetrics[],
+  initialCTL: number = 0,
+  initialATL: number = 0,
+  daysToShow: number = 42
+): Array<{ date: string; ctl: number; atl: number; tsb: number }> {
+  if (activities.length === 0) {
+    return [];
+  }
+
+  // Sort activities by date (oldest first)
+  const sortedActivities = [...activities].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  let ctl = initialCTL;
+  let atl = initialATL;
+
+  // Create daily TSS totals
+  const dailyTSS = new Map<string, number>();
+  sortedActivities.forEach(activity => {
+    const date = activity.date.split('T')[0]; // Get YYYY-MM-DD
+    dailyTSS.set(date, (dailyTSS.get(date) || 0) + activity.tss);
+  });
+
+  // Calculate CTL and ATL day by day, storing history
+  const history: Array<{ date: string; ctl: number; atl: number; tsb: number }> = [];
+  const startDate = new Date(sortedActivities[0].date);
+  const endDate = new Date(sortedActivities[sortedActivities.length - 1].date);
+  
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split('T')[0];
+    const todayTSS = dailyTSS.get(dateStr) || 0;
+    
+    // Update CTL (42-day EMA)
+    ctl = calculateEMA(ctl, todayTSS, 42);
+    
+    // Update ATL (7-day EMA)
+    atl = calculateEMA(atl, todayTSS, 7);
+
+    // Calculate TSB
+    const tsb = ctl - atl;
+
+    history.push({
+      date: dateStr,
+      ctl: Math.round(ctl * 10) / 10,
+      atl: Math.round(atl * 10) / 10,
+      tsb: Math.round(tsb * 10) / 10
+    });
+  }
+
+  // Return only last N days
+  return history.slice(-daysToShow);
+}
+
+/**
  * Interpret TSB value for user feedback
  */
 export function interpretTSB(tsb: number): {

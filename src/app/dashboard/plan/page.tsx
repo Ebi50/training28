@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import DashboardLayout from '@/components/DashboardLayout';
-import { getUserProfile } from '@/lib/firestore';
+import SessionNotes from '@/components/SessionNotes';
+import { getUserProfile, updateTrainingSession } from '@/lib/firestore';
+import { generateZWOFromSession, generateZWOFilename } from '@/lib/zwoGenerator';
 import { format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
+import type { TrainingSession } from '@/types';
 
 // Helper function to format hours to "h:mm h" (rounded to 5min)
 const formatHoursToTime = (hours: number): string => {
@@ -204,19 +207,22 @@ export default function TrainingPlanPage() {
                 </button>
               </div>
               <div className={`${components.card.base} bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700`}>
-                <div className={`${components.grid.cols4} ${spacing.cardGap}`}>
+                <div className="flex gap-6 items-center">
                   <div>
                     <p className={`${typography.body} ${colors.text.secondary}`}>TSS</p>
                     <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{(currentWeekData?.totalTss || 0).toFixed(1)}</p>
                   </div>
+                  <div className="text-gray-300 dark:text-gray-600">|</div>
                   <div>
                     <p className={`${typography.body} ${colors.text.secondary}`}>Hours</p>
                     <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{formatHoursToTime(currentWeekData?.totalHours || 0)}</p>
                   </div>
+                  <div className="text-gray-300 dark:text-gray-600">|</div>
                   <div>
                     <p className={`${typography.body} ${colors.text.secondary}`}>HIT</p>
-                    <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{currentWeekData?.hitSessions || 0}</p>
+                    <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{(((1 - (currentWeekData?.litRatio || 0)) * 100)).toFixed(1)}%</p>
                   </div>
+                  <div className="text-gray-300 dark:text-gray-600">|</div>
                   <div>
                     <p className={`${typography.body} ${colors.text.secondary}`}>LIT</p>
                     <p className={`${typography.h2} font-bold ${colors.text.primary}`}>{((currentWeekData?.litRatio || 0) * 100).toFixed(1)}%</p>
@@ -226,17 +232,17 @@ export default function TrainingPlanPage() {
             </div>
 
             <div className={spacing.section}>
-              {currentWeekData?.sessions?.map((session: any, idx: number) => (
-                <div key={idx} className={components.card.base}>
+              {currentWeekData?.sessions?.map((session: TrainingSession, idx: number) => (
+                <div key={session?.id || idx} className={`${components.card.base} ${session ? 'border-2 border-gray-200 dark:border-gray-700' : ''}`}>
                   <div className={`flex items-center ${spacing.cardGap} ${spacing.micro}`}>
                     <h3 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][idx]}
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][idx]}
                     </h3>
                     {session && (
-                      <span className={`${typography.bodySmall} rounded-full px-3 py-1 ` + (
-                        session.type === 'HIT' ? 'bg-coral-100 dark:bg-coral-900 text-coral-700 dark:text-coral-200' : 
+                      <span className={`${typography.bodySmall} rounded-full px-3 py-1 font-medium ` + (
+                        session.type === 'HIT' ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200' : 
                         session.type === 'LIT' ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200' :
-                        'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-200'
+                        'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200'
                       )}>
                         {session.type}
                       </span>
@@ -244,38 +250,99 @@ export default function TrainingPlanPage() {
                   </div>
                   {session ? (
                     <>
-                      <p className={`font-medium ${spacing.micro} ${typography.body} ${colors.text.primary}`}>{session.name || 'Training'}</p>
+                      <p className={`font-medium ${spacing.micro} ${typography.bodyLarge} ${colors.text.primary}`}>Training</p>
                       {session.description && (
                         <p className={`${typography.body} ${colors.text.secondary} ${spacing.tight}`}>
-                          {session.description
-                            // First handle "Xh Ym" patterns (e.g., "1h 48m" -> "1:48h")
-                            .replace(/(\d+\.?\d*)h\s*(\d+)m/g, (match: string, h: string, m: string) => {
-                              const totalHours = parseFloat(h) + parseFloat(m) / 60;
-                              return formatHoursToTime(totalHours);
-                            })
-                            // Then handle standalone "Xh" patterns
-                            .replace(/(\d+\.?\d*)h/g, (match: string) => {
-                              const hours = parseFloat(match.replace('h', ''));
-                              return formatHoursToTime(hours);
-                            })
-                            // Handle standalone minutes (e.g., "101.25min" -> "105min")
-                            .replace(/(\d+\.?\d*)min/g, (match: string) => {
-                              const mins = parseFloat(match.replace('min', ''));
-                              const rounded = Math.round(mins / 5) * 5;
-                              return `${rounded}min`;
-                            })
-                            // TSS formatting
-                            .replace(/TSS:\s*[\d.]+/g, (match: string) => {
-                              const tss = parseFloat(match.replace('TSS:', '').trim());
-                              return 'TSS: ' + tss.toFixed(1);
-                            })
-                          }
+                          {session.description}
                         </p>
                       )}
-                      <div className={`flex ${spacing.cardGap} ${typography.body} ${colors.text.secondary}`}>
-                        <span>{session.targetTss.toFixed(1)} TSS</span>
-                        {session.targetZone && <span>Zone {session.targetZone}</span>}
+                      <div className={`flex ${spacing.cardGap} ${typography.body} ${colors.text.secondary} ${spacing.tight}`}>
+                        <span>{formatHoursToTime(session.duration / 60)}</span>
                       </div>
+
+                      {/* Export Button */}
+                      <div className={`${spacing.tight} pt-2 border-t dark:border-gray-700`}>
+                        <button
+                          onClick={() => {
+                            try {
+                              const zwoXML = generateZWOFromSession(session, profile?.ftp || 200);
+                              const filename = generateZWOFilename(session);
+                              const blob = new Blob([zwoXML], { type: 'application/xml' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = filename;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              URL.revokeObjectURL(url);
+                            } catch (error) {
+                              console.error('Export error:', error);
+                              alert('Error exporting workout');
+                            }
+                          }}
+                          className="w-auto px-6 py-2.5 bg-gradient-to-r from-orange-500 to-purple-500 hover:from-orange-600 hover:to-purple-600 text-white font-semibold rounded-lg transition-all text-sm shadow-md hover:shadow-lg"
+                        >
+                          📥 Export to Zwift / MyWhoosh
+                        </button>
+                      </div>
+
+                      {/* Session Notes & RPE */}
+                      {trainingPlan && (
+                        <div className="mt-4 pt-4 border-t dark:border-gray-700">
+                          <SessionNotes
+                            session={session}
+                            onSave={async (updates) => {
+                              const user = auth.currentUser;
+                              if (!user) {
+                                console.error('No user logged in');
+                                alert('Bitte einloggen um Notizen zu speichern');
+                                return;
+                              }
+                              
+                              if (!trainingPlan?.id) {
+                                console.error('No training plan ID found:', trainingPlan);
+                                alert('Fehler: Kein Trainingsplan gefunden. Bitte Plan neu generieren.');
+                                return;
+                              }
+                              
+                              if (!session?.id) {
+                                console.error('No session ID found:', session);
+                                alert('Fehler: Keine Session-ID gefunden.');
+                                return;
+                              }
+                              
+                              try {
+                                console.log('💾 Saving session updates:', { 
+                                  userId: user.uid, 
+                                  planId: trainingPlan.id, 
+                                  sessionId: session.id, 
+                                  updates 
+                                });
+                                
+                                await updateTrainingSession(user.uid, trainingPlan.id, session.id, updates);
+                                console.log('✅ Session saved successfully');
+                                
+                                // Reload plan
+                                console.log('🔄 Reloading plan...');
+                                const planRes = await fetch(`/api/training/plan?userId=${user.uid}`);
+                                if (planRes.ok) {
+                                  const planData = await planRes.json();
+                                  setTrainingPlan(planData.plan);
+                                  console.log('✅ Plan reloaded successfully');
+                                } else {
+                                  const errorText = await planRes.text();
+                                  console.error('❌ Failed to reload plan:', errorText);
+                                  alert('Notizen gespeichert, aber Plan konnte nicht neu geladen werden. Bitte Seite neu laden.');
+                                }
+                              } catch (error) {
+                                console.error('❌ Error saving notes:', error);
+                                alert(`Fehler beim Speichern: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}\n\nBitte prüfe die Browser-Console (F12) für Details.`);
+                              }
+                            }}
+                          />
+                        </div>
+                      )}
                     </>
                   ) : (
                     <p className="text-text-secondary-light dark:text-text-secondary-dark">Rest Day</p>

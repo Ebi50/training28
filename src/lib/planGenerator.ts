@@ -308,15 +308,22 @@ export class TrainingPlanGenerator {
     weekDays.forEach((date, dayIndex) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       const isHitDay = hitDays.includes(dayIndex);
-      const availableSlots = this.getAvailableSlots(params.availableTimeSlots, dayIndex);
+      let availableSlots = this.getAvailableSlots(params.availableTimeSlots, dayIndex);
       
-      // If no slots defined, assume all days available with default slot
-      if (params.availableTimeSlots.length === 0 && availableSlots.length === 0) {
-        availableSlots.push({ day: dayIndex, startTime: '08:00', endTime: '10:00', type: 'both' });
-      }
+      // 🎯 Handle time slot scenarios:
+      // 1. User has NO time slots defined at all → Use sensible defaults (first-time setup)
+      // 2. User HAS time slots but NOT for this day → Rest day (respect their schedule!)
       
-      if (availableSlots.length === 0) {
-        // Rest day - no available slots
+      if (params.availableTimeSlots.length === 0) {
+        // Scenario 1: No time slots configured at all - use defaults (weekdays only)
+        // dayIndex: 0=Monday, 1=Tuesday, ..., 6=Sunday
+        if (dayIndex >= 0 && dayIndex <= 4) { // Monday-Friday (0-4)
+          availableSlots = [{ day: dayIndex, startTime: '08:00', endTime: '10:00', type: 'both' as const }];
+        } else {
+          return; // Weekend rest days by default
+        }
+      } else if (availableSlots.length === 0) {
+        // Scenario 2: User configured time slots, but not for this day → Respect their choice (rest day)
         return;
       }
 
@@ -332,12 +339,17 @@ export class TrainingPlanGenerator {
       // Create session(s) for the day
       const targetTss = dailyTssTargets[dayIndex];
       if (targetTss > 0) {
+        // Count existing HIT sessions for variety
+        const hitCount = sessions.filter(s => s.type === 'HIT').length;
+        
         const daySessions = this.createTrainingSessions(
           dateStr,
           sessionType,
           targetTss,
           availableSlots,
-          params.indoorAllowed
+          params.indoorAllowed,
+          userProfile.ftp, // Pass FTP for workout structure
+          hitCount // Pass HIT count for interval variety
         );
         
         sessions.push(...daySessions);
@@ -386,7 +398,9 @@ export class TrainingPlanGenerator {
     type: 'LIT' | 'HIT' | 'REC',
     targetTss: number,
     availableSlots: TimeSlot[],
-    indoorAllowed: boolean
+    indoorAllowed: boolean,
+    ftp?: number,
+    hitSessionCount: number = 0
   ): TrainingSession[] {
     
     if (availableSlots.length === 0) return [];
@@ -398,21 +412,32 @@ export class TrainingPlanGenerator {
     );
     
     const idealDuration = this.getMaxSessionDuration(type, targetTss);
+    
+    // Get longest single slot duration
+    const longestSlotDuration = Math.max(...availableSlots.map(slot => this.calculateSlotDuration(slot)));
 
-    // Case 1: Single slot is sufficient
-    if (availableSlots.length === 1 || totalAvailableTime <= idealDuration * 1.2) {
-      const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed);
+    // 🎯 Decision logic:
+    // 1. Single slot OR total time fits in one session → Single session
+    // 2. Multiple slots AND longest slot < 70% of ideal duration → Split across slots
+    // 3. Multiple slots for LIT AND total time > 120min → Split (allow long endurance rides)
+    
+    if (availableSlots.length === 1) {
+      // Single slot - always create one session
+      const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed, ftp, hitSessionCount);
       return session ? [session] : [];
     }
-
-    // Case 2: Multiple slots available and needed (e.g., long endurance ride split into AM + PM)
-    // Only split LIT sessions, keep HIT/REC as single sessions
-    if (type === 'LIT' && availableSlots.length > 1 && idealDuration > totalAvailableTime * 0.6) {
-      return this.createMultiSessionDay(date, type, targetTss, availableSlots, indoorAllowed);
+    
+    // Multiple slots available
+    const needsSplit = longestSlotDuration < idealDuration * 0.7 || 
+                      (type === 'LIT' && totalAvailableTime > 120 && idealDuration > 90);
+    
+    if (needsSplit) {
+      // Split training across multiple slots
+      return this.createMultiSessionDay(date, type, targetTss, availableSlots, indoorAllowed, ftp, hitSessionCount);
     }
-
-    // Default: Single session in best slot
-    const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed);
+    
+    // Use best slot for single session
+    const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed, ftp, hitSessionCount);
     return session ? [session] : [];
   }
 
@@ -424,7 +449,9 @@ export class TrainingPlanGenerator {
     type: 'LIT' | 'HIT' | 'REC',
     targetTss: number,
     availableSlots: TimeSlot[],
-    indoorAllowed: boolean
+    indoorAllowed: boolean,
+    ftp?: number,
+    hitSessionCount: number = 0
   ): TrainingSession[] {
     
     // Sort slots by start time
@@ -432,33 +459,37 @@ export class TrainingPlanGenerator {
       this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime)
     );
 
-    // Take first two slots (typically AM and PM)
-    const usedSlots = sortedSlots.slice(0, 2);
     const sessions: TrainingSession[] = [];
+    const numSlots = sortedSlots.length;
 
-    // Distribute TSS and duration across sessions
-    // First session gets 60% of TSS (main workout)
-    // Second session gets 40% of TSS (secondary/recovery)
-    const tssDistribution = [0.6, 0.4];
+    // 🎯 Distribute TSS across ALL available slots proportionally
+    // If 2 slots: 60/40 split (main + secondary)
+    // If 3+ slots: Equal distribution
+    const tssPerSlot = numSlots === 2 
+      ? [0.6, 0.4].map(ratio => Math.round(targetTss * ratio))
+      : Array(numSlots).fill(Math.round(targetTss / numSlots));
 
-    usedSlots.forEach((slot, index) => {
-      const sessionTss = Math.round(targetTss * tssDistribution[index]);
-      const sessionType = index === 0 ? type : 'LIT'; // Second session is always LIT
+    sortedSlots.forEach((slot, index) => {
+      const sessionTss = tssPerSlot[index];
+      // First session keeps the requested type, rest are LIT (recovery/easy)
+      const sessionType = index === 0 ? type : 'LIT';
       
       const session = this.createTrainingSession(
         date, 
         sessionType, 
         sessionTss, 
         [slot], // Only use this specific slot
-        indoorAllowed
+        indoorAllowed,
+        ftp,
+        hitSessionCount
       );
 
       if (session) {
-        // Mark as part of double day
+        // Mark as part of multi-session day
         session.id = `${date}-${sessionType.toLowerCase()}-${index + 1}`;
         session.notes = session.notes 
-          ? `${session.notes} | Part ${index + 1} of 2` 
-          : `Part ${index + 1} of 2 (Double Day)`;
+          ? `${session.notes} | Part ${index + 1} of ${numSlots}` 
+          : `Part ${index + 1} of ${numSlots} (Multi-Session Day)`;
         sessions.push(session);
       }
     });
@@ -474,21 +505,30 @@ export class TrainingPlanGenerator {
     type: 'LIT' | 'HIT' | 'REC',
     targetTss: number,
     availableSlots: TimeSlot[],
-    indoorAllowed: boolean
+    indoorAllowed: boolean,
+    ftp?: number,
+    hitSessionCount: number = 0
   ): TrainingSession | null {
     
     if (availableSlots.length === 0) return null;
 
-    // Select best slot (longest available time)
+    // Calculate TOTAL available time across all slots (for double-session days)
+    const totalSlotDuration = availableSlots.reduce((sum, slot) => {
+      return sum + this.calculateSlotDuration(slot);
+    }, 0);
+
+    // Select best slot (longest available time) - but use total duration for planning
     const bestSlot = availableSlots.reduce((best, slot) => {
       const duration = this.calculateSlotDuration(slot);
       const bestDuration = this.calculateSlotDuration(best);
       return duration > bestDuration ? slot : best;
     });
 
-    const slotDuration = this.calculateSlotDuration(bestSlot);
-    const idealDuration = this.getMaxSessionDuration(type, targetTss);
-    const sessionDuration = Math.min(slotDuration, idealDuration);
+    // 🎯 IMPORTANT: Session duration MUST match available time slot
+    // User expects training to fit exactly in their time slot (e.g., 6:00-7:00 = 60min)
+    const slotDuration = totalSlotDuration; // Use TOTAL duration from time slot
+    const idealDuration = this.getMaxSessionDuration(type, targetTss); // For TSS adjustment calculation only
+    const sessionDuration = slotDuration; // Session MUST fit in slot (no min() with idealDuration)!
 
     // 🎯 IMPORTANT: Adjust TSS proportionally if slot is too short
     // This prevents unrealistic intensity (e.g., 80 TSS in 30 minutes)
@@ -515,15 +555,18 @@ export class TrainingPlanGenerator {
                   bestSlot.type === 'outdoor' ? false :
                   Math.random() > 0.7; // 30% chance of indoor for 'both'
 
+    // Get session subtype based on type, TSS, and duration
+    const subType = this.getSessionSubType(type, adjustedTss, sessionDuration);
+
     const session: TrainingSession = {
       id: `${date}-${type.toLowerCase()}`,
       date,
       type,
-      subType: this.getSessionSubType(type),
+      subType,
       duration: sessionDuration,
       targetTss: adjustedTss, // ← Use adjusted TSS!
       indoor,
-      description: this.generateSessionDescription(type, sessionDuration, adjustedTss),
+      description: this.generateSessionDescription(type, subType, sessionDuration, adjustedTss, ftp, type === 'HIT' ? hitSessionCount : 0),
       completed: false,
       timeSlot: {
         startTime: bestSlot.startTime,
@@ -578,24 +621,160 @@ export class TrainingPlanGenerator {
   }
 
   /**
-   * Get session subtype
+   * Get session subtype based on type and TSS
    */
-  private getSessionSubType(type: string): 'endurance' | 'tempo' | 'threshold' | 'vo2max' | 'neuromuscular' | 'recovery' {
+  private getSessionSubType(
+    type: string, 
+    targetTss: number, 
+    duration: number
+  ): 'endurance' | 'tempo' | 'threshold' | 'vo2max' | 'neuromuscular' | 'recovery' {
     switch (type) {
       case 'HIT':
-        return Math.random() > 0.5 ? 'threshold' : 'vo2max';
+        // Determine HIT subtype based on TSS and duration
+        const intensity = targetTss / duration; // TSS per minute
+        if (intensity > 1.2) {
+          return 'vo2max'; // Very high intensity, short intervals (>106% FTP)
+        } else if (intensity > 0.95) {
+          return 'threshold'; // Sustained high intensity (95-105% FTP)
+        } else {
+          return 'tempo'; // Sweet Spot / Tempo (88-94% FTP)
+        }
       case 'REC':
         return 'recovery';
       case 'LIT':
       default:
-        return 'endurance';
+        // LIT is ONLY endurance (Zone 2) - never tempo!
+        // Tempo (Zone 3) is actually a HIT workout
+        return 'endurance'; // Always endurance for LIT (60-75% FTP, Zone 2)
     }
   }
 
   /**
-   * Generate session description with formatted time (rounded to 5min)
+   * Generate workout name based on subType
    */
-  private generateSessionDescription(type: string, duration: number, targetTss: number): string {
+  private generateWorkoutName(subType: TrainingSession['subType']): string {
+    const workoutNames = {
+      'endurance': 'Endurance Base',
+      'tempo': 'Tempo Ride',
+      'threshold': 'Threshold Intervals',
+      'vo2max': 'VO2max Repeats',
+      'neuromuscular': 'Sprint Training',
+      'recovery': 'Easy Recovery',
+    };
+    return workoutNames[subType || 'endurance'];
+  }
+
+  /**
+   * Select interval variation based on session count to add variety
+   */
+  private selectIntervalVariant(subType: 'vo2max' | 'threshold' | 'tempo', sessionCount: number): {
+    intervalMin: number;
+    restMin: number;
+    variant: string;
+  } {
+    const variantIndex = sessionCount % 4; // Rotate through 4 variants
+    
+    switch (subType) {
+      case 'vo2max':
+        const vo2Variants = [
+          { intervalMin: 5, restMin: 3, variant: '5min' },    // Classic
+          { intervalMin: 4, restMin: 4, variant: '4min' },    // Equal work:rest
+          { intervalMin: 3, restMin: 2, variant: '3min' },    // Short & sharp
+          { intervalMin: 6, restMin: 3, variant: '6min' },    // Longer intervals
+        ];
+        return vo2Variants[variantIndex];
+      
+      case 'threshold':
+        const thresholdVariants = [
+          { intervalMin: 10, restMin: 5, variant: '10min' },  // Classic 2:1
+          { intervalMin: 8, restMin: 4, variant: '8min' },    // Shorter
+          { intervalMin: 12, restMin: 5, variant: '12min' },  // Longer
+          { intervalMin: 15, restMin: 5, variant: '15min' },  // Extended
+        ];
+        return thresholdVariants[variantIndex];
+      
+      case 'tempo':
+        const tempoVariants = [
+          { intervalMin: 20, restMin: 5, variant: '20min' },  // Classic
+          { intervalMin: 15, restMin: 5, variant: '15min' },  // Shorter
+          { intervalMin: 12, restMin: 3, variant: '12min' },  // Frequent
+          { intervalMin: 25, restMin: 5, variant: '25min' },  // Long blocks
+        ];
+        return tempoVariants[variantIndex];
+    }
+  }
+
+  /**
+   * Generate structured workout details (intervals)
+   */
+  private generateWorkoutStructure(
+    subType: TrainingSession['subType'], 
+    duration: number, 
+    targetTss: number,
+    ftp?: number,
+    sessionCount: number = 0
+  ): string {
+    const intensity = targetTss / duration; // TSS per minute
+    
+    switch (subType) {
+      case 'vo2max': {
+        // VO2max with variety - rotates through 4 different interval patterns
+        const variant = this.selectIntervalVariant('vo2max', sessionCount);
+        const totalTime = variant.intervalMin + variant.restMin;
+        const reps = Math.max(3, Math.floor(duration / totalTime));
+        return `${reps}x${variant.variant} @ 110-120% FTP (${variant.restMin}min rest)`;
+      }
+      
+      case 'threshold': {
+        // Threshold with variety - rotates through 4 different patterns
+        const variant = this.selectIntervalVariant('threshold', sessionCount);
+        const totalTime = variant.intervalMin + variant.restMin;
+        const reps = Math.max(2, Math.floor(duration / totalTime));
+        return `${reps}x${variant.variant} @ 95-105% FTP (${variant.restMin}min rest)`;
+      }
+      
+      case 'tempo': {
+        // Tempo/Sweet Spot with variety
+        if (duration > 60) {
+          const variant = this.selectIntervalVariant('tempo', sessionCount);
+          const totalTime = variant.intervalMin + variant.restMin;
+          const reps = Math.max(2, Math.floor(duration / totalTime));
+          return `${reps}x${variant.variant} @ 88-94% FTP (${variant.restMin}min rest)`;
+        } else {
+          const roundedDuration = Math.round(duration);
+          return `${roundedDuration}min @ 88-94% FTP (Sweet Spot)`;
+        }
+      }
+      
+      case 'endurance': {
+        // Zone 2 Endurance - the ONLY type for LIT workouts (60-75% FTP)
+        // No duration in description - shown separately in UI
+        return `@ 60-75% FTP (Zone 2)`;
+      }
+      
+      case 'recovery':
+        return `${duration}min @ 50-60% FTP (Active Recovery)`;
+      
+      case 'neuromuscular':
+        const sprintReps = Math.floor(duration / 5); // Short sprints
+        return `${sprintReps}x30sec all-out sprints (4min rest)`;
+      
+      default:
+        return `${duration}min steady ride`;
+    }
+  }
+
+  /**
+   * Generate session description with formatted time and workout details
+   */
+  private generateSessionDescription(
+    type: string, 
+    subType: TrainingSession['subType'],
+    duration: number, 
+    targetTss: number,
+    ftp?: number,
+    sessionCount: number = 0
+  ): string {
     // Round to nearest 5 minutes
     const roundedMinutes = Math.round(duration / 5) * 5;
     const hours = Math.floor(roundedMinutes / 60);
@@ -606,17 +785,13 @@ export class TrainingPlanGenerator {
       ? `${hours}:${String(minutes).padStart(2, '0')} h` 
       : `${minutes}min`;
     
-    const tssStr = targetTss.toFixed(1);
+    const tssStr = targetTss.toFixed(0);
+    
+    // Get workout name and structure (with variety for HIT)
+    const workoutName = this.generateWorkoutName(subType);
+    const structure = this.generateWorkoutStructure(subType, duration, targetTss, ftp, sessionCount);
 
-    switch (type) {
-      case 'HIT':
-        return `${timeStr} threshold/VO2 intervals (TSS: ${tssStr})`;
-      case 'REC':
-        return `${timeStr} easy recovery ride (TSS: ${tssStr})`;
-      case 'LIT':
-      default:
-        return `${timeStr} endurance base training (TSS: ${tssStr})`;
-    }
+    return `${workoutName} - ${structure} (${tssStr} TSS)`;
   }
 
   /**

@@ -244,3 +244,37 @@ export const deleteTrainingCamp = async (userId: string, campId: string): Promis
   const campRef = doc(db, 'users', userId, 'planning', 'camps', campId);
   await deleteDoc(campRef);
 };
+
+// Training Session Updates (for notes, RPE, etc.)
+export const updateTrainingSession = async (
+  userId: string, 
+  planId: string, 
+  sessionId: string, 
+  updates: Partial<TrainingSession>
+): Promise<void> => {
+  // Get the plan
+  const planRef = doc(db, 'users', userId, 'plans', planId);
+  const planSnap = await getDoc(planRef);
+  
+  if (!planSnap.exists()) {
+    throw new Error('Training plan not found');
+  }
+  
+  const plan = planSnap.data() as WeeklyPlan;
+  
+  // Update the specific session in the sessions array
+  if (plan.sessions) {
+    const updatedSessions = plan.sessions.map(session => {
+      if (session.id === sessionId) {
+        return { ...session, ...updates };
+      }
+      return session;
+    });
+    
+    // Save back to Firestore
+    await updateDoc(planRef, { 
+      sessions: updatedSessions,
+      lastModified: Timestamp.now()
+    });
+  }
+};

@@ -105,15 +105,34 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    // Generate 8 weeks
+    // Generate 8 weeks with progressive loading
     const weeks = [];
     let currentWeekStart = new Date();
+    const baseWeeklyHours = parameters.weeklyHours;
+    const rampRate = parameters.rampRate || 0.08; // 8% increase per week
     
     for (let i = 0; i < 8; i++) {
+      // Progressive loading: increase hours each week, except deload weeks (every 4th week)
+      const isDeloadWeek = (i + 1) % 4 === 0;
+      let weeklyHours = baseWeeklyHours;
+      
+      if (isDeloadWeek) {
+        // Deload week: 70% of current volume
+        weeklyHours = baseWeeklyHours * (1 + rampRate * (i - 1)) * 0.7;
+      } else {
+        // Progressive increase
+        weeklyHours = baseWeeklyHours * (1 + rampRate * i);
+      }
+      
+      const weekParameters = {
+        ...parameters,
+        weeklyHours: Math.round(weeklyHours * 10) / 10 // Round to 1 decimal
+      };
+      
       const weekPlan = await generator.generateWeeklyPlan(
         userId,
         currentWeekStart,
-        parameters,
+        weekParameters,
         [], // previousMetrics - will load from DB later
         userProfile,
         [] // upcomingGoals
