@@ -293,7 +293,7 @@ export class TrainingPlanGenerator {
       // Create session(s) for the day
       const targetTss = dailyTssTargets[dayIndex];
       if (targetTss > 0) {
-        const session = this.createTrainingSession(
+        const daySessions = this.createTrainingSessions(
           dateStr,
           sessionType,
           targetTss,
@@ -301,9 +301,7 @@ export class TrainingPlanGenerator {
           params.indoorAllowed
         );
         
-        if (session) {
-          sessions.push(session);
-        }
+        sessions.push(...daySessions);
       }
     });
 
@@ -341,7 +339,96 @@ export class TrainingPlanGenerator {
   }
 
   /**
-   * Create a training session
+   * Create training session(s) for a day - supports multi-session if needed
+   * This is a wrapper that can split training into multiple sessions if slots are too short
+   */
+  private createTrainingSessions(
+    date: string,
+    type: 'LIT' | 'HIT' | 'REC',
+    targetTss: number,
+    availableSlots: TimeSlot[],
+    indoorAllowed: boolean
+  ): TrainingSession[] {
+    
+    if (availableSlots.length === 0) return [];
+
+    // Calculate total available time across all slots
+    const totalAvailableTime = availableSlots.reduce(
+      (sum, slot) => sum + this.calculateSlotDuration(slot), 
+      0
+    );
+    
+    const idealDuration = this.getMaxSessionDuration(type, targetTss);
+
+    // Case 1: Single slot is sufficient
+    if (availableSlots.length === 1 || totalAvailableTime <= idealDuration * 1.2) {
+      const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed);
+      return session ? [session] : [];
+    }
+
+    // Case 2: Multiple slots available and needed (e.g., long endurance ride split into AM + PM)
+    // Only split LIT sessions, keep HIT/REC as single sessions
+    if (type === 'LIT' && availableSlots.length > 1 && idealDuration > totalAvailableTime * 0.6) {
+      return this.createMultiSessionDay(date, type, targetTss, availableSlots, indoorAllowed);
+    }
+
+    // Default: Single session in best slot
+    const session = this.createTrainingSession(date, type, targetTss, availableSlots, indoorAllowed);
+    return session ? [session] : [];
+  }
+
+  /**
+   * Create multiple sessions for a single day (e.g., AM + PM doubles)
+   */
+  private createMultiSessionDay(
+    date: string,
+    type: 'LIT' | 'HIT' | 'REC',
+    targetTss: number,
+    availableSlots: TimeSlot[],
+    indoorAllowed: boolean
+  ): TrainingSession[] {
+    
+    // Sort slots by start time
+    const sortedSlots = [...availableSlots].sort((a, b) => 
+      this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime)
+    );
+
+    // Take first two slots (typically AM and PM)
+    const usedSlots = sortedSlots.slice(0, 2);
+    const sessions: TrainingSession[] = [];
+
+    // Distribute TSS and duration across sessions
+    // First session gets 60% of TSS (main workout)
+    // Second session gets 40% of TSS (secondary/recovery)
+    const tssDistribution = [0.6, 0.4];
+
+    usedSlots.forEach((slot, index) => {
+      const sessionTss = Math.round(targetTss * tssDistribution[index]);
+      const sessionType = index === 0 ? type : 'LIT'; // Second session is always LIT
+      
+      const session = this.createTrainingSession(
+        date, 
+        sessionType, 
+        sessionTss, 
+        [slot], // Only use this specific slot
+        indoorAllowed
+      );
+
+      if (session) {
+        // Mark as part of double day
+        session.id = `${date}-${sessionType.toLowerCase()}-${index + 1}`;
+        session.notes = session.notes 
+          ? `${session.notes} | Part ${index + 1} of 2` 
+          : `Part ${index + 1} of 2 (Double Day)`;
+        sessions.push(session);
+      }
+    });
+
+    return sessions;
+  }
+
+  /**
+   * Create a single training session (with proper time slot constraints)
    */
   private createTrainingSession(
     date: string,
@@ -360,10 +447,28 @@ export class TrainingPlanGenerator {
       return duration > bestDuration ? slot : best;
     });
 
-    const sessionDuration = Math.min(
-      this.calculateSlotDuration(bestSlot),
-      this.getMaxSessionDuration(type, targetTss)
-    );
+    const slotDuration = this.calculateSlotDuration(bestSlot);
+    const idealDuration = this.getMaxSessionDuration(type, targetTss);
+    const sessionDuration = Math.min(slotDuration, idealDuration);
+
+    // 🎯 IMPORTANT: Adjust TSS proportionally if slot is too short
+    // This prevents unrealistic intensity (e.g., 80 TSS in 30 minutes)
+    let adjustedTss = targetTss;
+    let warning: string | undefined;
+
+    if (slotDuration < idealDuration) {
+      const durationRatio = slotDuration / idealDuration;
+      
+      // Only adjust if slot is significantly shorter (< 70% of ideal)
+      if (durationRatio < 0.7) {
+        adjustedTss = Math.round(targetTss * durationRatio);
+        warning = `⚠️ Training shortened: ${sessionDuration}min (ideal: ${idealDuration}min) - TSS reduced from ${targetTss} to ${adjustedTss}`;
+        console.warn(`${date}: ${warning}`);
+      } else {
+        // Slot is 70-99% of ideal - acceptable but note it
+        warning = `Session fits in ${sessionDuration}min slot (ideal: ${idealDuration}min)`;
+      }
+    }
 
     // Determine if indoor is required/preferred
     const indoor = !indoorAllowed ? false : 
@@ -377,14 +482,15 @@ export class TrainingPlanGenerator {
       type,
       subType: this.getSessionSubType(type),
       duration: sessionDuration,
-      targetTss,
+      targetTss: adjustedTss, // ← Use adjusted TSS!
       indoor,
-      description: this.generateSessionDescription(type, sessionDuration, targetTss),
+      description: this.generateSessionDescription(type, sessionDuration, adjustedTss),
       completed: false,
       timeSlot: {
         startTime: bestSlot.startTime,
         endTime: this.addMinutesToTime(bestSlot.startTime, sessionDuration),
       },
+      notes: warning, // Add warning as note if present
     };
 
     return session;
