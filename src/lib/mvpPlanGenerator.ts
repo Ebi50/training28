@@ -62,7 +62,20 @@ export async function generateMvpWeeklyPlan(
   }
 
   // Calculate available hours from slots
-  const weeklyHours = calculateWeeklyHours(slots);
+  const availableHours = calculateWeeklyHours(slots);
+  
+  // Use user's target hours if set, otherwise use available hours
+  const targetHours = userProfile.weeklyTrainingHoursTarget || availableHours;
+  const weeklyHours = Math.min(targetHours, availableHours); // Can't train more than slots allow
+  
+  // ✅ Adjust TSS based on target time
+  const maxPossibleTss = weeklyHours * 45; // ~45 TSS per hour
+  if (adjustedTss > maxPossibleTss) {
+    console.log(`⚠️ TSS capped: ${adjustedTss} → ${maxPossibleTss} (target: ${targetHours.toFixed(1)}h, available: ${availableHours.toFixed(1)}h)`);
+    adjustedTss = maxPossibleTss;
+  }
+  
+  console.log(`📊 Week ${weekNumber}: Target ${targetHours.toFixed(1)}h / Available ${availableHours.toFixed(1)}h → Using ${weeklyHours.toFixed(1)}h, Target TSS: ${adjustedTss}`);
 
   // Determine max HIT days based on phase
   let maxHitDays = 1;
@@ -155,9 +168,16 @@ async function generateWeeklySessions(
   libraryData: import('@/types/workout').WorkoutLibrary
 ): Promise<TrainingSession[]> {
   const sessions: TrainingSession[] = [];
+  let totalScheduledHours = 0; // Track how many hours we've scheduled
+  const targetHours = userProfile.weeklyTrainingHoursTarget || 999; // Get user's target
   
   // Group slots by day
   const slotsByDay = groupSlotsByDay(slots);
+  console.log(`📅 Days with slots:`, Object.keys(slotsByDay).map(d => {
+    const dayNames = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']; // Index 1-7 (ISO 8601)
+    const dayIndex = parseInt(d);
+    return `${dayNames[dayIndex] || `day${dayIndex}`} (${slotsByDay[dayIndex].length} slot(s))`;
+  }).join(', '));
   
   // Select HIT days (spread them out)
   const hitDays = selectHitDays(slotsByDay, maxHitDays);
@@ -170,13 +190,26 @@ async function generateWeeklySessions(
     categoryDistribution
   );
 
-  // Generate sessions for each day
-  for (const dayStr of Object.keys(slotsByDay)) {
-    const dayIndex = parseInt(dayStr);
+  // Generate sessions for each day (sort by ISO day: 1=Mon, 2=Tue, ..., 7=Sun)
+  const sortedDays = Object.keys(slotsByDay).sort((a, b) => {
+    const dayA = parseInt(a);
+    const dayB = parseInt(b);
+    // Simple numeric sort: 1 (Mon) < 2 (Tue) < ... < 7 (Sun)
+    return dayA - dayB;
+  });
+
+  for (const dayStr of sortedDays) {
+    const dayIndex = parseInt(dayStr); // ISO day: 1=Mon, 2=Tue, ..., 7=Sun
     const daySlots = slotsByDay[dayIndex];
     const targetTss = dailyTssTargets[dayIndex] || 0;
     const isHitDay = hitDays.includes(dayIndex);
-    const date = addDays(weekStart, dayIndex);
+    
+    // Convert ISO day (1=Mon, 7=Sun) to offset from week start (0=Mon, 6=Sun)
+    const dayOffset = dayIndex - 1; // 1(Mon) → 0, 2(Tue) → 1, ..., 7(Sun) → 6
+    const date = addDays(weekStart, dayOffset);
+    
+    const dayNames = ['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']; // Index 1-7 (ISO 8601)
+    console.log(`📆 Processing ${dayNames[dayIndex]} (${format(date, 'yyyy-MM-dd')}): ${daySlots.length} slot(s), Target TSS: ${targetTss}`);
 
     if (targetTss === 0) continue; // Rest day
 
@@ -191,32 +224,120 @@ async function generateWeeklySessions(
       category = 'LIT';
     }
 
-    // Find matching workouts from library
-    const slotDuration = daySlots.reduce((sum, s) => sum + calculateSlotDuration(s), 0);
-    const matchingWorkouts = findWorkouts(libraryData, {
-      category,
-      minDuration: slotDuration * 0.7, // Allow 30% shorter
-      maxDuration: slotDuration * 1.1, // Allow 10% longer
-      outdoor: userProfile.preferences?.indoorAllowed === false ? true : undefined,
-    });
+    // ✅ FIX: Group slots by time - if same time = alternatives, different times = separate sessions
+    if (daySlots.length > 1) {
+      console.log(`📅 Multiple slots on ${format(date, 'yyyy-MM-dd')}: ${daySlots.length} slots`);
+      
+      // Group by start time to identify alternatives vs separate sessions
+      const slotsByTime = daySlots.reduce((acc, slot) => {
+        const key = slot.startTime;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(slot);
+        return acc;
+      }, {} as Record<string, TimeSlot[]>);
+      
+      const timeSlotGroups = Object.values(slotsByTime);
+      console.log(`  → ${timeSlotGroups.length} time slot(s) with alternatives`);
+      
+      // Calculate TSS per time slot group
+      const totalGroupDuration = timeSlotGroups.reduce((sum, group) => {
+        const duration = calculateSlotDuration(group[0]); // All in group have same time
+        return sum + duration;
+      }, 0);
+      
+      // Create ONE session per time slot (use first as primary, others as alternatives)
+      for (const slotGroup of timeSlotGroups) {
+        const primarySlot = slotGroup[0];
+        const slotDuration = calculateSlotDuration(primarySlot);
+        const slotTss = Math.round((slotDuration / totalGroupDuration) * targetTss);
+        
+        console.log(`  → Time ${primarySlot.startTime}: ${slotGroup.length} option(s) (${slotDuration}min, ${slotTss} TSS)`);
+        
+        // Find workout matching this time slot
+        let matchingWorkouts = findWorkouts(libraryData, {
+          category,
+          minDuration: slotDuration * 0.7,
+          maxDuration: slotDuration * 1.1,
+          outdoor: userProfile.preferences?.indoorAllowed === false ? true : undefined,
+        });
 
-    if (matchingWorkouts.length === 0) {
-      console.warn(`No matching workouts for ${category} on ${format(date, 'yyyy-MM-dd')}`);
-      continue;
+        // ✅ Fallback: If no exact match, broaden search
+        if (matchingWorkouts.length === 0) {
+          console.warn(`⚠️ No exact match for ${category} (${slotDuration}min), trying broader search...`);
+          matchingWorkouts = findWorkouts(libraryData, {
+            category,
+            minDuration: slotDuration * 0.5, // Allow 50% shorter
+            maxDuration: slotDuration * 1.5, // Allow 50% longer
+          });
+        }
+
+        if (matchingWorkouts.length === 0) {
+          console.warn(`❌ No matching workouts for ${category} on ${format(date, 'yyyy-MM-dd')} (${slotDuration}min slot) - SKIPPING`);
+          continue;
+        }
+
+        const workout = selectBestWorkout(matchingWorkouts, slotTss, slotDuration);
+        const session = createSessionFromWorkout(workout, date, primarySlot, slotTss);
+        
+        // Check if adding this session would exceed target hours
+        const sessionHours = session.duration / 60;
+        if (totalScheduledHours + sessionHours > targetHours) {
+          console.log(`  ⏭️ Skipping session (would exceed ${targetHours}h target: ${totalScheduledHours.toFixed(1)}h + ${sessionHours.toFixed(1)}h = ${(totalScheduledHours + sessionHours).toFixed(1)}h)`);
+          continue; // Skip this time slot
+        }
+        
+        console.log(`  ✅ Created session: ${workout.name} (${session.duration}min, ${session.targetTss} TSS)`);
+        
+        // If multiple time slots on same day, add suffix to differentiate
+        if (timeSlotGroups.length > 1) {
+          session.id = `${session.id}-${primarySlot.startTime}`;
+        }
+        
+        sessions.push(session);
+        totalScheduledHours += sessionHours;
+        console.log(`  📊 Total scheduled: ${totalScheduledHours.toFixed(1)}h / ${targetHours}h`);
+      }
+    } else {
+      // Single slot - original logic
+      const slotDuration = calculateSlotDuration(daySlots[0]);
+      let matchingWorkouts = findWorkouts(libraryData, {
+        category,
+        minDuration: slotDuration * 0.7,
+        maxDuration: slotDuration * 1.1,
+        outdoor: userProfile.preferences?.indoorAllowed === false ? true : undefined,
+      });
+
+      // ✅ Fallback: If no exact match, broaden search
+      if (matchingWorkouts.length === 0) {
+        console.warn(`⚠️ No exact match for ${category} (${slotDuration}min), trying broader search...`);
+        matchingWorkouts = findWorkouts(libraryData, {
+          category,
+          minDuration: slotDuration * 0.5,
+          maxDuration: slotDuration * 1.5,
+        });
+      }
+
+      if (matchingWorkouts.length === 0) {
+        console.warn(`❌ No matching workouts for ${category} on ${format(date, 'yyyy-MM-dd')} - SKIPPING`);
+        continue;
+      }
+
+      const workout = selectBestWorkout(matchingWorkouts, targetTss, slotDuration);
+      const session = createSessionFromWorkout(workout, date, daySlots[0], targetTss);
+      
+      // Check if adding this session would exceed target hours
+      const sessionHours = session.duration / 60;
+      if (totalScheduledHours + sessionHours > targetHours) {
+        console.log(`  ⏭️ Skipping session (would exceed ${targetHours}h target: ${totalScheduledHours.toFixed(1)}h + ${sessionHours.toFixed(1)}h = ${(totalScheduledHours + sessionHours).toFixed(1)}h)`);
+        continue; // Skip this day
+      }
+      
+      console.log(`  ✅ Created session: ${workout.name} (${session.duration}min, ${session.targetTss} TSS)`);
+      
+      sessions.push(session);
+      totalScheduledHours += sessionHours;
+      console.log(`  📊 Total scheduled: ${totalScheduledHours.toFixed(1)}h / ${targetHours}h`);
     }
-
-    // Select best matching workout
-    const workout = selectBestWorkout(matchingWorkouts, targetTss, slotDuration);
-
-    // Create training session
-    const session = createSessionFromWorkout(
-      workout,
-      date,
-      daySlots[0], // Use first slot
-      targetTss
-    );
-
-    sessions.push(session);
   }
 
   return sessions;
@@ -361,6 +482,9 @@ function createSessionFromWorkout(
 ): TrainingSession {
   const dateStr = format(date, 'yyyy-MM-dd');
   
+  // Calculate slot duration in minutes
+  const slotDuration = calculateSlotDuration(slot);
+  
   // Map WorkoutCategory to session subType
   const subTypeMap: Record<string, string> = {
     'LIT': 'endurance',
@@ -378,8 +502,8 @@ function createSessionFromWorkout(
     date: dateStr,
     type: workout.category === 'LIT' || workout.category === 'RECOVERY' ? 'LIT' : 'HIT',
     subType: subTypeMap[workout.category] as any,
-    duration: Math.round(workout.total_duration_s / 60),
-    targetTss: workout.target_tss,
+    duration: slotDuration, // ✅ Use slot duration, not workout duration
+    targetTss: targetTss, // ✅ Use calculated TSS, not workout library TSS
     indoor: slot.type === 'indoor',
     description: `${workout.name} - ${workout.description}`,
     notes: `Workout ID: ${workout.id}`,

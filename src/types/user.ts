@@ -34,6 +34,8 @@ export interface UserProfile {
   
   // Weekly duration management
   weeklyOverrides?: Record<string, TimeSlot[]>; // Week-specific time slot overrides
+  weeklyTrainingHoursTarget?: number; // Target training hours per week (e.g., 8.0) - STANDARD
+  weeklyTargetHoursOverrides?: Record<string, number>; // Week-specific target hours overrides
   
   // Settings
   autoLogoutMinutes?: number;     // 0 = never, 5, 10, etc.
@@ -57,7 +59,7 @@ export interface UserPreferences {
  * Time slot for training availability
  */
 export interface TimeSlot {
-  day: number;                    // 0-6 (Sunday-Saturday)
+  day: number;                    // 1-7 (Monday-Sunday, ISO 8601)
   startTime: string;              // HH:MM (24-hour format)
   endTime: string;                // HH:MM (24-hour format)
   type: 'indoor' | 'outdoor' | 'both';

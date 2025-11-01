@@ -37,6 +37,11 @@ export default function SettingsPage() {
   const [weeklyOverrides, setWeeklyOverrides] = useState<Record<string, TimeSlot[]>>({});
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0); // 0 = this week, 1 = next week, etc.
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  
+  // Weekly training hours targets (separate for standard and per-week)
+  const [standardTargetHours, setStandardTargetHours] = useState<number>(0);
+  const [weeklyTargetHoursOverrides, setWeeklyTargetHoursOverrides] = useState<Record<string, number>>({});
+  const [currentTargetHours, setCurrentTargetHours] = useState<number>(0);
   const [newSlot, setNewSlot] = useState<TimeSlot>({
     day: 1, // Monday
     startTime: '08:00',
@@ -77,6 +82,11 @@ export default function SettingsPage() {
           
           // Load weekly overrides
           setWeeklyOverrides(userProfile.weeklyOverrides || {});
+          
+          // Load target hours (standard and overrides)
+          setStandardTargetHours(userProfile.weeklyTrainingHoursTarget || 0);
+          setWeeklyTargetHoursOverrides(userProfile.weeklyTargetHoursOverrides || {});
+          setCurrentTargetHours(userProfile.weeklyTrainingHoursTarget || 0);
         }
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -96,13 +106,16 @@ export default function SettingsPage() {
     if (activeTab === 'standard') {
       console.log('📋 Switching to standard tab, loading slots:', standardSlots);
       setTimeSlots([...standardSlots]); // Clone array to trigger re-render
+      setCurrentTargetHours(standardTargetHours);
     } else {
       const weekKey = getWeekKey(currentWeekOffset);
       const weekSlots = weeklyOverrides[weekKey] || standardSlots;
+      const weekTargetHours = weeklyTargetHoursOverrides[weekKey] || standardTargetHours;
       console.log('📋 Switching to week tab, loading slots:', weekSlots);
       setTimeSlots([...weekSlots]); // Clone array
+      setCurrentTargetHours(weekTargetHours);
     }
-  }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides, loading]);
+  }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides, standardTargetHours, weeklyTargetHoursOverrides, loading]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -175,13 +188,17 @@ export default function SettingsPage() {
           preferredTrainingTimes: [],
         };
         
+        console.log('💾 Saving Standard: TimeSlots:', timeSlots.length, 'slots, Target:', currentTargetHours, 'h');
+        
         await updateUserProfile(user.uid, {
           preferences: {
             ...currentPrefs, // ← Keep existing preferences!
             preferredTrainingTimes: timeSlots,
           },
+          weeklyTrainingHoursTarget: currentTargetHours,
         });
         setStandardSlots(timeSlots);
+        setStandardTargetHours(currentTargetHours);
         
         // Update local profile state
         setProfile({
@@ -190,16 +207,23 @@ export default function SettingsPage() {
             ...currentPrefs,
             preferredTrainingTimes: timeSlots,
           },
+          weeklyTrainingHoursTarget: currentTargetHours,
         });
       } else {
         // Save as weekly override
         const weekKey = getWeekKey(currentWeekOffset);
         const newOverrides = { ...weeklyOverrides, [weekKey]: timeSlots };
+        const newTargetOverrides = { ...weeklyTargetHoursOverrides, [weekKey]: currentTargetHours };
+        
+        console.log('💾 Saving Week Override:', weekKey, 'TimeSlots:', timeSlots.length, 'slots, Target:', currentTargetHours, 'h');
         
         await updateUserProfile(user.uid, {
           weeklyOverrides: newOverrides,
+          // Store target hours in a new field (we'll add this to schema)
+          weeklyTargetHoursOverrides: newTargetOverrides,
         });
         setWeeklyOverrides(newOverrides);
+        setWeeklyTargetHoursOverrides(newTargetOverrides);
       }
 
       console.log('✅ Time slots saved successfully:', timeSlots);
@@ -318,16 +342,19 @@ export default function SettingsPage() {
     return `CW ${cwNumber}: ${dateRange}`;
   };
 
-  // Load slots based on active tab and week
+  // Load slots AND target hours based on active tab and week
   useEffect(() => {
     if (activeTab === 'standard') {
       setTimeSlots(standardSlots);
+      setCurrentTargetHours(standardTargetHours);
     } else {
       const weekKey = getWeekKey(currentWeekOffset);
       const overrides = weeklyOverrides[weekKey];
+      const targetOverride = weeklyTargetHoursOverrides[weekKey];
       setTimeSlots(overrides || standardSlots); // Use overrides or fall back to standard
+      setCurrentTargetHours(targetOverride !== undefined ? targetOverride : standardTargetHours);
     }
-  }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides]);
+  }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides, standardTargetHours, weeklyTargetHoursOverrides]);
 
   const handleSignOut = async () => {
     try {
@@ -666,8 +693,122 @@ export default function SettingsPage() {
           {/* Time Slots Section */}
           <div className={`${components.card.base} ${colors.border.default} border`}>
             <div className={`${components.card.base} ${colors.border.default} border-b`}>
-              <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>Training Time Slots</h2>
-              <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>Wann kannst du trainieren?</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>Training Time Slots</h2>
+                  <p className={`${typography.body} ${colors.text.secondary} ${spacing.micro}`}>Wann kannst du trainieren?</p>
+                </div>
+                {/* Weekly Hours Summary */}
+                {timeSlots.length > 0 && (
+                  <div className={`rounded-lg px-4 py-2 border ${
+                    (() => {
+                      const totalMinutes = timeSlots.reduce((sum, slot) => {
+                        const [startHour, startMin] = slot.startTime.split(':').map(Number);
+                        const [endHour, endMin] = slot.endTime.split(':').map(Number);
+                        const startMinutes = startHour * 60 + startMin;
+                        const endMinutes = endHour * 60 + endMin;
+                        return sum + (endMinutes - startMinutes);
+                      }, 0);
+                      const availableHours = totalMinutes / 60;
+                      const hasWarning = currentTargetHours > 0 && currentTargetHours > availableHours;
+                      return hasWarning 
+                        ? 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-700'
+                        : 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700';
+                    })()
+                  }`}>
+                    <p className={`text-sm font-medium ${
+                      (() => {
+                        const totalMinutes = timeSlots.reduce((sum, slot) => {
+                          const [startHour, startMin] = slot.startTime.split(':').map(Number);
+                          const [endHour, endMin] = slot.endTime.split(':').map(Number);
+                          const startMinutes = startHour * 60 + startMin;
+                          const endMinutes = endHour * 60 + endMin;
+                          return sum + (endMinutes - startMinutes);
+                        }, 0);
+                        const availableHours = totalMinutes / 60;
+                        const hasWarning = currentTargetHours > 0 && currentTargetHours > availableHours;
+                        return hasWarning 
+                          ? 'text-yellow-600 dark:text-yellow-300'
+                          : 'text-blue-600 dark:text-blue-300';
+                      })()
+                    }`}>
+                      Verfügbare Zeit/Woche:
+                    </p>
+                    <p className={`text-2xl font-bold ${
+                      (() => {
+                        const totalMinutes = timeSlots.reduce((sum, slot) => {
+                          const [startHour, startMin] = slot.startTime.split(':').map(Number);
+                          const [endHour, endMin] = slot.endTime.split(':').map(Number);
+                          const startMinutes = startHour * 60 + startMin;
+                          const endMinutes = endHour * 60 + endMin;
+                          return sum + (endMinutes - startMinutes);
+                        }, 0);
+                        const availableHours = totalMinutes / 60;
+                        const hasWarning = currentTargetHours > 0 && currentTargetHours > availableHours;
+                        return hasWarning 
+                          ? 'text-yellow-900 dark:text-yellow-100'
+                          : 'text-blue-900 dark:text-blue-100';
+                      })()
+                    }`}>
+                      {(() => {
+                        const totalMinutes = timeSlots.reduce((sum, slot) => {
+                          const [startHour, startMin] = slot.startTime.split(':').map(Number);
+                          const [endHour, endMin] = slot.endTime.split(':').map(Number);
+                          const startMinutes = startHour * 60 + startMin;
+                          const endMinutes = endHour * 60 + endMin;
+                          return sum + (endMinutes - startMinutes);
+                        }, 0);
+                        const hours = Math.floor(totalMinutes / 60);
+                        const mins = totalMinutes % 60;
+                        return `${hours}:${String(mins).padStart(2, '0')} h`;
+                      })()}
+                    </p>
+                    {currentTargetHours > 0 && (
+                      <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+                        Ziel: {currentTargetHours.toFixed(1)} h
+                        {(() => {
+                          const totalMinutes = timeSlots.reduce((sum, slot) => {
+                            const [startHour, startMin] = slot.startTime.split(':').map(Number);
+                            const [endHour, endMin] = slot.endTime.split(':').map(Number);
+                            const startMinutes = startHour * 60 + startMin;
+                            const endMinutes = endHour * 60 + endMin;
+                            return sum + (endMinutes - startMinutes);
+                          }, 0);
+                          const availableHours = totalMinutes / 60;
+                          if (currentTargetHours > availableHours) {
+                            return ` ⚠️ Ziel überschreitet verfügbare Zeit!`;
+                          }
+                          return ` ✓`;
+                        })()}
+                      </p>
+                    )}
+                    
+                    {/* Target Hours Input */}
+                    <div className={`mt-3 pt-3 border-t ${colors.border.default}`}>
+                      <label className={`block ${typography.bodySmall} font-medium ${colors.text.primary} ${spacing.micro}`}>
+                        Trainingszeit-Ziel für diese Woche:
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          value={currentTargetHours || ''}
+                          onChange={(e) => setCurrentTargetHours(parseFloat(e.target.value) || 0)}
+                          className={components.input.base}
+                          placeholder="8.0"
+                        />
+                        <span className={`${typography.bodySmall} ${colors.text.secondary}`}>Stunden</span>
+                      </div>
+                      <p className={`${spacing.micro} ${typography.bodySmall} ${colors.text.muted}`}>
+                        {activeTab === 'standard' 
+                          ? 'Standard-Ziel für alle Wochen (wird gespeichert beim Klick auf "Save Time Slots")'
+                          : 'Ziel nur für diese Woche (Override)'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Tab Navigation */}

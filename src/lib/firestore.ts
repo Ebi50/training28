@@ -59,6 +59,9 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     stravaConnected: userData.stravaConnected || false,
     stravaAthleteId: userData.stravaAthleteId,
     weeklyOverrides: userData.weeklyOverrides || {},
+    // ✅ Read training hours targets (standard + week-specific overrides)
+    weeklyTrainingHoursTarget: userData.weeklyTrainingHoursTarget,
+    weeklyTargetHoursOverrides: userData.weeklyTargetHoursOverrides || {},
     preferences: userData.preferences || {
       indoorAllowed: true,
       availableDevices: [],
@@ -66,12 +69,57 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     }
   };
   
+  // ✅ MIGRATION: Convert old day=0 (Sunday) to day=7 (ISO 8601)
+  if (profile.preferences?.preferredTrainingTimes) {
+    profile.preferences.preferredTrainingTimes = profile.preferences.preferredTrainingTimes.map(slot => {
+      if (slot.day === 0) {
+        console.log('🔄 Migrating slot from day=0 (Sun) to day=7 (ISO 8601)');
+        return { ...slot, day: 7 };
+      }
+      return slot;
+    });
+  }
+  
+  // Same for weekly overrides
+  if (profile.weeklyOverrides) {
+    Object.keys(profile.weeklyOverrides).forEach(weekKey => {
+      profile.weeklyOverrides![weekKey] = profile.weeklyOverrides![weekKey].map(slot => {
+        if (slot.day === 0) {
+          console.log(`🔄 Migrating weekly override slot from day=0 to day=7 for week ${weekKey}`);
+          return { ...slot, day: 7 };
+        }
+        return slot;
+      });
+    });
+  }
+  
+  // Debug: Log loaded TimeSlots and Target Hours
+  console.log('📥 getUserProfile - Loaded TimeSlots:', profile.preferences?.preferredTrainingTimes?.length || 0, 'slots');
+  console.log('📥 getUserProfile - Target Hours:', profile.weeklyTrainingHoursTarget || 'not set');
+  console.log('📥 getUserProfile - Weekly Overrides:', Object.keys(profile.weeklyTargetHoursOverrides || {}).length, 'weeks');
+  if (profile.preferences?.preferredTrainingTimes?.length) {
+    console.log('📅 TimeSlots:', profile.preferences.preferredTrainingTimes);
+  }
+  
   return profile;
 };
 
 export const updateUserProfile = async (userId: string, profile: Partial<UserProfile>): Promise<void> => {
-  const profileRef = doc(db, 'users', userId, 'profile', 'main');
-  await setDoc(profileRef, profile, { merge: true });
+  // ✅ FIX: Write to main user document, not subcollection
+  const userRef = doc(db, 'users', userId);
+  
+  // Debug: Log what we're saving
+  if (profile.preferences?.preferredTrainingTimes) {
+    console.log('💾 updateUserProfile - Saving TimeSlots:', profile.preferences.preferredTrainingTimes.length, 'slots');
+    console.log('📅 TimeSlots to save:', profile.preferences.preferredTrainingTimes);
+  }
+  
+  await setDoc(userRef, {
+    ...profile,
+    updatedAt: Timestamp.now()
+  }, { merge: true });
+  
+  console.log('✅ updateUserProfile - Saved successfully');
 };
 
 // Strava integration
@@ -282,6 +330,29 @@ export const saveTrainingPlan = async (
     updatedAt: string;
   }
 ): Promise<void> => {
+  console.log('📦 Saving new plan:', plan.planId);
+  
+  // ✅ STEP 1: Delete ALL old plans first
+  const plansCollectionRef = collection(db, 'users', userId, 'plans');
+  const oldPlansSnapshot = await getDocs(plansCollectionRef);
+  
+  console.log(`🗑️ Found ${oldPlansSnapshot.size} old plan(s) to delete`);
+  
+  if (oldPlansSnapshot.size > 0) {
+    oldPlansSnapshot.docs.forEach(doc => {
+      console.log(`  🗑️ Deleting plan: ${doc.id}`);
+    });
+  }
+  
+  // Delete all old plans in batch
+  const deletePromises = oldPlansSnapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletePromises);
+  
+  if (oldPlansSnapshot.size > 0) {
+    console.log(`✅ Deleted ${oldPlansSnapshot.size} old plan(s)`);
+  }
+  
+  // ✅ STEP 2: Save new plan
   const planRef = doc(db, 'users', userId, 'plans', plan.planId);
   
   console.log('📦 Original plan before cleaning:', plan);
@@ -301,6 +372,7 @@ export const saveTrainingPlan = async (
   console.log('✨ Cleaned plan:', cleanedPlan);
   
   await setDoc(planRef, cleanedPlan);
+  console.log('💾 New plan saved successfully');
 };
 
 export const getTrainingPlan = async (userId: string, planId: string): Promise<any | null> => {

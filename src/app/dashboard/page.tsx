@@ -20,6 +20,7 @@ import { generateZWOFromSession, generateZWOFilename } from '@/lib/zwoGenerator'
 import { generateMvpWeeklyPlan } from '@/lib/mvpPlanGenerator';
 import { getSeasonGoals, saveTrainingPlan, getLatestTrainingPlan } from '@/lib/firestore';
 import type { SeasonGoal } from '@/types/user';
+import { format } from 'date-fns';
 
 interface StravaActivity {
   id: number;
@@ -139,6 +140,15 @@ export default function DashboardPage() {
           setTrainingPlan(data.plan);
           if (data.plan) {
             console.log('✅ Plan loaded successfully, weeks:', data.plan.weeks?.length);
+            // Debug: Check if first week has timeSlots
+            if (data.plan.weeks?.[0]?.sessions) {
+              console.log('🕒 First week sessions timeSlots:', 
+                data.plan.weeks[0].sessions.map((s: any) => ({ 
+                  date: s.date, 
+                  timeSlot: s.timeSlot 
+                }))
+              );
+            }
           } else {
             console.log('ℹ️ No plan found for user');
           }
@@ -589,11 +599,23 @@ export default function DashboardPage() {
             {profile?.stravaConnected && (
               <button
                 onClick={async () => {
-                  if (!auth.currentUser || !profile) return;
+                  console.log('🎯 Generate Plan Button clicked!');
+                  console.log('👤 auth.currentUser:', auth.currentUser?.uid);
+                  console.log('📋 profile:', profile ? 'loaded' : 'NOT LOADED');
+                  
+                  if (!auth.currentUser || !profile) {
+                    console.error('❌ Cannot generate plan: Missing user or profile!');
+                    return;
+                  }
+                  
+                  console.log('✅ Starting plan generation...');
                   setGeneratingPlan(true);
                   try {
-                    // Extract user slots from profile
-                    const userSlots = profile.preferences?.preferredTrainingTimes || [];
+                    // Extract user slots from profile (standard template)
+                    const standardSlots = profile.preferences?.preferredTrainingTimes || [];
+                    
+                    console.log('📅 Standard slots loaded:', standardSlots.length, 'slots');
+                    console.log('📅 Standard slots:', standardSlots);
                     
                     // Get next event date from season goals
                     const seasonGoals = await getSeasonGoals(auth.currentUser.uid);
@@ -613,14 +635,30 @@ export default function DashboardPage() {
                       const weekStartDate = new Date(startDate);
                       weekStartDate.setDate(startDate.getDate() + (weekNum - 1) * 7);
                       
+                      // ✅ Check for week-specific override
+                      const weekKey = format(weekStartDate, 'yyyy-MM-dd');
+                      const weekOverride = profile.weeklyOverrides?.[weekKey];
+                      const weekSlots = weekOverride || standardSlots;
+                      
+                      console.log(`📅 Week ${weekNum} (${weekKey}): Using ${weekOverride ? 'OVERRIDE' : 'standard'} slots (${weekSlots.length} slots)`);
+                      
                       const weekPlan = await generateMvpWeeklyPlan({
                         userId: auth.currentUser.uid,
                         userProfile: profile,
                         weekStart: weekStartDate,
-                        slots: userSlots,
+                        slots: weekSlots,
                         eventDate,
                         weekNumber: weekNum
                       });
+                      
+                      // Debug: Check if sessions have timeSlots
+                      console.log(`📅 Week ${weekNum} sessions with timeSlots:`, 
+                        weekPlan.sessions?.map(s => ({ 
+                          date: s.date, 
+                          type: s.type, 
+                          timeSlot: s.timeSlot 
+                        }))
+                      );
                       
                       weeks.push(weekPlan);
                     }
@@ -716,6 +754,11 @@ export default function DashboardPage() {
                                   <p className={`${typography.body} font-semibold ${colors.text.primary}`}>{session.type}</p>
                                   <p className={`${typography.bodySmall} ${colors.text.secondary} ${spacing.micro}`}>{formatHoursToTime(session.duration / 60)}</p>
                                   <p className={`${typography.bodySmall} ${colors.text.secondary}`}>{session.targetTss.toFixed(1)} TSS</p>
+                                  {session.timeSlot && (
+                                    <p className={`${typography.bodySmall} ${colors.text.secondary} ${spacing.micro} font-mono`}>
+                                      🕒 {session.timeSlot.startTime} - {session.timeSlot.endTime}
+                                    </p>
+                                  )}
                                 </>
                               ) : (
                                 <p className={`${typography.bodySmall} ${colors.text.secondary}`}>Rest</p>

@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -31,6 +31,7 @@ export default function TrainingPlanPage() {
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(0);
   const [generatingPlan, setGeneratingPlan] = useState(false);
+  const [shouldLoadPlan, setShouldLoadPlan] = useState(true);  // Control when to load from API
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -51,7 +52,12 @@ export default function TrainingPlanPage() {
   useEffect(() => {
     const loadPlan = async () => {
       const user = auth.currentUser;
-      if (!user || !profile?.stravaConnected) return;
+      if (!user || !profile?.stravaConnected || !shouldLoadPlan) {
+        if (!shouldLoadPlan) {
+          console.log('⏭️ Skipping API load - plan was just generated');
+        }
+        return;
+      }
 
       setLoadingPlan(true);
       try {
@@ -74,6 +80,18 @@ export default function TrainingPlanPage() {
           
           console.log('📊 Processed weeks:', plan?.weeks);
           console.log('📊 First week:', plan?.weeks?.[0]);
+          
+          // Debug: Check timeSlots in first week
+          if (plan?.weeks?.[0]?.sessions) {
+            console.log('🕒 Training Plan Page - First week timeSlots:', 
+              plan.weeks[0].sessions.map((s: any) => ({ 
+                date: s.date, 
+                type: s.type,
+                timeSlot: s.timeSlot 
+              }))
+            );
+          }
+          
           setTrainingPlan(plan);
           setCurrentWeek(0); // Reset to first week
         }
@@ -85,7 +103,7 @@ export default function TrainingPlanPage() {
     };
 
     loadPlan();
-  }, [profile?.stravaConnected]);
+  }, [profile?.stravaConnected, shouldLoadPlan]);
 
   const handleGeneratePlan = async () => {
     const user = auth.currentUser;
@@ -94,7 +112,6 @@ export default function TrainingPlanPage() {
       return;
     }
     
-    alert('Button clicked! Starting plan generation...');
     setGeneratingPlan(true);
     try {
       console.log('🚀 Starting MVP plan generation...');
@@ -120,11 +137,19 @@ export default function TrainingPlanPage() {
       // Generate 12 weeks of training
       console.log('📝 Generating 12 weeks...');
       const weeks: WeeklyPlan[] = [];
-      const startDate = new Date();
-      startDate.setHours(0, 0, 0, 0); // Start at midnight
+      console.log('🔍 Initial weeks array length:', weeks.length);
+      
+      // Start from next Monday (or today if today is Monday)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek; // If Sun → 1, If Mon → 0, else days to next Mon
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() + daysUntilMonday);
+      console.log(`📅 Plan starts on: ${startDate.toLocaleDateString('de-DE')} (${['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][startDate.getDay()]})`);
       
       for (let weekNum = 1; weekNum <= 12; weekNum++) {
-        console.log(`⏳ Generating week ${weekNum}...`);
+        console.log(`⏳ Generating week ${weekNum}... (current weeks.length: ${weeks.length})`);
         const weekStartDate = new Date(startDate);
         weekStartDate.setDate(startDate.getDate() + (weekNum - 1) * 7);
         
@@ -138,6 +163,17 @@ export default function TrainingPlanPage() {
         });
         
         console.log(`✅ Week ${weekNum} generated:`, weekPlan);
+        
+        // DEBUG: Check Week 1 specifically
+        if (weekNum === 1) {
+          console.log('🔍🔍🔍 WEEK 1 DEEP CHECK:');
+          console.log('  weekId:', weekPlan.id);
+          console.log('  totalTss:', weekPlan.totalTss);
+          console.log('  totalHours:', weekPlan.totalHours);
+          console.log('  sessions count:', weekPlan.sessions?.length);
+          console.log('  first session:', weekPlan.sessions?.[0]);
+        }
+        
         weeks.push(weekPlan);
       }
 
@@ -152,15 +188,24 @@ export default function TrainingPlanPage() {
       };
 
       console.log('✅ MVP Plan generated with', weeks.length, 'weeks');
-      console.log('💾 Saving plan to Firestore...');
+      console.log('� Week 1 CHECK:', {
+        weekId: weeks[0]?.id,
+        totalTss: weeks[0]?.totalTss,
+        sessions: weeks[0]?.sessions?.length,
+        firstSession: weeks[0]?.sessions?.[0]?.name
+      });
+      console.log('�💾 Saving plan to Firestore...');
       
       // Save to Firestore
       await saveTrainingPlan(user.uid, fullPlan);
       console.log('✅ Plan saved to Firestore');
       
-      // Update UI
+      // Update UI - prevent API reload
+      console.log('🔄 Setting new plan in state:', fullPlan.planId, 'with', fullPlan.weeks.length, 'weeks');
+      setShouldLoadPlan(false);  // ← Prevent API from overwriting (forever on this page load!)
       setTrainingPlan(fullPlan);
       setCurrentWeek(0);
+      console.log('🔄 State update triggered - plan will NOT be reloaded from API');
     } catch (error) {
       console.error('❌ Error generating plan:', error);
       console.error('❌ Error details:', error instanceof Error ? error.message : String(error));
@@ -188,6 +233,7 @@ export default function TrainingPlanPage() {
   
   // Debug logging
   console.log('🔍 Current week index:', currentWeek);
+  console.log('🔍 trainingPlan.planId:', trainingPlan?.planId);  // ← Check which plan is in state!
   console.log('🔍 Weeks array:', weeksArray);
   console.log('🔍 Current week data:', currentWeekData);
   console.log('🔍 Total weeks:', weeksArray?.length);
@@ -248,7 +294,18 @@ export default function TrainingPlanPage() {
                 >
                   Previous Week
                 </button>
-                <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Woche {currentWeek + 1}</h2>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">
+                    Woche {currentWeek + 1}
+                  </h2>
+                  {currentWeekData && currentWeekData.weekStartDate && (
+                    <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">
+                      {currentWeekData.id} • {format(new Date(currentWeekData.weekStartDate), 'dd.MM.yyyy')}
+                      {' - '}
+                      {format(new Date(new Date(currentWeekData.weekStartDate).getTime() + 6 * 24 * 60 * 60 * 1000), 'dd.MM.yyyy')}
+                    </p>
+                  )}
+                </div>
                 <button
                   onClick={() => setCurrentWeek(Math.min(weeksArray.length - 1, currentWeek + 1))}
                   disabled={currentWeek >= weeksArray.length - 1}
@@ -283,11 +340,18 @@ export default function TrainingPlanPage() {
             </div>
 
             <div className={spacing.section}>
-              {currentWeekData?.sessions?.map((session: TrainingSession, idx: number) => (
+              {currentWeekData?.sessions?.map((session: TrainingSession, idx: number) => {
+                // Get the actual day name from the session date
+                const sessionDate = session?.date ? new Date(session.date) : null;
+                const dayName = sessionDate 
+                  ? format(sessionDate, 'EEEE', { locale: de })
+                  : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][idx];
+                
+                return (
                 <div key={session?.id || idx} className={`${components.card.base} ${session ? 'border-2 border-gray-200 dark:border-gray-700' : ''}`}>
                   <div className={`flex items-center ${spacing.cardGap} ${spacing.micro}`}>
                     <h3 className="text-xl font-semibold text-text-primary-light dark:text-text-primary-dark">
-                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][idx]}
+                      {dayName}
                     </h3>
                     {session && (
                       <span className={`${typography.bodySmall} rounded-full px-3 py-1 font-medium ` + (
@@ -308,7 +372,13 @@ export default function TrainingPlanPage() {
                         </p>
                       )}
                       <div className={`flex ${spacing.cardGap} ${typography.body} ${colors.text.secondary} ${spacing.tight}`}>
-                        <span>{formatHoursToTime(session.duration / 60)}</span>
+                        <span>⏱️ {formatHoursToTime(session.duration / 60)}</span>
+                        {session.timeSlot && (
+                          <span className="font-mono">
+                            🕒 {session.timeSlot.startTime} - {session.timeSlot.endTime}
+                          </span>
+                        )}
+                        <span>📊 {session.targetTss.toFixed(1)} TSS</span>
                       </div>
 
                       {/* Export Button */}
@@ -399,7 +469,8 @@ export default function TrainingPlanPage() {
                     <p className="text-text-secondary-light dark:text-text-secondary-dark">Rest Day</p>
                   )}
                 </div>
-              ))}
+              );
+              })}
             </div>
           </>
         )}
