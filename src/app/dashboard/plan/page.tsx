@@ -6,12 +6,13 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import DashboardLayout from '@/components/DashboardLayout';
 import SessionNotes from '@/components/SessionNotes';
-import { getUserProfile, updateTrainingSession } from '@/lib/firestore';
+import { getUserProfile, updateTrainingSession, getSeasonGoals, saveTrainingPlan } from '@/lib/firestore';
 import { generateZWOFromSession, generateZWOFilename } from '@/lib/zwoGenerator';
+import { generateMvpWeeklyPlan } from '@/lib/mvpPlanGenerator';
 import { format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
-import type { TrainingSession } from '@/types';
+import type { TrainingSession, WeeklyPlan, SeasonGoal, UserProfile } from '@/types';
 
 // Helper function to format hours to "h:mm h" (rounded to 5min)
 const formatHoursToTime = (hours: number): string => {
@@ -21,12 +22,6 @@ const formatHoursToTime = (hours: number): string => {
   const m = roundedMinutes % 60;
   return `${h}:${String(m).padStart(2, '0')} h`;
 };
-
-interface UserProfile {
-  email?: string;
-  ftp?: number;
-  stravaConnected?: boolean;
-}
 
 export default function TrainingPlanPage() {
   const router = useRouter();
@@ -94,34 +89,82 @@ export default function TrainingPlanPage() {
 
   const handleGeneratePlan = async () => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user || !profile) {
+      alert('User or profile missing!');
+      return;
+    }
     
+    alert('Button clicked! Starting plan generation...');
     setGeneratingPlan(true);
     try {
-      const response = await fetch('/api/training/generate-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid })
-      });
+      console.log('🚀 Starting MVP plan generation...');
+      console.log('📊 Profile:', profile);
       
-      if (response.ok) {
-        const data = await response.json();
+      // Extract user slots from profile
+      const userSlots = profile.preferences?.preferredTrainingTimes || [];
+      console.log('📅 User slots:', userSlots);
+      
+      // Get next event date from season goals
+      console.log('🎯 Loading season goals...');
+      const seasonGoals = await getSeasonGoals(user.uid);
+      console.log('🎯 Season goals:', seasonGoals);
+      
+      const nextEvent = seasonGoals.find(
+        (goal: SeasonGoal) => goal.date && new Date(goal.date) > new Date()
+      );
+      const eventDate = nextEvent?.date 
+        ? new Date(nextEvent.date)
+        : null; // No event means MAINTENANCE phase
+      console.log('📆 Event date:', eventDate);
+
+      // Generate 12 weeks of training
+      console.log('📝 Generating 12 weeks...');
+      const weeks: WeeklyPlan[] = [];
+      const startDate = new Date();
+      startDate.setHours(0, 0, 0, 0); // Start at midnight
+      
+      for (let weekNum = 1; weekNum <= 12; weekNum++) {
+        console.log(`⏳ Generating week ${weekNum}...`);
+        const weekStartDate = new Date(startDate);
+        weekStartDate.setDate(startDate.getDate() + (weekNum - 1) * 7);
         
-        // Convert weeks object to array if needed
-        let plan = data.plan;
-        if (plan?.weeks && !Array.isArray(plan.weeks)) {
-          console.log('🔄 Converting weeks object to array on generate');
-          plan = {
-            ...plan,
-            weeks: Object.values(plan.weeks)
-          };
-        }
+        const weekPlan = await generateMvpWeeklyPlan({
+          userId: user.uid,
+          userProfile: profile,
+          weekStart: weekStartDate,
+          slots: userSlots,
+          eventDate,
+          weekNumber: weekNum
+        });
         
-        setTrainingPlan(plan);
-        setCurrentWeek(0);
+        console.log(`✅ Week ${weekNum} generated:`, weekPlan);
+        weeks.push(weekPlan);
       }
+
+      const fullPlan = {
+        userId: user.uid,
+        planId: `plan-${Date.now()}`,
+        startDate: startDate.toISOString(),
+        endDate: new Date(startDate.getTime() + 12 * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        weeks,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      console.log('✅ MVP Plan generated with', weeks.length, 'weeks');
+      console.log('💾 Saving plan to Firestore...');
+      
+      // Save to Firestore
+      await saveTrainingPlan(user.uid, fullPlan);
+      console.log('✅ Plan saved to Firestore');
+      
+      // Update UI
+      setTrainingPlan(fullPlan);
+      setCurrentWeek(0);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Error generating plan:', error);
+      console.error('❌ Error details:', error instanceof Error ? error.message : String(error));
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
     } finally {
       setGeneratingPlan(false);
     }
@@ -158,17 +201,25 @@ export default function TrainingPlanPage() {
         <div className={`${spacing.contentBlock} ${layout.flexRowBetween}`}>
           <div>
             <h1 className={`${typography.h1} font-bold ${colors.text.primary}`}>Training Plan</h1>
-            <p className={`${colors.text.secondary} ${spacing.micro} ${typography.body}`}>8-week training schedule</p>
+            <p className={`${colors.text.secondary} ${spacing.micro} ${typography.body}`}>12-week training schedule</p>
           </div>
-          {profile?.stravaConnected && (
-            <button
-              onClick={handleGeneratePlan}
-              disabled={generatingPlan}
-              className={`${components.button.primary} ${typography.body} font-medium disabled:opacity-50`}
-            >
-              {generatingPlan ? 'Generating...' : 'Generate Plan'}
-            </button>
-          )}
+          {(() => {
+            console.log('🔍 Render check - profile:', profile);
+            console.log('🔍 stravaConnected:', profile?.stravaConnected);
+            console.log('🔍 generatingPlan:', generatingPlan);
+            return profile?.stravaConnected ? (
+              <button
+                onClick={(e) => {
+                  console.log('🔘 Button clicked!', e);
+                  handleGeneratePlan();
+                }}
+                disabled={generatingPlan}
+                className={`${components.button.primary} ${typography.body} font-medium disabled:opacity-50`}
+              >
+                {generatingPlan ? 'Generating...' : 'Generate Plan'}
+              </button>
+            ) : null;
+          })()}
         </div>
 
         {loadingPlan ? (

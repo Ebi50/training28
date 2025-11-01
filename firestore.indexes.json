@@ -1,30 +1,56 @@
 {
   "indexes": [
     {
-      "collectionGroup": "activities",
+      "collectionGroup": "completions",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "startTime",
+          "fieldPath": "date",
           "order": "DESCENDING"
         }
       ]
     },
     {
-      "collectionGroup": "plans",
-      "queryScope": "COLLECTION_GROUP", 
+      "collectionGroup": "completions",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
+          "fieldPath": "synced_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "plans_weekly",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "start_date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "plans_daily",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "plans_daily",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
         },
         {
-          "fieldPath": "weekStartDate",
-          "order": "DESCENDING"
+          "fieldPath": "completed",
+          "order": "ASCENDING"
         }
       ]
     },
@@ -33,11 +59,21 @@
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "userId",
+          "fieldPath": "date",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "season_goals",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "date",
+          "fieldPath": "priority",
           "order": "ASCENDING"
         }
       ]
@@ -47,26 +83,56 @@
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "userId", 
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "startDate",
+          "fieldPath": "start_date",
           "order": "ASCENDING"
         }
       ]
     },
     {
-      "collectionGroup": "notifications",
+      "collectionGroup": "camps",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
-          "fieldPath": "userId",
+          "fieldPath": "end_date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "metrics_daily",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "metrics_daily",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "createdAt",
+          "fieldPath": "ctl",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "availability",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "day_of_week",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "active",
+          "order": "ASCENDING"
         }
       ]
     }

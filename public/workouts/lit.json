@@ -1,0 +1,177 @@
+{
+  "category": "LIT",
+  "name": "Low Intensity Training / Grundlagenausdauer",
+  "description": "LIT im Bereich 60–75% FTP; Fokus auf ruhige, konstante Belastung. Aerobe Basis & Fettstoffwechsel stärken.",
+  "intensity_range": "60-75% FTP",
+  "workouts": [
+    {
+      "id": "lit_01_ga1_60",
+      "name": "GA1 60",
+      "duration_min": 60,
+      "tss_estimate": 45,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60, "description": "Warmup"},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.65, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50, "description": "Cooldown"}
+      ]
+    },
+    {
+      "id": "lit_02_ga1_90",
+      "name": "GA1 90",
+      "duration_min": 90,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 4200, "intensity_ftp": 0.65, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_03_ga1_120",
+      "name": "GA1 120",
+      "duration_min": 120,
+      "tss_estimate": 90,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 6000, "intensity_ftp": 0.65, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_04_endurance_ramp_90",
+      "name": "Endurance Ramp 90",
+      "duration_min": 90,
+      "tss_estimate": 60,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 5400, "intensity_ftp": 0.60, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_05_low_cadence_endurance",
+      "name": "Low Cadence Endurance",
+      "duration_min": 75,
+      "tss_estimate": 58,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.70, "cadence_rpm": 60, "description": "Steady Z2 @ 60rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_06_z2_w_sprints",
+      "name": "Z2 w/ Sprints",
+      "duration_min": 75,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3600, "intensity_ftp": 0.65, "description": "Steady Z2"},
+        {"type": "intervals", "repeats": 5, "work_s": 8, "rest_s": 120, "work_intensity_ftp": 2.5, "rest_intensity_ftp": 0.65, "description": "Aerobic Sprints (neuromuscular)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_07_progressive_z2_100",
+      "name": "Progressive Z2 100",
+      "duration_min": 100,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 4800, "intensity_ftp": 0.68, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_08_decoupling_test_120",
+      "name": "Decoupling Test 120",
+      "duration_min": 120,
+      "tss_estimate": 98,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 6000, "intensity_ftp": 0.70, "description": "Steady Z2 (monitor HR drift)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_09_z2_mixed_cadence",
+      "name": "Z2 Mixed Cadence",
+      "duration_min": 70,
+      "tss_estimate": 56,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3000, "intensity_ftp": 0.68, "cadence_rpm": "100/60 alternating", "description": "Steady Z2 alternating cadence"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_10_endurance_surges",
+      "name": "Endurance + Surges",
+      "duration_min": 80,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3900, "intensity_ftp": 0.70, "description": "Steady Z2"},
+        {"type": "intervals", "repeats": 6, "work_s": 10, "rest_s": 110, "work_intensity_ftp": 1.5, "rest_intensity_ftp": 0.70, "description": "Surges"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_11_z2_long_150",
+      "name": "Z2 Long 150",
+      "duration_min": 150,
+      "tss_estimate": 118,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 7800, "intensity_ftp": 0.68, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_12_z2_60_high_cadence",
+      "name": "Z2 60 High-Cadence",
+      "duration_min": 60,
+      "tss_estimate": 45,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.65, "cadence_rpm": 100, "description": "Steady Z2 @ 100rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_13_z2_75_low_cadence",
+      "name": "Z2 75 Low-Cadence",
+      "duration_min": 75,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3300, "intensity_ftp": 0.70, "cadence_rpm": 65, "description": "Steady Z2 @ 65rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_14_aerobic_tiz_builder_90",
+      "name": "Aerobic TiZ Builder 90",
+      "duration_min": 90,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 4200, "intensity_ftp": 0.67, "description": "Steady Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "lit_15_endurance_sandwich_100",
+      "name": "Endurance Sandwich 100",
+      "duration_min": 100,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.65, "description": "Steady Z2 (part 1)"},
+        {"type": "steady", "duration_s": 1800, "intensity_ftp": 0.70, "description": "Steady Z2 (part 2, harder)"},
+        {"type": "steady", "duration_s": 600, "intensity_ftp": 0.65, "description": "Steady Z2 (part 3)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

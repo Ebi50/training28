@@ -1,0 +1,356 @@
+{
+  "category": "SKILL",
+  "name": "Technik / Skills / Kraftausdauer",
+  "description": "Leistungsziel zweitrangig; saubere Ausführung zählt. Technik, Pacing und Koordination verbessern.",
+  "intensity_range": "variabel",
+  "workouts": [
+    {
+      "id": "skill_01_single_leg_drills_5x1r_1l",
+      "name": "Single-Leg Drills 5x(1R/1L)",
+      "duration_min": 45,
+      "tss_estimate": 42,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 60, "rest_s": 60, "work_intensity_ftp": 0.60, "rest_intensity_ftp": 0.50, "description": "Right/left leg alternating"},
+        {"type": "steady", "duration_s": 180, "intensity_ftp": 0.60, "description": "Both legs"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_02_cadence_ladder_80_120rpm",
+      "name": "Cadence Ladder 80-120rpm",
+      "duration_min": 45,
+      "tss_estimate": 44,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 0.60, "cadence_rpm": 80, "description": "@80rpm"},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 0.60, "cadence_rpm": 90, "description": "@90rpm"},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 0.60, "cadence_rpm": 100, "description": "@100rpm"},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 0.60, "cadence_rpm": 110, "description": "@110rpm"},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 0.60, "cadence_rpm": 120, "description": "@120rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_03_low_cadence_climb_5x6min",
+      "name": "Low-Cadence Climb 5x6min",
+      "duration_min": 60,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 360, "rest_s": 180, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.60, "cadence_rpm": 70, "description": "@70rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_04_high_cadence_neuromotorik_6x1min",
+      "name": "High-Cadence Neuromotorik 6x1min",
+      "duration_min": 40,
+      "tss_estimate": 42,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 60, "rest_s": 120, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.60, "cadence_rpm": ">120", "description": ">120rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_05_cornering_surge_indoor",
+      "name": "Cornering & Surge (indoor)",
+      "duration_min": 50,
+      "tss_estimate": 58,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 90, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.60, "description": "Short surges"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_06_pacing_practice_2x15_steady",
+      "name": "Pacing Practice 2x15 steady",
+      "duration_min": 55,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 900, "rest_s": 300, "work_intensity_ftp": 0.80, "rest_intensity_ftp": 0.60, "description": "Even pacing practice"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_07_tt_position_hold_3x10",
+      "name": "TT Position Hold 3x10",
+      "duration_min": 55,
+      "tss_estimate": 64,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 600, "rest_s": 300, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.60, "description": "Aero position hold"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_08_climb_simulation_long_3x10",
+      "name": "Climb Simulation Long 3x10",
+      "duration_min": 65,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 600, "rest_s": 300, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.60, "cadence_rpm": 70, "description": "@70rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_09_gear_change_drill_8x2min",
+      "name": "Gear Change Drill 8x2min",
+      "duration_min": 50,
+      "tss_estimate": 56,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 120, "rest_s": 60, "work_intensity_ftp": 0.75, "rest_intensity_ftp": 0.60, "description": "Gear changes every 30s"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_10_pedal_stroke_efficiency_6x5min",
+      "name": "Pedal Stroke Efficiency 6x5min",
+      "duration_min": 60,
+      "tss_estimate": 64,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 300, "rest_s": 180, "work_intensity_ftp": 0.70, "rest_intensity_ftp": 0.60, "description": "Focus on smooth pedal stroke"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_11_form_focus_z2_60",
+      "name": "Form Focus Z2 60",
+      "duration_min": 60,
+      "tss_estimate": 52,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3000, "intensity_ftp": 0.65, "description": "Focus on form and technique"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_12_balance_drills_8x1min",
+      "name": "Balance Drills 8x1min",
+      "duration_min": 45,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 60, "rest_s": 120, "work_intensity_ftp": 0.70, "rest_intensity_ftp": 0.60, "description": "No hands / balance practice"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_13_standing_endurance_4x8min",
+      "name": "Standing Endurance 4x8min",
+      "duration_min": 65,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 480, "rest_s": 240, "work_intensity_ftp": 0.80, "rest_intensity_ftp": 0.60, "description": "Standing climbing"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_14_seated_standing_transitions_12x90s",
+      "name": "Seated/Standing Transitions 12x90s",
+      "duration_min": 55,
+      "tss_estimate": 60,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 12, "work_s": 90, "rest_s": 90, "work_intensity_ftp": 0.80, "rest_intensity_ftp": 0.60, "description": "Alternate seated/standing every 30s"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_15_descending_skills_indoor",
+      "name": "Descending Skills (indoor)",
+      "duration_min": 50,
+      "tss_estimate": 54,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 180, "rest_s": 120, "work_intensity_ftp": 0.75, "rest_intensity_ftp": 0.60, "description": "High cadence spinning"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_16_power_modulation_6x6min",
+      "name": "Power Modulation 6x6min",
+      "duration_min": 65,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 360, "rest_s": 180, "work_intensity_ftp": 0.75, "rest_intensity_ftp": 0.60, "description": "Vary power every minute"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_17_cadence_pyramid_60_120_60",
+      "name": "Cadence Pyramid 60-120-60",
+      "duration_min": 50,
+      "tss_estimate": 54,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 60, "description": "@60rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 80, "description": "@80rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 100, "description": "@100rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 120, "description": "@120rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 100, "description": "@100rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 80, "description": "@80rpm"},
+        {"type": "steady", "duration_s": 240, "intensity_ftp": 0.70, "cadence_rpm": 60, "description": "@60rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_18_coordination_complex_8x3min",
+      "name": "Coordination Complex 8x3min",
+      "duration_min": 55,
+      "tss_estimate": 58,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 180, "rest_s": 120, "work_intensity_ftp": 0.75, "rest_intensity_ftp": 0.60, "description": "Complex coordination drills"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_19_overgear_strength_6x4min",
+      "name": "Overgear Strength 6x4min",
+      "duration_min": 55,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 240, "rest_s": 180, "work_intensity_ftp": 0.80, "rest_intensity_ftp": 0.60, "cadence_rpm": 50, "description": "Overgear @50rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_20_tempo_changes_10x2min",
+      "name": "Tempo Changes 10x2min",
+      "duration_min": 55,
+      "tss_estimate": 60,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 120, "rest_s": 60, "work_intensity_ftp": 0.80, "rest_intensity_ftp": 0.60, "description": "Tempo changes"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_21_recovery_spin_45",
+      "name": "Recovery Spin 45",
+      "duration_min": 45,
+      "tss_estimate": 28,
+      "structure": [
+        {"type": "warmup", "duration_s": 300, "intensity_ftp": 0.50},
+        {"type": "steady", "duration_s": 2100, "intensity_ftp": 0.55, "description": "Easy recovery spin"},
+        {"type": "cooldown", "duration_s": 300, "intensity_ftp": 0.45}
+      ]
+    },
+    {
+      "id": "skill_22_active_recovery_60",
+      "name": "Active Recovery 60",
+      "duration_min": 60,
+      "tss_estimate": 38,
+      "structure": [
+        {"type": "warmup", "duration_s": 300, "intensity_ftp": 0.50},
+        {"type": "steady", "duration_s": 3000, "intensity_ftp": 0.55, "description": "Active recovery"},
+        {"type": "cooldown", "duration_s": 300, "intensity_ftp": 0.45}
+      ]
+    },
+    {
+      "id": "skill_23_mobility_and_spin_50",
+      "name": "Mobility and Spin 50",
+      "duration_min": 50,
+      "tss_estimate": 32,
+      "structure": [
+        {"type": "warmup", "duration_s": 300, "intensity_ftp": 0.50},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.55, "cadence_rpm": 90, "description": "Easy spin with mobility focus"},
+        {"type": "cooldown", "duration_s": 300, "intensity_ftp": 0.45}
+      ]
+    },
+    {
+      "id": "skill_24_technical_endurance_75",
+      "name": "Technical Endurance 75",
+      "duration_min": 75,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 3600, "intensity_ftp": 0.68, "description": "Technical focus at Z2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_25_pre_race_opener_40",
+      "name": "Pre-Race Opener 40",
+      "duration_min": 40,
+      "tss_estimate": 42,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 60, "rest_s": 120, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.60, "description": "Openers"},
+        {"type": "sprints", "repeats": 2, "work_s": 10, "rest_s": 120, "description": "Short sprints"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_26_race_warm_up_30",
+      "name": "Race Warm-Up 30",
+      "duration_min": 30,
+      "tss_estimate": 32,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 90, "rest_s": 120, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.60, "description": "Build efforts"},
+        {"type": "sprints", "repeats": 2, "work_s": 8, "rest_s": 120, "description": "Openers"},
+        {"type": "cooldown", "duration_s": 300, "intensity_ftp": 0.55}
+      ]
+    },
+    {
+      "id": "skill_27_form_maintenance_z2_90",
+      "name": "Form Maintenance Z2 90",
+      "duration_min": 90,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 4500, "intensity_ftp": 0.67, "description": "Form and technique focus"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_28_fatigue_resistance_progressive",
+      "name": "Fatigue Resistance Progressive",
+      "duration_min": 65,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 1200, "intensity_ftp": 0.70, "description": "Build 1"},
+        {"type": "steady", "duration_s": 1200, "intensity_ftp": 0.75, "description": "Build 2"},
+        {"type": "steady", "duration_s": 900, "intensity_ftp": 0.80, "description": "Build 3"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_29_neuromuscular_activation_35",
+      "name": "Neuromuscular Activation 35",
+      "duration_min": 35,
+      "tss_estimate": 38,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 6, "work_s": 8, "rest_s": 120, "description": "Activation sprints (submaximal)"},
+        {"type": "intervals", "repeats": 3, "work_s": 90, "rest_s": 120, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.60, "description": "Tempo bursts"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "skill_30_endurance_with_skills_100",
+      "name": "Endurance with Skills 100",
+      "duration_min": 100,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 0.65, "description": "Z2 block 1"},
+        {"type": "intervals", "repeats": 4, "work_s": 180, "rest_s": 120, "work_intensity_ftp": 0.75, "rest_intensity_ftp": 0.60, "description": "Technical intervals"},
+        {"type": "steady", "duration_s": 1200, "intensity_ftp": 0.65, "description": "Z2 block 2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "category": "TEMPO",
+  "name": "Tempo / Sweet Spot",
+  "description": "Sweet Spot ca. 88–92% FTP; Tempo ca. 80–87% FTP. Schwellennahe Ausdauer und Ökonomie verbessern.",
+  "intensity_range": "80-92% FTP",
+  "workouts": [
+    {
+      "id": "tempo_01_2x20_sweet_spot",
+      "name": "2x20 Sweet Spot",
+      "duration_min": 60,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 1200, "rest_s": 300, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.50, "description": "2x20min @ Sweet Spot"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_02_3x15_sweet_spot",
+      "name": "3x15 Sweet Spot",
+      "duration_min": 75,
+      "tss_estimate": 82,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 900, "rest_s": 300, "work_intensity_ftp": 0.88, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_03_4x10_sweet_spot",
+      "name": "4x10 Sweet Spot",
+      "duration_min": 70,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 600, "rest_s": 180, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_04_over_under_3x12",
+      "name": "Over/Under 3x12",
+      "duration_min": 70,
+      "tss_estimate": 85,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 720, "rest_s": 240, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.95, "description": "Over/Under (95%/105%)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_05_30_15_sweet_spot_surge",
+      "name": "30/15 Sweet Spot Surge",
+      "duration_min": 60,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 15, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.90, "description": "Set 1"},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 15, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.90, "description": "Set 2"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_06_3x20_tempo_85",
+      "name": "3x20 Tempo 85%",
+      "duration_min": 85,
+      "tss_estimate": 92,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 1200, "rest_s": 360, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_07_sweet_spot_pyramid",
+      "name": "Sweet Spot Pyramid",
+      "duration_min": 75,
+      "tss_estimate": 84,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "interval", "work_s": 600, "rest_s": 180, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.55, "description": "10min"},
+        {"type": "interval", "work_s": 900, "rest_s": 300, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.55, "description": "15min"},
+        {"type": "interval", "work_s": 1200, "rest_s": 300, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.55, "description": "20min"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_08_criss_cross_4x10",
+      "name": "Criss-Cross 4x10",
+      "duration_min": 65,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 600, "rest_s": 180, "work_intensity_ftp": 0.95, "rest_intensity_ftp": 0.90, "description": "Criss-Cross"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_09_tempo_w_end_sprints",
+      "name": "Tempo w/ End Sprints",
+      "duration_min": 70,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 900, "rest_s": 300, "work_intensity_ftp": 0.88, "rest_intensity_ftp": 0.55, "description": "2x15 Tempo"},
+        {"type": "intervals", "repeats": 6, "work_s": 10, "rest_s": 110, "work_intensity_ftp": 2.5, "rest_intensity_ftp": 0.60, "description": "Finish Sprints"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_10_sst_tiz_60",
+      "name": "SST TiZ 60",
+      "duration_min": 60,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2100, "intensity_ftp": 0.90, "description": "35min continuous Sweet Spot"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_11_tempo_2x25",
+      "name": "Tempo 2x25",
+      "duration_min": 75,
+      "tss_estimate": 86,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 1500, "rest_s": 300, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_12_sst_3x12_progressive",
+      "name": "SST 3x12 Progressive",
+      "duration_min": 65,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 720, "rest_s": 240, "work_intensity_ftp": 0.88, "rest_intensity_ftp": 0.55, "description": "Progressive effort"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_13_tempo_broken_45",
+      "name": "Tempo Broken 45",
+      "duration_min": 55,
+      "tss_estimate": 64,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 480, "rest_s": 120, "work_intensity_ftp": 0.85, "rest_intensity_ftp": 0.60, "description": "3x8min broken tempo"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_14_over_under_4x8",
+      "name": "Over/Under 4x8",
+      "duration_min": 60,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 480, "rest_s": 180, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.90, "description": "Over/Under (90%/105%)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "tempo_15_sweet_spot_3x16",
+      "name": "Sweet Spot 3x16",
+      "duration_min": 70,
+      "tss_estimate": 82,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 960, "rest_s": 300, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "category": "NEUROMUSCULAR",
+  "name": "Neuromuskulär / Sprint",
+  "description": "Volle Erholung zwischen Sprints für maximale Qualität. Schnellkraft, Antritt und Sprintleistung verbessern.",
+  "intensity_range": "Maximum effort",
+  "workouts": [
+    {
+      "id": "neu_01_standing_start_8x12s",
+      "name": "Standing Start 8x12s",
+      "duration_min": 35,
+      "tss_estimate": 42,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 8, "work_s": 12, "rest_s": 180, "description": "Standing start sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_02_flying_sprint_10x15s",
+      "name": "Flying Sprint 10x15s",
+      "duration_min": 45,
+      "tss_estimate": 48,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 10, "work_s": 15, "rest_s": 120, "description": "Flying sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_03_big_gear_accel_6x20s",
+      "name": "Big Gear Accel 6x20s",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 6, "work_s": 20, "rest_s": 240, "description": "Big gear accelerations (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_04_microburst_3x10x10_20",
+      "name": "Microburst 3x(10x10/20)",
+      "duration_min": 35,
+      "tss_estimate": 44,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 10, "rest_s": 20, "work_intensity_ftp": 2.00, "rest_intensity_ftp": 0.40, "description": "Set 1"},
+        {"type": "rest", "duration_s": 240, "intensity_ftp": 0.60, "description": "Set rest"},
+        {"type": "intervals", "repeats": 10, "work_s": 10, "rest_s": 20, "work_intensity_ftp": 2.00, "rest_intensity_ftp": 0.40, "description": "Set 2"},
+        {"type": "rest", "duration_s": 240, "intensity_ftp": 0.60, "description": "Set rest"},
+        {"type": "intervals", "repeats": 10, "work_s": 10, "rest_s": 20, "work_intensity_ftp": 2.00, "rest_intensity_ftp": 0.40, "description": "Set 3"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_05_track_starts_12x8s",
+      "name": "Track Starts 12x8s",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 12, "work_s": 8, "rest_s": 112, "description": "Track starts (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_06_sprint_ladder_8_10_12s",
+      "name": "Sprint Ladder 8-10-12s",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 3, "work_s": 8, "rest_s": 120, "description": "8s sprints (max effort)"},
+        {"type": "sprints", "repeats": 3, "work_s": 10, "rest_s": 140, "description": "10s sprints (max effort)"},
+        {"type": "sprints", "repeats": 3, "work_s": 12, "rest_s": 160, "description": "12s sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_07_torque_jumps_10x8s",
+      "name": "Torque Jumps 10x8s",
+      "duration_min": 35,
+      "tss_estimate": 42,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 10, "work_s": 8, "rest_s": 120, "description": "Torque jumps (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_08_spin_ups_6x1min",
+      "name": "Spin-Ups 6x1min",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 60, "rest_s": 120, "work_intensity_ftp": 0.90, "rest_intensity_ftp": 0.60, "cadence_rpm": ">120", "description": "Spin-ups to >120rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_09_mixed_sprints_6x10s_seated_standing",
+      "name": "Mixed Sprints 6x(10s seated/10s standing)",
+      "duration_min": 45,
+      "tss_estimate": 50,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 6, "work_s": 10, "rest_s": 110, "description": "Seated sprints (max effort)"},
+        {"type": "sprints", "repeats": 6, "work_s": 10, "rest_s": 110, "description": "Out of saddle sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_10_end_sprint_finishers_6x15s",
+      "name": "End Sprint Finishers 6x15s",
+      "duration_min": 50,
+      "tss_estimate": 54,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 1800, "intensity_ftp": 0.70, "description": "Base endurance"},
+        {"type": "sprints", "repeats": 6, "work_s": 15, "rest_s": 120, "description": "Finish sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_11_acceleration_drill_8x20s",
+      "name": "Acceleration Drill 8x20s",
+      "duration_min": 45,
+      "tss_estimate": 48,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 8, "work_s": 20, "rest_s": 160, "description": "Overgear accelerations (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_12_lead_out_5x20s",
+      "name": "Lead-Out 5x20s",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 5, "work_s": 20, "rest_s": 180, "description": "Lead-out sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_13_uphill_sprint_8x12s",
+      "name": "Uphill Sprint 8x12s",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 8, "work_s": 12, "rest_s": 160, "description": "Uphill sprints (max effort)"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_14_neuromuscular_mix_3x6x12s",
+      "name": "Neuromuscular Mix 3x(6x12s)",
+      "duration_min": 45,
+      "tss_estimate": 50,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "sprints", "repeats": 18, "work_s": 12, "rest_s": 110, "description": "Mixed sprints in 3 sets (max effort), 4min rest between sets"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "neu_15_cadence_sprints_8x10s_130rpm",
+      "name": "Cadence Sprints 8x10s @130rpm",
+      "duration_min": 40,
+      "tss_estimate": 46,
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 10, "rest_s": 120, "work_intensity_ftp": 1.80, "rest_intensity_ftp": 0.50, "cadence_rpm": 130, "description": "@130rpm"},
+        {"type": "cooldown", "duration_s": 480, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

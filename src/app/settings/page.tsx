@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
-import { getUserProfile } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
+import { getUserProfile, updateUserProfile } from '@/lib/firestore';
 import type { UserProfile, TimeSlot } from '@/types';
 import { Info, Plus, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -13,6 +11,7 @@ import { spacing, typography, colors, components, layout } from '@/styles/design
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,7 +48,7 @@ export default function SettingsPage() {
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    async function loadProfile() {
       if (!user) {
         setLoading(false);
         return;
@@ -57,6 +56,7 @@ export default function SettingsPage() {
 
       try {
         const userProfile = await getUserProfile(user.uid);
+        console.log('📥 Loaded profile:', userProfile);
         setProfile(userProfile);
         
         // Populate form fields
@@ -71,6 +71,7 @@ export default function SettingsPage() {
           
           // Load standard slots
           const standard = userProfile.preferences?.preferredTrainingTimes || [];
+          console.log('📅 Loaded time slots from profile:', standard);
           setStandardSlots(standard);
           setTimeSlots(standard); // Initialize with standard
           
@@ -82,26 +83,41 @@ export default function SettingsPage() {
       } finally {
         setLoading(false);
       }
-    });
+    }
 
-    return () => unsubscribe();
-  }, []);
+    loadProfile();
+  }, [user]);
+
+  // Update timeSlots when switching tabs or week (only if data is loaded)
+  useEffect(() => {
+    // Don't update if standardSlots haven't been loaded yet (loading state)
+    if (loading) return;
+    
+    if (activeTab === 'standard') {
+      console.log('📋 Switching to standard tab, loading slots:', standardSlots);
+      setTimeSlots([...standardSlots]); // Clone array to trigger re-render
+    } else {
+      const weekKey = getWeekKey(currentWeekOffset);
+      const weekSlots = weeklyOverrides[weekKey] || standardSlots;
+      console.log('📋 Switching to week tab, loading slots:', weekSlots);
+      setTimeSlots([...weekSlots]); // Clone array
+    }
+  }, [activeTab, currentWeekOffset, standardSlots, weeklyOverrides, loading]);
 
   const handleSaveProfile = async () => {
-    const user = auth.currentUser;
     if (!user) return;
 
     setSaving(true);
     setProfileSuccess(false);
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await updateUserProfile(user.uid, {
         birthDate,
-        weight: weight || null,
-        ftp: ftp || null,
-        lthr: lthr || null,
-        maxHr: maxHr || null,
-        restHr: restHr || null,
+        weight: weight || undefined,
+        ftp: ftp || undefined,
+        lthr: lthr || undefined,
+        maxHr: maxHr || undefined,
+        restHr: restHr || undefined,
       });
 
       setProfileSuccess(true);
@@ -115,7 +131,6 @@ export default function SettingsPage() {
   };
 
   const handleSavePreferences = async () => {
-    const user = auth.currentUser;
     if (!user) return;
 
     setSaving(true);
@@ -128,7 +143,7 @@ export default function SettingsPage() {
         preferredTrainingTimes: [],
       };
 
-      await updateDoc(doc(db, 'users', user.uid), {
+      await updateUserProfile(user.uid, {
         preferences: {
           ...currentPrefs,
           hideTimeSlotWarnings,
@@ -146,38 +161,52 @@ export default function SettingsPage() {
   };
 
   const handleSaveTimeSlots = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
+    if (!user || !profile) return;
 
     setSaving(true);
     setSlotsSuccess(false);
 
     try {
       if (activeTab === 'standard') {
-        // Save as standard template
-        await updateDoc(doc(db, 'users', user.uid), {
+        // Save as standard template - preserve existing preferences
+        const currentPrefs = profile.preferences || {
+          indoorAllowed: true,
+          availableDevices: [],
+          preferredTrainingTimes: [],
+        };
+        
+        await updateUserProfile(user.uid, {
           preferences: {
-            indoorAllowed: true,
-            availableDevices: [],
+            ...currentPrefs, // ← Keep existing preferences!
             preferredTrainingTimes: timeSlots,
           },
         });
         setStandardSlots(timeSlots);
+        
+        // Update local profile state
+        setProfile({
+          ...profile,
+          preferences: {
+            ...currentPrefs,
+            preferredTrainingTimes: timeSlots,
+          },
+        });
       } else {
         // Save as weekly override
         const weekKey = getWeekKey(currentWeekOffset);
         const newOverrides = { ...weeklyOverrides, [weekKey]: timeSlots };
         
-        await updateDoc(doc(db, 'users', user.uid), {
+        await updateUserProfile(user.uid, {
           weeklyOverrides: newOverrides,
         });
         setWeeklyOverrides(newOverrides);
       }
 
+      console.log('✅ Time slots saved successfully:', timeSlots);
       setSlotsSuccess(true);
       setTimeout(() => setSlotsSuccess(false), 3000);
     } catch (error) {
-      console.error('Error saving time slots:', error);
+      console.error('❌ Error saving time slots:', error);
       alert('Failed to save time slots. Please try again.');
     } finally {
       setSaving(false);
@@ -302,7 +331,7 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      await signOut();
       router.push('/login');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -322,7 +351,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout
-      userEmail={auth.currentUser?.email || undefined}
+      userEmail={user?.email || undefined}
       onSignOut={handleSignOut}
       onHelp={() => {}}
     >
@@ -589,7 +618,6 @@ export default function SettingsPage() {
                     <div className="space-y-3">
                       <button
                         onClick={async () => {
-                          const user = auth.currentUser;
                           if (!user) return;
                           try {
                             const response = await fetch(`/api/strava/activities?userId=${user.uid}&per_page=50`);
@@ -609,7 +637,6 @@ export default function SettingsPage() {
                       </button>
                       <button
                         onClick={() => {
-                          const user = auth.currentUser;
                           if (!user) return;
                           const state = Buffer.from(user.uid).toString('base64');
                           window.location.href = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI!)}&approval_prompt=force&scope=activity:read_all,activity:write&state=${state}`;
@@ -622,7 +649,6 @@ export default function SettingsPage() {
                   ) : (
                     <button
                       onClick={() => {
-                        const user = auth.currentUser;
                         if (!user) return;
                         const state = Buffer.from(user.uid).toString('base64');
                         window.location.href = `https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI!)}&approval_prompt=force&scope=activity:read_all,activity:write&state=${state}`;

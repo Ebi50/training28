@@ -1,0 +1,184 @@
+{
+  "category": "VO2MAX",
+  "name": "VO₂max",
+  "description": "VO₂ Sessions sind fordernd; gute Erholung und Hydration beachten. Maximale Sauerstoffaufnahme und aerobe Kapazität steigern.",
+  "intensity_range": "110-125% FTP",
+  "workouts": [
+    {
+      "id": "vo2_01_4x4_vo2",
+      "name": "4x4 VO2",
+      "duration_min": 60,
+      "tss_estimate": 90,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 240, "rest_s": 240, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_02_5x3_vo2",
+      "name": "5x3 VO2",
+      "duration_min": 55,
+      "tss_estimate": 82,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 180, "rest_s": 180, "work_intensity_ftp": 1.18, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_03_6x2_vo2",
+      "name": "6x2 VO2",
+      "duration_min": 50,
+      "tss_estimate": 74,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.22, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_04_3x5_vo2_big_gear",
+      "name": "3x5 VO2 Big Gear",
+      "duration_min": 60,
+      "tss_estimate": 85,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 300, "rest_s": 360, "work_intensity_ftp": 1.15, "rest_intensity_ftp": 0.50, "cadence_rpm": 70, "description": "3x5min @ 70rpm"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_05_30_30_x2",
+      "name": "30/30 x2",
+      "duration_min": 45,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 30, "work_intensity_ftp": 1.25, "rest_intensity_ftp": 0.60, "description": "Set 1"},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 30, "work_intensity_ftp": 1.25, "rest_intensity_ftp": 0.60, "description": "Set 2"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_06_40_20_x3",
+      "name": "40/20 x3",
+      "duration_min": 50,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 40, "rest_s": 20, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "Set 1"},
+        {"type": "intervals", "repeats": 10, "work_s": 40, "rest_s": 20, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "Set 2"},
+        {"type": "intervals", "repeats": 10, "work_s": 40, "rest_s": 20, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "Set 3"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_07_vo2_ladder_2_3_4_3_2",
+      "name": "VO2 Ladder 2-3-4-3-2",
+      "duration_min": 60,
+      "tss_estimate": 88,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "interval", "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "2min"},
+        {"type": "interval", "work_s": 180, "rest_s": 180, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "3min"},
+        {"type": "interval", "work_s": 240, "rest_s": 240, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "4min"},
+        {"type": "interval", "work_s": 180, "rest_s": 180, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "3min"},
+        {"type": "interval", "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "description": "2min"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_08_vo2_8x90s",
+      "name": "VO2 8x90s",
+      "duration_min": 50,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 90, "rest_s": 90, "work_intensity_ftp": 1.22, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_09_vo2_10x1min",
+      "name": "VO2 10x1min",
+      "duration_min": 55,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 60, "rest_s": 60, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_10_vo2_3x6",
+      "name": "VO2 3x6",
+      "duration_min": 60,
+      "tss_estimate": 86,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 360, "rest_s": 300, "work_intensity_ftp": 1.13, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_11_microbursts_15_15_x3",
+      "name": "Microbursts 15/15 x3",
+      "duration_min": 45,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 15, "work_s": 15, "rest_s": 15, "work_intensity_ftp": 1.25, "rest_intensity_ftp": 0.60, "description": "Set 1"},
+        {"type": "intervals", "repeats": 15, "work_s": 15, "rest_s": 15, "work_intensity_ftp": 1.25, "rest_intensity_ftp": 0.60, "description": "Set 2"},
+        {"type": "intervals", "repeats": 15, "work_s": 15, "rest_s": 15, "work_intensity_ftp": 1.25, "rest_intensity_ftp": 0.60, "description": "Set 3"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_12_broken_vo2_2x5x2min",
+      "name": "Broken VO2 2x(5x2min)",
+      "duration_min": 60,
+      "tss_estimate": 84,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.22, "rest_intensity_ftp": 0.50, "description": "Set 1"},
+        {"type": "rest", "duration_s": 300, "intensity_ftp": 0.60, "description": "Set rest"},
+        {"type": "intervals", "repeats": 5, "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.22, "rest_intensity_ftp": 0.50, "description": "Set 2"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_13_vo2_hill_repeats_6x2",
+      "name": "VO2 Hill Repeats 6x2",
+      "duration_min": 55,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 120, "rest_s": 120, "work_intensity_ftp": 1.20, "rest_intensity_ftp": 0.50, "cadence_rpm": 70, "description": "@70rpm"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_14_vo2_progressive_3x4",
+      "name": "VO2 Progressive 3x4",
+      "duration_min": 55,
+      "tss_estimate": 80,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 240, "rest_s": 240, "work_intensity_ftp": 1.15, "rest_intensity_ftp": 0.50, "description": "Progressive effort"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "vo2_15_vo2_finisher_5x1",
+      "name": "VO2 Finisher 5x1",
+      "duration_min": 50,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 60, "rest_s": 60, "work_intensity_ftp": 1.22, "rest_intensity_ftp": 0.50, "description": "Finisher"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

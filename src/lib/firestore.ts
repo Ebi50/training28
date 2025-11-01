@@ -170,19 +170,19 @@ export const updateWeeklyPlan = async (userId: string, planId: string, updates: 
 
 // Season goals
 export const getSeasonGoals = async (userId: string): Promise<SeasonGoal[]> => {
-  const goalsRef = collection(db, 'users', userId, 'planning', 'season_goals');
+  const goalsRef = collection(db, 'users', userId, 'season_goals');
   const q = query(goalsRef, orderBy('date', 'asc'));
   const snapshot = await getDocs(q);
   
   return snapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id,
-    date: doc.data().date.toDate(),
+    date: doc.data().date?.toDate ? doc.data().date.toDate() : doc.data().date,
   })) as SeasonGoal[];
 };
 
 export const createSeasonGoal = async (userId: string, goal: Omit<SeasonGoal, 'id'>): Promise<string> => {
-  const goalsRef = collection(db, 'users', userId, 'planning', 'season_goals');
+  const goalsRef = collection(db, 'users', userId, 'season_goals');
   const docRef = await addDoc(goalsRef, {
     ...goal,
     date: Timestamp.fromDate(goal.date),
@@ -243,6 +243,87 @@ export const updateTrainingCamp = async (userId: string, campId: string, updates
 export const deleteTrainingCamp = async (userId: string, campId: string): Promise<void> => {
   const campRef = doc(db, 'users', userId, 'planning', 'camps', campId);
   await deleteDoc(campRef);
+};
+
+// Training Plan Management
+/**
+ * Recursively remove undefined values from an object
+ */
+function removeUndefined(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return null;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUndefined(item));
+  }
+  
+  if (typeof obj === 'object' && !(obj instanceof Date) && !(obj instanceof Timestamp)) {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = removeUndefined(value);
+      }
+    }
+    return cleaned;
+  }
+  
+  return obj;
+}
+
+export const saveTrainingPlan = async (
+  userId: string,
+  plan: {
+    planId: string;
+    startDate: string;
+    endDate: string;
+    weeks: WeeklyPlan[];
+    createdAt: string;
+    updatedAt: string;
+  }
+): Promise<void> => {
+  const planRef = doc(db, 'users', userId, 'plans', plan.planId);
+  
+  console.log('📦 Original plan before cleaning:', plan);
+  
+  // Remove ALL undefined values recursively
+  const cleanedPlan = removeUndefined({
+    userId,
+    planId: plan.planId,
+    startDate: plan.startDate,
+    endDate: plan.endDate,
+    weeks: plan.weeks,
+    createdAt: plan.createdAt,
+    updatedAt: plan.updatedAt,
+    lastModified: Timestamp.now(),
+  });
+  
+  console.log('✨ Cleaned plan:', cleanedPlan);
+  
+  await setDoc(planRef, cleanedPlan);
+};
+
+export const getTrainingPlan = async (userId: string, planId: string): Promise<any | null> => {
+  const planRef = doc(db, 'users', userId, 'plans', planId);
+  const planSnap = await getDoc(planRef);
+  
+  if (!planSnap.exists()) {
+    return null;
+  }
+  
+  return planSnap.data();
+};
+
+export const getLatestTrainingPlan = async (userId: string): Promise<any | null> => {
+  const plansRef = collection(db, 'users', userId, 'plans');
+  const q = query(plansRef, orderBy('createdAt', 'desc'), limit(1));
+  const snapshot = await getDocs(q);
+  
+  if (snapshot.empty) {
+    return null;
+  }
+  
+  return snapshot.docs[0].data();
 };
 
 // Training Session Updates (for notes, RPE, etc.)

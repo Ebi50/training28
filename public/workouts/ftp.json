@@ -1,0 +1,179 @@
+{
+  "category": "FTP",
+  "name": "Schwelle / FTP",
+  "description": "Sequenzen nahe 95–105% FTP; sauber pacing, gute Kühlung und Hydration. Funktionelle Schwellenleistung erhöhen.",
+  "intensity_range": "95-105% FTP",
+  "workouts": [
+    {
+      "id": "ftp_01_2x20_ftp_classic",
+      "name": "2x20 FTP Classic",
+      "duration_min": 70,
+      "tss_estimate": 90,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 1200, "rest_s": 600, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.55},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_02_3x12_ftp",
+      "name": "3x12 FTP",
+      "duration_min": 75,
+      "tss_estimate": 92,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 720, "rest_s": 360, "work_intensity_ftp": 0.98, "rest_intensity_ftp": 0.60},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_03_4x10_ftp",
+      "name": "4x10 FTP",
+      "duration_min": 75,
+      "tss_estimate": 88,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 600, "rest_s": 300, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_04_pyramid_5_10_15_10_5",
+      "name": "Pyramid 5-10-15-10-5",
+      "duration_min": 70,
+      "tss_estimate": 86,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "interval", "work_s": 300, "rest_s": 180, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "5min"},
+        {"type": "interval", "work_s": 600, "rest_s": 180, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "10min"},
+        {"type": "interval", "work_s": 900, "rest_s": 240, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "15min"},
+        {"type": "interval", "work_s": 600, "rest_s": 180, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "10min"},
+        {"type": "interval", "work_s": 300, "rest_s": 180, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "5min"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_05_ftp_continuous_40",
+      "name": "FTP Continuous 40",
+      "duration_min": 65,
+      "tss_estimate": 85,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 2400, "intensity_ftp": 1.00, "description": "40min steady FTP"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_06_over_under_ftp_4x9",
+      "name": "Over/Under FTP 4x9",
+      "duration_min": 70,
+      "tss_estimate": 92,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 540, "rest_s": 240, "work_intensity_ftp": 1.05, "rest_intensity_ftp": 0.95, "description": "Over/Under (95%/105%)"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_07_3x15_ftp",
+      "name": "3x15 FTP",
+      "duration_min": 80,
+      "tss_estimate": 96,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 900, "rest_s": 360, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_08_broken_ftp_3x2x8",
+      "name": "Broken FTP 3x(2x8)",
+      "duration_min": 75,
+      "tss_estimate": 90,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 480, "rest_s": 120, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "2x8min, 3 sets with 5min rest between sets"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_09_ftp_w_surges",
+      "name": "FTP w/ Surges",
+      "duration_min": 70,
+      "tss_estimate": 88,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 720, "rest_s": 300, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "description": "2x12min steady"},
+        {"type": "intervals", "repeats": 6, "work_s": 8, "rest_s": 112, "work_intensity_ftp": 1.5, "rest_intensity_ftp": 1.00, "description": "Surges"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_10_tt_simulation_30",
+      "name": "TT Simulation 30",
+      "duration_min": 60,
+      "tss_estimate": 80,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "steady", "duration_s": 1800, "intensity_ftp": 1.00, "description": "30min TT"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_11_climb_ftp_3x10",
+      "name": "Climb FTP 3x10",
+      "duration_min": 70,
+      "tss_estimate": 88,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 600, "rest_s": 300, "work_intensity_ftp": 1.00, "rest_intensity_ftp": 0.60, "cadence_rpm": 70, "description": "3x10min @ 70rpm"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_12_ftp_2x25",
+      "name": "FTP 2x25",
+      "duration_min": 85,
+      "tss_estimate": 100,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 2, "work_s": 1500, "rest_s": 480, "work_intensity_ftp": 0.98, "rest_intensity_ftp": 0.60},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_13_ftp_4x8",
+      "name": "FTP 4x8",
+      "duration_min": 60,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 4, "work_s": 480, "rest_s": 120, "work_intensity_ftp": 1.03, "rest_intensity_ftp": 0.60},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_14_ftp_progressive_45",
+      "name": "FTP Progressive 45",
+      "duration_min": 60,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 600, "rest_s": 180, "work_intensity_ftp": 0.95, "rest_intensity_ftp": 0.60, "description": "Build 3x10min"},
+        {"type": "steady", "duration_s": 300, "intensity_ftp": 1.02, "description": "Finish 5min"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ftp_15_ftp_micro_over_under_6x6",
+      "name": "FTP Micro Over/Under 6x6",
+      "duration_min": 65,
+      "tss_estimate": 82,
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 360, "rest_s": 120, "work_intensity_ftp": 1.03, "rest_intensity_ftp": 0.95, "description": "Micro Over/Under"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}

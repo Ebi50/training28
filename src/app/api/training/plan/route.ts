@@ -14,19 +14,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
     }
 
-    // Get current plan from Firestore
-    const planDoc = await adminDb
+    // Get latest plan from Firestore (sorted by createdAt)
+    const plansSnapshot = await adminDb
       .collection('users')
       .doc(userId)
       .collection('plans')
-      .doc('current')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
       .get();
     
-    if (!planDoc.exists) {
+    if (plansSnapshot.empty) {
+      console.log('ℹ️ No plan found for user:', userId);
       return NextResponse.json({ plan: null }, { status: 200 });
     }
 
-    const plan = planDoc.data();
+    const plan = plansSnapshot.docs[0].data();
+    console.log('✅ Plan loaded:', plan.planId, 'with', plan.weeks?.length, 'weeks');
     
     return NextResponse.json({
       success: true,

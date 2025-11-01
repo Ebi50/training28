@@ -2,9 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -14,6 +12,14 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { signIn, signUp, user } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   // Show error message if redirected from Strava with error
   useEffect(() => {
@@ -30,18 +36,10 @@ function LoginForm() {
 
     try {
       if (isSignUp) {
-        // Create Firebase Auth account
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
-        // Create Firestore user profile
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
-          email: userCredential.user.email,
-          createdAt: new Date().toISOString(),
-          displayName: email.split('@')[0], // Use email username as displayName
-          stravaConnected: false,
-        });
+        const displayName = email.split('@')[0];
+        await signUp(email, password, displayName);
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signIn(email, password);
       }
       router.push('/dashboard');
     } catch (err: any) {

@@ -11,11 +11,15 @@ import DashboardLayout from '@/components/DashboardLayout';
 import Tooltip from '@/components/Tooltip';
 import PlanQualityBanner from '@/components/PlanQualityBanner';
 import SessionNotes from '@/components/SessionNotes';
+import TodayWorkoutCard from '@/components/TodayWorkoutCard';
 import { useAutoLogout } from '@/hooks/useAutoLogout';
 import { calculateTSS, calculateFitnessMetrics, calculateFitnessMetricsHistory, interpretTSB, getCombinedFitnessMetrics, forecastFitnessMetrics } from '@/lib/fitnessMetrics';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
 import FitnessChart from '@/components/FitnessChart';
 import { generateZWOFromSession, generateZWOFilename } from '@/lib/zwoGenerator';
+import { generateMvpWeeklyPlan } from '@/lib/mvpPlanGenerator';
+import { getSeasonGoals, saveTrainingPlan, getLatestTrainingPlan } from '@/lib/firestore';
+import type { SeasonGoal } from '@/types/user';
 
 interface StravaActivity {
   id: number;
@@ -300,6 +304,52 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Today's Workout Card */}
+        {profile?.stravaConnected && (() => {
+          // Find today's session from training plan
+          const today = new Date().toISOString().split('T')[0];
+          let todaySession: TrainingSession | null = null;
+          
+          if (trainingPlan?.weeks) {
+            for (const week of trainingPlan.weeks) {
+              if (week.sessions) {
+                const session = week.sessions.find((s: TrainingSession) => s && s.date === today);
+                if (session) {
+                  todaySession = session;
+                  break;
+                }
+              }
+            }
+          }
+
+          return (
+            <TodayWorkoutCard
+              session={todaySession}
+              onStartWorkout={() => {
+                // TODO: Implement start workout (Strava activity tracking)
+                console.log('Start workout:', todaySession);
+              }}
+              onViewDetails={() => {
+                // Navigate to training plan page with today's session highlighted
+                router.push('/dashboard/plan');
+              }}
+              onDownloadZWO={() => {
+                if (todaySession && profile?.ftp) {
+                  const zwoContent = generateZWOFromSession(todaySession, profile.ftp);
+                  const filename = generateZWOFilename(todaySession);
+                  const blob = new Blob([zwoContent], { type: 'application/xml' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = filename;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }
+              }}
+            />
+          );
+        })()}
+
         {/* Plan Quality Banner */}
         {!profile?.preferences?.hideTimeSlotWarnings && 
          currentWeekPlan?.quality && 
@@ -539,30 +589,65 @@ export default function DashboardPage() {
             {profile?.stravaConnected && (
               <button
                 onClick={async () => {
-                  if (!auth.currentUser) return;
+                  if (!auth.currentUser || !profile) return;
                   setGeneratingPlan(true);
                   try {
-                    const response = await fetch('/api/training/generate-plan', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId: auth.currentUser.uid })
-                    });
-                    if (response.ok) {
-                      const data = await response.json();
-                      console.log('✅ Plan generated:', data);
-                      console.log('✅ Plan structure:', data.plan);
-                      console.log('✅ Plan weeks:', data.plan?.weeks);
-                      setTrainingPlan(data.plan);
-                      setStravaMessage('✓ Training plan successfully generated!');
-                      setTimeout(() => setStravaMessage(null), 5000);
-                    } else {
-                      const errorText = await response.text();
-                      console.error('❌ Failed to generate plan:', errorText);
-                      setStravaMessage('❌ Failed to generate plan');
-                      setTimeout(() => setStravaMessage(null), 5000);
+                    // Extract user slots from profile
+                    const userSlots = profile.preferences?.preferredTrainingTimes || [];
+                    
+                    // Get next event date from season goals
+                    const seasonGoals = await getSeasonGoals(auth.currentUser.uid);
+                    const nextEvent = seasonGoals.find(
+                      (goal: SeasonGoal) => goal.date && new Date(goal.date) > new Date()
+                    );
+                    const eventDate = nextEvent?.date 
+                      ? new Date(nextEvent.date)
+                      : null; // No event means MAINTENANCE phase
+
+                    // Generate 12 weeks of training
+                    const weeks: WeeklyPlan[] = [];
+                    const startDate = new Date();
+                    startDate.setHours(0, 0, 0, 0); // Start at midnight
+                    
+                    for (let weekNum = 1; weekNum <= 12; weekNum++) {
+                      const weekStartDate = new Date(startDate);
+                      weekStartDate.setDate(startDate.getDate() + (weekNum - 1) * 7);
+                      
+                      const weekPlan = await generateMvpWeeklyPlan({
+                        userId: auth.currentUser.uid,
+                        userProfile: profile,
+                        weekStart: weekStartDate,
+                        slots: userSlots,
+                        eventDate,
+                        weekNumber: weekNum
+                      });
+                      
+                      weeks.push(weekPlan);
                     }
+
+                    const fullPlan = {
+                      userId: auth.currentUser.uid,
+                      planId: `plan-${Date.now()}`,
+                      startDate: startDate.toISOString(),
+                      endDate: new Date(startDate.getTime() + 12 * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                      weeks,
+                      createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString()
+                    };
+
+                    console.log('✅ MVP Plan generated:', fullPlan);
+                    console.log('💾 Saving plan to Firestore...');
+                    
+                    // Save to Firestore
+                    await saveTrainingPlan(auth.currentUser.uid, fullPlan);
+                    console.log('✅ Plan saved to Firestore');
+                    
+                    // Update UI
+                    setTrainingPlan(fullPlan);
+                    setStravaMessage('✓ Training plan successfully generated!');
+                    setTimeout(() => setStravaMessage(null), 5000);
                   } catch (error) {
-                    console.error('❌ Error:', error);
+                    console.error('❌ Error generating plan:', error);
                     setStravaMessage('❌ Error generating plan');
                     setTimeout(() => setStravaMessage(null), 5000);
                   } finally {
