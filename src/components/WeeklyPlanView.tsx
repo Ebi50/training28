@@ -1,11 +1,16 @@
 'use client';
 
 import { format, startOfWeek, addDays } from 'date-fns';
+import { useState } from 'react';
 import type { WeeklyPlan, TrainingSession } from '@/types';
+import SessionNotes from '@/components/SessionNotes';
+import { updateTrainingSession } from '@/lib/firestore';
+import { auth } from '@/lib/firebase';
 
 interface WeeklyPlanViewProps {
   plan: WeeklyPlan | null;
   loading?: boolean;
+  onSessionUpdate?: () => void; // Callback when session is updated
 }
 
 // Helper function to format hours to "h:mm h" (rounded to 5min)
@@ -36,7 +41,7 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
   recovery: 'Recovery',
 };
 
-export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
+export default function WeeklyPlanView({ plan, loading, onSessionUpdate }: WeeklyPlanViewProps) {
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
@@ -150,7 +155,7 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
               ) : (
                 <div className="space-y-2">
                   {sessions.map((session, sessionIndex) => (
-                    <SessionCard key={sessionIndex} session={session} />
+                    <SessionCard key={sessionIndex} session={session} planId={plan.id} onUpdate={onSessionUpdate} />
                   ))}
                 </div>
               )}
@@ -162,11 +167,69 @@ export default function WeeklyPlanView({ plan, loading }: WeeklyPlanViewProps) {
   );
 }
 
-function SessionCard({ session }: { session: TrainingSession }) {
+function SessionCard({ session, planId, onUpdate }: { 
+  session: TrainingSession; 
+  planId: string;
+  onUpdate?: () => void;
+}) {
+  const [exporting, setExporting] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const typeLabel = session.subType ? SESSION_TYPE_LABELS[session.subType] : session.type;
 
+  const handleSaveNotes = async (updates: { notes?: string; rpe?: number }) => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Du musst eingeloggt sein.');
+      return;
+    }
+
+    await updateTrainingSession(user.uid, planId, session.id, updates);
+    
+    // Trigger refresh
+    if (onUpdate) {
+      onUpdate();
+    }
+  };
+
+  const handleExportZWO = async (platform: 'zwift' | 'mywoosh') => {
+    setExporting(true);
+    try {
+      // Get user's FTP from localStorage or default
+      const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      const ftp = userProfile.ftp || 200;
+
+      const response = await fetch('/api/training/export-zwo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session, ftp, platform })
+      });
+
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+
+      // Download file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'workout.zwo';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setShowExportDialog(true);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Fehler beim Export. Bitte versuche es erneut.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -220,6 +283,29 @@ function SessionCard({ session }: { session: TrainingSession }) {
               <span>✓ {session.actualTss.toFixed(1)} TSS actual</span>
             )}
           </div>
+
+          {/* Export Buttons */}
+          {(session.type === 'HIT' || session.type === 'LIT' || session.type === 'REC') && (
+            <div className="flex items-center gap-2 mt-3">
+              <button
+                onClick={() => handleExportZWO('zwift')}
+                disabled={exporting}
+                className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {exporting ? '...' : '📥 Zwift'}
+              </button>
+              <button
+                onClick={() => handleExportZWO('mywoosh')}
+                disabled={exporting}
+                className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {exporting ? '...' : '📥 MyWhoosh'}
+              </button>
+            </div>
+          )}
+
+          {/* Session Notes & RPE */}
+          <SessionNotes session={session} onSave={handleSaveNotes} />
         </div>
 
         {session.completed && (
@@ -230,6 +316,63 @@ function SessionCard({ session }: { session: TrainingSession }) {
           </div>
         )}
       </div>
+
+      {/* Export Instructions Dialog */}
+      {showExportDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowExportDialog(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl mx-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Workout erfolgreich exportiert! 🎉
+            </h3>
+            
+            <div className="space-y-4 text-base text-gray-700 dark:text-gray-300">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">💻 Zwift (Desktop):</h4>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Öffne <code className="bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">Dokumente/Zwift/Workouts/&lt;deine-Zwift-ID&gt;/</code></li>
+                  <li>Kopiere die heruntergeladene .ZWO-Datei in diesen Ordner</li>
+                  <li>Starte Zwift → Workouts → Custom Workouts</li>
+                  <li>Wähle dein Workout aus und starte! 🚴</li>
+                </ol>
+              </div>
+
+              <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+                <h4 className="font-semibold text-orange-900 dark:text-orange-200 mb-2">📱 Zwift (iOS/iPad):</h4>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Verbinde dein Gerät mit deinem Mac/PC</li>
+                  <li>Öffne Finder → Dein Gerät → Dateien → Zwift → Workouts</li>
+                  <li>Kopiere die .ZWO-Datei hierhin</li>
+                  <li>Sync abwarten, dann in Zwift unter Custom Workouts finden</li>
+                </ol>
+              </div>
+
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                <h4 className="font-semibold text-green-900 dark:text-green-200 mb-2">🌐 MyWhoosh:</h4>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Öffne <a href="https://app.mywoosh.com/workout-builder" target="_blank" className="text-blue-600 hover:underline">MyWhoosh Workout Builder</a></li>
+                  <li>Klicke auf "Import" und wähle deine .ZWO-Datei</li>
+                  <li>Workout erscheint in deinem Custom-Ordner</li>
+                  <li>Öffne MyWhoosh App und starte das Workout! 🚴</li>
+                </ol>
+              </div>
+
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                <p className="text-sm">
+                  <strong>💡 Tipp:</strong> Die Workout-Intensitäten basieren auf deinem FTP. 
+                  Stelle sicher, dass dein FTP in den Settings aktuell ist!
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowExportDialog(false)}
+              className="mt-6 w-full px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+            >
+              Verstanden
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
