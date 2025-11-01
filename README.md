@@ -271,7 +271,20 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 ## 🧪 Testing
 
+### Quick Test Commands
 ```bash
+# Run all tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests once (CI mode)
+npm run test:run
+
+# Generate coverage report
+npm run test:coverage
+
 # Type checking
 npm run type-check
 
@@ -281,6 +294,20 @@ npm run lint
 # Run with emulators
 npm run emulator
 ```
+
+### Test Documentation
+- **📊 [Test Summary](TEST_SUMMARY.md)** - Executive overview of test status
+- **📋 [Detailed Test Report](TEST_REPORT.md)** - Complete test documentation
+- **🧪 [Testing Guide](TESTING_GUIDE.md)** - How to write and run tests
+
+### Test Status
+- **Unit Tests**: ⚠️ 7/8 passing (Firebase mocking needed)
+- **Integration Tests**: ❌ Not implemented
+- **Component Tests**: ❌ Not implemented
+- **E2E Tests**: ❌ Not implemented
+- **Manual Tests**: ✅ All passing
+
+**Current Coverage**: ~5-10% automated, 100% manual validation
 
 ## 📝 Environment Variables
 

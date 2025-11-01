@@ -11,7 +11,11 @@
     "deploy": "firebase deploy",
     "type-check": "tsc --noEmit",
     "check-design-system": "echo 'Checking Design System usage...' && grep -r \"className=\\\"space-y-\\|className=\\\"gap-\\|className=\\\"p-[0-9]\" src/app src/components --exclude-dir=node_modules || echo '✅ Design System wird korrekt verwendet!'",
-    "test:forecast": "tsx test/fitness-forecast.test.ts"
+    "test:forecast": "tsx test/fitness-forecast.test.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.1.0",
@@ -35,16 +39,25 @@
     "tailwindcss": "^3.3.6"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^5.1.0",
+    "@vitest/ui": "^4.0.6",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
+    "happy-dom": "^20.0.10",
     "ignore-loader": "^0.1.2",
+    "jsdom": "^27.1.0",
     "node-loader": "^2.1.0",
     "postcss": "^8",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.6"
   }
 }

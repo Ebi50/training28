@@ -49,6 +49,16 @@
 - [ ] Loading States verbessern
 - [ ] Error Handling für fehlgeschlagene API-Calls
 
+### Training Details & Export
+- [ ] MyWhoosh Workout Export
+  - Indoor-Training direkt als MyWhoosh Workout exportieren
+  - Workout-Format konvertieren (Details folgen)
+  - Export-Button in Training-Details
+- [ ] Kommentar-Funktion für Trainings
+  - Kommentarfeld zu jedem Training hinzufügen
+  - Notizen vor/nach Training speichern
+  - Anzeige in Activity Details und History
+
 ### Daten & Logik
 - [ ] availableTimeSlots richtig aus User-Profil laden
 - [ ] ML-Model Integration wieder aktivieren (optional)
