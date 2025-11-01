@@ -8,7 +8,9 @@ import {
   TrainingCamp,
   TimeSlot,
   UserProfile,
-  MorningCheck 
+  MorningCheck,
+  PlanQuality,
+  PlanWarning 
 } from '@/types';
 import { addDays, startOfWeek, format, differenceInDays, isBefore, isAfter } from 'date-fns';
 import { predictTSS, isModelAvailable } from './mlPredictor';
@@ -85,8 +87,8 @@ export class TrainingPlanGenerator {
       adjustedParams.maxHitDays = Math.min(adjustedParams.maxHitDays, 1);
     }
 
-    // Generate training sessions
-    const sessions = await this.generateTrainingSessions(
+    // Generate training sessions with quality tracking
+    const { sessions, quality } = await this.generateTrainingSessionsWithQuality(
       weekStartDate,
       adjustedParams,
       currentMetrics,
@@ -119,7 +121,16 @@ export class TrainingPlanGenerator {
       },
       generated: new Date(),
       lastModified: new Date(),
+      quality, // ← Add quality assessment
     };
+
+    // Log summary if there are warnings (only once per plan)
+    if (quality.warnings.length > 0) {
+      console.warn(`\n⚠️  Plan Quality Summary (${plan.id}):`);
+      console.warn(`   Quality Score: ${(quality.score * 100).toFixed(0)}%`);
+      console.warn(`   Adjustments: ${quality.adjustments.splitSessions} split, ${quality.adjustments.tssReduced} TSS reduced`);
+      console.warn(`   Total TSS lost: ${quality.adjustments.totalTssLost}\n`);
+    }
 
     return plan;
   }
@@ -233,6 +244,34 @@ export class TrainingPlanGenerator {
       const daysUntilGoal = differenceInDays(goal.date, weekStart);
       return daysUntilGoal >= 0 && daysUntilGoal <= goal.taperStrategy.daysBeforeEvent;
     }) || null;
+  }
+
+  /**
+   * Generate training sessions with quality assessment (wrapper)
+   */
+  private async generateTrainingSessionsWithQuality(
+    weekStart: Date,
+    params: PlanningParameters,
+    currentMetrics: { ctl: number; atl: number; tsb: number },
+    userProfile: UserProfile,
+    previousMetrics: DailyMetrics[],
+    taperGoal?: SeasonGoal
+  ): Promise<{ sessions: TrainingSession[]; quality: PlanQuality }> {
+    
+    // Generate sessions (existing logic)
+    const sessions = await this.generateTrainingSessions(
+      weekStart,
+      params,
+      currentMetrics,
+      userProfile,
+      previousMetrics,
+      taperGoal
+    );
+
+    // Assess plan quality
+    const quality = this.assessPlanQuality(sessions, params);
+
+    return { sessions, quality };
   }
 
   /**
@@ -454,7 +493,7 @@ export class TrainingPlanGenerator {
     // 🎯 IMPORTANT: Adjust TSS proportionally if slot is too short
     // This prevents unrealistic intensity (e.g., 80 TSS in 30 minutes)
     let adjustedTss = targetTss;
-    let warning: string | undefined;
+    let note: string | undefined;
 
     if (slotDuration < idealDuration) {
       const durationRatio = slotDuration / idealDuration;
@@ -462,11 +501,11 @@ export class TrainingPlanGenerator {
       // Only adjust if slot is significantly shorter (< 70% of ideal)
       if (durationRatio < 0.7) {
         adjustedTss = Math.round(targetTss * durationRatio);
-        warning = `⚠️ Training shortened: ${sessionDuration}min (ideal: ${idealDuration}min) - TSS reduced from ${targetTss} to ${adjustedTss}`;
-        console.warn(`${date}: ${warning}`);
+        // Store details in note for quality assessment (no console.warn here)
+        note = `⚠️ Training shortened: ${sessionDuration}min (ideal: ${idealDuration}min) - TSS reduced from ${targetTss} to ${adjustedTss}`;
       } else {
-        // Slot is 70-99% of ideal - acceptable but note it
-        warning = `Session fits in ${sessionDuration}min slot (ideal: ${idealDuration}min)`;
+        // Slot is 70-99% of ideal - acceptable, minor note
+        note = `Fits in ${sessionDuration}min slot (ideal: ${idealDuration}min)`;
       }
     }
 
@@ -490,7 +529,7 @@ export class TrainingPlanGenerator {
         startTime: bestSlot.startTime,
         endTime: this.addMinutesToTime(bestSlot.startTime, sessionDuration),
       },
-      notes: warning, // Add warning as note if present
+      notes: note, // Add note for quality assessment (not a user-facing warning)
     };
 
     return session;
@@ -602,6 +641,148 @@ export class TrainingPlanGenerator {
     }
     
     return predictions;
+  }
+
+  /**
+   * Assess the quality of a generated training plan
+   * Analyzes time slot compliance and generates warnings
+   */
+  private assessPlanQuality(
+    sessions: TrainingSession[],
+    params: PlanningParameters
+  ): PlanQuality {
+    const warnings: PlanWarning[] = [];
+    let splitSessions = 0;
+    let tssReduced = 0;
+    let totalTssLost = 0;
+
+    // Group sessions by date to detect double days (split sessions)
+    const sessionsByDate = new Map<string, TrainingSession[]>();
+    sessions.forEach(session => {
+      const existing = sessionsByDate.get(session.date) || [];
+      existing.push(session);
+      sessionsByDate.set(session.date, existing);
+    });
+
+    // Analyze each day
+    sessionsByDate.forEach((daySessions, date) => {
+      // Check for split sessions (double days)
+      if (daySessions.length > 1) {
+        splitSessions++;
+        const totalDayTss = daySessions.reduce((sum, s) => sum + s.targetTss, 0);
+        
+        warnings.push({
+          type: 'split-session',
+          severity: 'info',
+          sessionIds: daySessions.map(s => s.id),
+          message: `${date}: Training split into ${daySessions.length} sessions (${totalDayTss} TSS total)`,
+          details: {
+            adjustedTss: totalDayTss,
+          }
+        });
+      }
+
+      // Check for TSS reductions (indicated by warning notes)
+      daySessions.forEach(session => {
+        if (session.notes?.includes('⚠️ Training shortened')) {
+          tssReduced++;
+          
+          // Extract original TSS from warning message
+          const match = session.notes.match(/TSS reduced from (\d+) to (\d+)/);
+          if (match) {
+            const originalTss = parseInt(match[1]);
+            const adjustedTss = parseInt(match[2]);
+            const lostTss = originalTss - adjustedTss;
+            totalTssLost += lostTss;
+
+            warnings.push({
+              type: 'tss-reduced',
+              severity: 'warning',
+              sessionIds: [session.id],
+              message: `${date}: TSS reduced due to time constraints`,
+              details: {
+                originalTss,
+                adjustedTss,
+                originalDuration: session.timeSlot ? this.calculateSlotDuration({
+                  day: 0,
+                  startTime: session.timeSlot.startTime,
+                  endTime: session.timeSlot.endTime,
+                  type: 'both'
+                }) : undefined,
+                availableDuration: session.duration,
+              }
+            });
+          }
+        }
+      });
+    });
+
+    // Calculate quality factors
+    const timeSlotMatch = 1 - (tssReduced / Math.max(sessions.length, 1)) * 0.5; // Max 50% penalty
+    const trainingDistribution = this.assessDistributionQuality(sessions, params);
+    const recoveryAdequacy = this.assessRecoveryQuality(sessions);
+
+    // Calculate overall score (weighted average)
+    const score = (
+      timeSlotMatch * 0.4 +
+      trainingDistribution * 0.3 +
+      recoveryAdequacy * 0.3
+    );
+
+    return {
+      score: Math.max(0, Math.min(1, score)), // Clamp to 0-1
+      warnings,
+      adjustments: {
+        splitSessions,
+        tssReduced,
+        totalTssLost,
+      },
+      factors: {
+        timeSlotMatch,
+        trainingDistribution,
+        recoveryAdequacy,
+      }
+    };
+  }
+
+  /**
+   * Assess training distribution quality (LIT/HIT balance)
+   */
+  private assessDistributionQuality(sessions: TrainingSession[], params: PlanningParameters): number {
+    if (sessions.length === 0) return 1;
+
+    const litDuration = sessions.filter(s => s.type === 'LIT').reduce((sum, s) => sum + s.duration, 0);
+    const totalDuration = sessions.reduce((sum, s) => sum + s.duration, 0);
+    const actualLitRatio = litDuration / totalDuration;
+    const targetLitRatio = params.litRatio;
+
+    // Penalize deviation from target LIT ratio
+    const deviation = Math.abs(actualLitRatio - targetLitRatio);
+    return Math.max(0, 1 - deviation * 2); // Max 50% deviation = 0 score
+  }
+
+  /**
+   * Assess recovery adequacy (spacing between HIT sessions)
+   */
+  private assessRecoveryQuality(sessions: TrainingSession[]): number {
+    const hitSessions = sessions.filter(s => s.type === 'HIT').sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    if (hitSessions.length <= 1) return 1; // No recovery issues with 0-1 HIT sessions
+
+    let penaltyPoints = 0;
+    for (let i = 1; i < hitSessions.length; i++) {
+      const prevDate = new Date(hitSessions[i - 1].date);
+      const currDate = new Date(hitSessions[i].date);
+      const daysBetween = differenceInDays(currDate, prevDate);
+
+      if (daysBetween < 2) {
+        penaltyPoints += 0.3; // 30% penalty for back-to-back or 1-day gap
+      }
+    }
+
+    return Math.max(0, 1 - penaltyPoints);
   }
 }
 

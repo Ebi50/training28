@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [lthr, setLthr] = useState<number>(0);
   const [maxHr, setMaxHr] = useState<number>(0);
   const [restHr, setRestHr] = useState<number>(0);
+  const [hideTimeSlotWarnings, setHideTimeSlotWarnings] = useState<boolean>(false);
   
   // Time slots state
   const [activeTab, setActiveTab] = useState<'standard' | 'weekly'>('standard');
@@ -66,6 +67,7 @@ export default function SettingsPage() {
           setLthr(userProfile.lthr || 0);
           setMaxHr(userProfile.maxHr || 0);
           setRestHr(userProfile.restHr || 0);
+          setHideTimeSlotWarnings(userProfile.preferences?.hideTimeSlotWarnings || false);
           
           // Load standard slots
           const standard = userProfile.preferences?.preferredTrainingTimes || [];
@@ -107,6 +109,37 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Failed to save profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    setSaving(true);
+    setSuccess(false);
+
+    try {
+      const currentPrefs = profile?.preferences || {
+        indoorAllowed: true,
+        availableDevices: [],
+        preferredTrainingTimes: [],
+      };
+
+      await updateDoc(doc(db, 'users', user.uid), {
+        preferences: {
+          ...currentPrefs,
+          hideTimeSlotWarnings,
+        },
+      });
+
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      alert('Failed to save preferences. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -466,6 +499,57 @@ export default function SettingsPage() {
                   className={`${components.button.primary} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {saving ? 'Saving...' : 'Save Profile'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Notification Preferences Section */}
+          <div className={components.card.base}>
+            <div className={`${components.card.base} ${colors.border.default} border-b`}>
+              <h2 className={`${typography.h3} font-semibold ${colors.text.primary}`}>Benachrichtigungen & Hinweise</h2>
+            </div>
+            <div className={spacing.card}>
+              {success && (
+                <div className="mb-4 bg-secondary-50 dark:bg-secondary-900/30 border border-secondary dark:border-secondary-dark text-secondary-700 dark:text-secondary-200 px-4 py-3 rounded-md text-base">
+                  ✓ Einstellungen gespeichert!
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {/* Time Slot Warnings Checkbox */}
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="hideTimeSlotWarnings"
+                      type="checkbox"
+                      checked={hideTimeSlotWarnings}
+                      onChange={(e) => setHideTimeSlotWarnings(e.target.checked)}
+                      className="w-4 h-4 text-primary dark:text-primary-dark border-border-light dark:border-border-dark rounded focus:ring-primary dark:focus:ring-primary-dark"
+                    />
+                  </div>
+                  <div className="ml-3 text-base">
+                    <label htmlFor="hideTimeSlotWarnings" className="font-medium text-text-primary-light dark:text-text-primary-dark cursor-pointer">
+                      Zeit-Slot Anpassungswarnungen ausblenden
+                    </label>
+                    <p className="text-text-secondary-light dark:text-text-secondary-dark mt-1">
+                      Wenn Trainingseinheiten aufgrund von Zeitbeschränkungen angepasst werden (z.B. TSS-Reduktion oder Aufteilung in mehrere Sessions), 
+                      wird normalerweise eine Zusammenfassung beim Erstellen des Wochenplans angezeigt. Aktiviere diese Option, um diese Hinweise zu unterdrücken.
+                    </p>
+                    <p className="text-text-secondary-light dark:text-text-secondary-dark mt-2 text-sm italic">
+                      💡 Details zu angepassten Trainings findest du immer in den Trainingsnotizen.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <button
+                  onClick={handleSavePreferences}
+                  disabled={saving}
+                  className={`${components.button.primary} w-full disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {saving ? 'Saving...' : 'Save Preferences'}
                 </button>
               </div>
             </div>

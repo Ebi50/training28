@@ -25,6 +25,7 @@ export interface UserProfile {
     indoorAllowed: boolean;
     availableDevices: string[];
     preferredTrainingTimes: TimeSlot[];
+    hideTimeSlotWarnings?: boolean; // User can dismiss time slot adjustment warnings
   };
 }
 
@@ -178,6 +179,7 @@ export interface WeeklyPlan {
     totalSessions: number;
     adherenceScore: number; // 0-1
   };
+  quality?: PlanQuality; // Quality metrics for the plan
 }
 
 export interface PlanningParameters {
@@ -236,4 +238,33 @@ export interface PlanningStrategy {
   type: 'heuristic' | 'ml' | 'hybrid';
   version: string;
   parameters: Record<string, any>;
+}
+
+// Plan Quality Assessment
+export interface PlanQuality {
+  score: number; // 0-1 (overall quality score)
+  warnings: PlanWarning[];
+  adjustments: {
+    splitSessions: number; // Number of sessions split into multiple
+    tssReduced: number; // Number of sessions with reduced TSS
+    totalTssLost: number; // Total TSS reduction due to time constraints
+  };
+  factors: {
+    timeSlotMatch: number; // 0-1 (how well sessions fit available time)
+    trainingDistribution: number; // 0-1 (LIT/HIT balance quality)
+    recoveryAdequacy: number; // 0-1 (recovery time between hard sessions)
+  };
+}
+
+export interface PlanWarning {
+  type: 'split-session' | 'tss-reduced' | 'insufficient-time' | 'suboptimal-timing';
+  severity: 'info' | 'warning' | 'error';
+  sessionIds: string[];
+  message: string;
+  details?: {
+    originalTss?: number;
+    adjustedTss?: number;
+    originalDuration?: number;
+    availableDuration?: number;
+  };
 }
