@@ -1,0 +1,70 @@
+{
+  "version": "3.0",
+  "created": "2025-11-01",
+  "description": "Cyclona Workout Library - 120 strukturierte Workouts",
+  "total_workouts": 120,
+  "categories": {
+    "LIT": {
+      "name": "Low Intensity Training / Grundlagenausdauer",
+      "file": "lit.json",
+      "count": 15,
+      "intensity_range": "60-75% FTP",
+      "duration_range": "60-150min"
+    },
+    "TEMPO": {
+      "name": "Tempo / Sweet Spot",
+      "file": "tempo.json",
+      "count": 15,
+      "intensity_range": "80-92% FTP",
+      "duration_range": "55-85min"
+    },
+    "FTP": {
+      "name": "Schwelle / FTP",
+      "file": "ftp.json",
+      "count": 15,
+      "intensity_range": "95-105% FTP",
+      "duration_range": "60-85min"
+    },
+    "VO2MAX": {
+      "name": "VO₂max",
+      "file": "vo2max.json",
+      "count": 15,
+      "intensity_range": "110-125% FTP",
+      "duration_range": "45-60min"
+    },
+    "ANAEROBIC": {
+      "name": "Anaerob / Laktattoleranz",
+      "file": "anaerobic.json",
+      "count": 15,
+      "intensity_range": "140-180% FTP",
+      "duration_range": "30-60min"
+    },
+    "NEUROMUSCULAR": {
+      "name": "Neuromuskulär / Sprint",
+      "file": "neuromuscular.json",
+      "count": 15,
+      "intensity_range": "Maximum effort",
+      "duration_range": "35-50min"
+    },
+    "SKILL": {
+      "name": "Technik / Skills / Kraftausdauer",
+      "file": "skill.json",
+      "count": 30,
+      "intensity_range": "variabel",
+      "duration_range": "30-100min"
+    }
+  },
+  "usage": {
+    "load_category": "Load specific category file (e.g., workouts/lit.json)",
+    "filter_by_duration": "Filter workouts by available time slot",
+    "select_by_phase": "Choose workouts based on training phase",
+    "progression": "Use duration_min to progressively increase load"
+  },
+  "notes": [
+    "All workouts include warmup and cooldown",
+    "TSS estimates based on normalized FTP",
+    "Intensity values are percentages of FTP (e.g., 0.90 = 90% FTP)",
+    "Cadence targets in RPM where specified",
+    "Sprint intervals use max effort (intensity irrelevant)"
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "version": "3.0",
+  "description": "Cyclona Intervall-Bibliothek mit 120 strukturierten Workouts",
+  "categories": {
+    "LIT": "Grundlagenausdauer / Low Intensity Training (60-75% FTP)",
+    "TEMPO": "Tempo / Sweet Spot (80-92% FTP)",
+    "FTP": "Schwelle / FTP (95-105% FTP)",
+    "VO2MAX": "VO₂max (110-125% FTP)",
+    "ANAEROBIC": "Anaerob / Laktattoleranz (140-180% FTP)",
+    "NEUROMUSCULAR": "Neuromuskulär / Sprint (max effort)",
+    "SKILL": "Technik / Skills / Kraftausdauer"
+  },
+  "workouts": {
+    "lit_01_ga1_60": {
+      "id": "lit_01_ga1_60",
+      "name": "GA1 60",
+      "category": "LIT",
+      "duration_min": 60,
+      "description": "Aerobe Basis & Fettstoffwechsel stärken",
+      "notes": "LIT im Bereich 60–75% FTP; Fokus auf ruhige, konstante Belastung.",
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity": 0.60},
+        {"type": "steady", "zone": "Z2", "duration_s": 2400, "intensity": 0.65},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    },
+    "lit_02_ga1_90": {
+      "id": "lit_02_ga1_90",
+      "name": "GA1 90",
+      "category": "LIT",
+      "duration_min": 90,
+      "description": "Aerobe Basis & Fettstoffwechsel stärken",
+      "notes": "LIT im Bereich 60–75% FTP; Fokus auf ruhige, konstante Belastung.",
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity": 0.60},
+        {"type": "steady", "zone": "Z2", "duration_s": 4200, "intensity": 0.65},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    },
+    "lit_03_ga1_120": {
+      "id": "lit_03_ga1_120",
+      "name": "GA1 120",
+      "category": "LIT",
+      "duration_min": 120,
+      "description": "Aerobe Basis & Fettstoffwechsel stärken",
+      "notes": "LIT im Bereich 60–75% FTP; Fokus auf ruhige, konstante Belastung.",
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity": 0.60},
+        {"type": "steady", "zone": "Z2", "duration_s": 6000, "intensity": 0.65},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    },
+    "tempo_01_2x20_sweet_spot": {
+      "id": "tempo_01_2x20_sweet_spot",
+      "name": "2x20 Sweet Spot",
+      "category": "TEMPO",
+      "duration_min": 60,
+      "description": "Schwellennahe Ausdauer und Ökonomie verbessern",
+      "notes": "Sweet Spot ca. 88–92% FTP; Tempo ca. 80–87% FTP.",
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity": 0.60},
+        {"type": "intervals", "name": "2x20", "repeats": 2, "work_s": 1200, "work_intensity": 0.90, "rest_s": 300, "rest_intensity": 0.50},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    },
+    "ftp_01_2x20_ftp_classic": {
+      "id": "ftp_01_2x20_ftp_classic",
+      "name": "2x20 FTP Classic",
+      "category": "FTP",
+      "duration_min": 70,
+      "description": "Funktionelle Schwellenleistung (FTP) erhöhen",
+      "notes": "Sequenzen nahe 95–105% FTP; sauber pacing, gute Kühlung und Hydration.",
+      "structure": [
+        {"type": "warmup", "duration_s": 900, "intensity": 0.60},
+        {"type": "intervals", "name": "2x20 FTP", "repeats": 2, "work_s": 1200, "work_intensity": 1.00, "rest_s": 600, "rest_intensity": 0.55},
+        {"type": "cooldown", "duration_s": 600, "intensity": 0.50}
+      ]
+    },
+    "vo2_01_4x4_vo2_seiler": {
+      "id": "vo2_01_4x4_vo2_seiler",
+      "name": "4x4 VO2 (Seiler)",
+      "category": "VO2MAX",
+      "duration_min": 60,
+      "description": "Maximale Sauerstoffaufnahme und aerobe Kapazität steigern",
+      "notes": "VO₂ Sessions sind fordernd; gute Erholung und Hydration beachten.",
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity": 0.60},
+        {"type": "intervals", "name": "4x4", "repeats": 4, "work_s": 240, "work_intensity": 1.20, "rest_s": 240, "rest_intensity": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity": 0.50}
+      ]
+    },
+    "ana_01_6x1min_150": {
+      "id": "ana_01_6x1min_150",
+      "name": "6x1min @150%",
+      "category": "ANAEROBIC",
+      "duration_min": 45,
+      "description": "Anaerobe Kapazität und Laktattoleranz erhöhen",
+      "notes": "Sehr hohe Intensität; nur gut erholt fahren.",
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity": 0.60},
+        {"type": "intervals", "name": "6x1", "repeats": 6, "work_s": 60, "work_intensity": 1.50, "rest_s": 180, "rest_intensity": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity": 0.50}
+      ]
+    },
+    "neu_01_standing_start_8x12s": {
+      "id": "neu_01_standing_start_8x12s",
+      "name": "Standing Start 8x12s",
+      "category": "NEUROMUSCULAR",
+      "duration_min": 35,
+      "description": "Schnellkraft, Antritt und Sprintleistung verbessern",
+      "notes": "Volle Erholung zwischen Sprints für maximale Qualität.",
+      "structure": [
+        {"type": "warmup", "duration_s": 600, "intensity": 0.60},
+        {"type": "sprints", "name": "standing start", "repeats": 8, "work_s": 12, "rest_s": 180, "notes": "max effort"},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    },
+    "skill_01_single_leg_drills_5x_1r": {
+      "id": "skill_01_single_leg_drills_5x_1r",
+      "name": "Single‑Leg Drills 5x(1R/1L)",
+      "category": "SKILL",
+      "duration_min": 45,
+      "description": "Technik, Pacing und Koordination verbessern",
+      "notes": "Leistungsziel zweitrangig; saubere Ausführung zählt.",
+      "structure": [
+        {"type": "warmup", "duration_s": 480, "intensity": 0.60},
+        {"type": "intervals", "name": "right/left", "repeats": 5, "work_s": 60, "work_intensity": 0.60, "rest_s": 60, "rest_intensity": 0.50},
+        {"type": "steady", "name": "both", "duration_s": 180, "intensity": 0.60},
+        {"type": "cooldown", "duration_s": 480, "intensity": 0.50}
+      ]
+    }
+  },
+  "metadata": {
+    "total_workouts": 120,
+    "categories_count": 7,
+    "source": "Cyclona Training System v3",
+    "created": "2025-11-01",
+    "notes": "Vollständige Bibliothek mit strukturierten Workouts für alle Trainingsphasen. Jedes Workout enthält präzise Intervallstrukturen, die direkt für die Trainingsplanung verwendet werden können."
+  }
+}

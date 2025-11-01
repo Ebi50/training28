@@ -1,0 +1,183 @@
+{
+  "category": "ANAEROBIC",
+  "name": "Anaerob / Laktattoleranz",
+  "description": "Sehr hohe Intensität; nur gut erholt fahren. Anaerobe Kapazität und Laktattoleranz erhöhen.",
+  "intensity_range": "140-180% FTP",
+  "workouts": [
+    {
+      "id": "ana_01_6x1min_150",
+      "name": "6x1min @150%",
+      "duration_min": 45,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 60, "rest_s": 180, "work_intensity_ftp": 1.50, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_02_5x90s_160",
+      "name": "5x90s @160%",
+      "duration_min": 40,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 90, "rest_s": 240, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_03_tabata_4x8x20_10",
+      "name": "Tabata 4x(8x20/10)",
+      "duration_min": 30,
+      "tss_estimate": 58,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 20, "rest_s": 10, "work_intensity_ftp": 1.70, "rest_intensity_ftp": 0.40, "description": "Set 1"},
+        {"type": "intervals", "repeats": 8, "work_s": 20, "rest_s": 10, "work_intensity_ftp": 1.70, "rest_intensity_ftp": 0.40, "description": "Set 2"},
+        {"type": "intervals", "repeats": 8, "work_s": 20, "rest_s": 10, "work_intensity_ftp": 1.70, "rest_intensity_ftp": 0.40, "description": "Set 3"},
+        {"type": "intervals", "repeats": 8, "work_s": 20, "rest_s": 10, "work_intensity_ftp": 1.70, "rest_intensity_ftp": 0.40, "description": "Set 4"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_04_sprint_finish_10x30s",
+      "name": "Sprint Finish 10x30s",
+      "duration_min": 60,
+      "tss_estimate": 78,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 30, "rest_s": 90, "work_intensity_ftp": 1.80, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_05_anaerobe_kaskade_3x1_2",
+      "name": "Anaerobe Kaskade 3x(1'/2')",
+      "duration_min": 50,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 3, "work_s": 60, "rest_s": 120, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.60, "description": "1min efforts"},
+        {"type": "intervals", "repeats": 3, "work_s": 120, "rest_s": 240, "work_intensity_ftp": 1.40, "rest_intensity_ftp": 0.60, "description": "2min efforts"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_06_laktat_bloecke_2x5x45s",
+      "name": "Laktat Blöcke 2x(5x45s)",
+      "duration_min": 45,
+      "tss_estimate": 66,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 45, "rest_s": 135, "work_intensity_ftp": 1.65, "rest_intensity_ftp": 0.50, "description": "Set 1"},
+        {"type": "rest", "duration_s": 300, "intensity_ftp": 0.60, "description": "Set rest"},
+        {"type": "intervals", "repeats": 5, "work_s": 45, "rest_s": 135, "work_intensity_ftp": 1.65, "rest_intensity_ftp": 0.50, "description": "Set 2"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_07_power_stomp_6x30s_big_gear",
+      "name": "Power Stomp 6x30s",
+      "duration_min": 40,
+      "tss_estimate": 62,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 30, "rest_s": 180, "work_intensity_ftp": 1.80, "rest_intensity_ftp": 0.50, "description": "Big gear stomps"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_08_1_1_x10",
+      "name": "1'/1' x10",
+      "duration_min": 50,
+      "tss_estimate": 74,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 60, "rest_s": 60, "work_intensity_ftp": 1.50, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_09_2_3_x5",
+      "name": "2'/3' x5",
+      "duration_min": 50,
+      "tss_estimate": 72,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 5, "work_s": 120, "rest_s": 180, "work_intensity_ftp": 1.45, "rest_intensity_ftp": 0.50},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_10_pyramid_anaerob_30_45_60",
+      "name": "Pyramid Anaerob 30/45/60/45/30",
+      "duration_min": 45,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "interval", "work_s": 30, "rest_s": 90, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "30s"},
+        {"type": "interval", "work_s": 45, "rest_s": 120, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "45s"},
+        {"type": "interval", "work_s": 60, "rest_s": 180, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "60s"},
+        {"type": "interval", "work_s": 45, "rest_s": 120, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "45s"},
+        {"type": "interval", "work_s": 30, "rest_s": 90, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "30s"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_11_race_bursts_12x20s",
+      "name": "Race Bursts 12x20s",
+      "duration_min": 40,
+      "tss_estimate": 64,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 12, "work_s": 20, "rest_s": 100, "work_intensity_ftp": 1.80, "rest_intensity_ftp": 0.50, "description": "Race bursts"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_12_kriterium_surges_6x90s",
+      "name": "Kriterium Surges 6x90s",
+      "duration_min": 55,
+      "tss_estimate": 76,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 6, "work_s": 90, "rest_s": 180, "work_intensity_ftp": 1.50, "rest_intensity_ftp": 0.50, "description": "Crit surges"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_13_gravel_punch_8x45s",
+      "name": "Gravel Punch 8x45s",
+      "duration_min": 50,
+      "tss_estimate": 70,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 8, "work_s": 45, "rest_s": 135, "work_intensity_ftp": 1.60, "rest_intensity_ftp": 0.50, "description": "Gravel punches"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_14_hill_sprints_10x20s",
+      "name": "Hill Sprints 10x20s",
+      "duration_min": 40,
+      "tss_estimate": 66,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 10, "work_s": 20, "rest_s": 100, "work_intensity_ftp": 1.85, "rest_intensity_ftp": 0.50, "description": "Hill sprints"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    },
+    {
+      "id": "ana_15_anaerob_mix_3x4x30s",
+      "name": "Anaerob Mix 3x(4x30s)",
+      "duration_min": 45,
+      "tss_estimate": 68,
+      "structure": [
+        {"type": "warmup", "duration_s": 720, "intensity_ftp": 0.60},
+        {"type": "intervals", "repeats": 12, "work_s": 30, "rest_s": 90, "work_intensity_ftp": 1.70, "rest_intensity_ftp": 0.50, "description": "3 sets of 4x30s with 5min rest between sets"},
+        {"type": "cooldown", "duration_s": 600, "intensity_ftp": 0.50}
+      ]
+    }
+  ]
+}
