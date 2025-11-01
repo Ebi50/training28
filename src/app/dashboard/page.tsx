@@ -5,10 +5,11 @@ import { signOut } from 'firebase/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { getUserProfile } from '@/lib/firestore';
-import type { UserProfile } from '@/types';
+import type { UserProfile, WeeklyPlan } from '@/types';
 import UserTutorial from '@/components/UserTutorial';
 import DashboardLayout from '@/components/DashboardLayout';
 import Tooltip from '@/components/Tooltip';
+import PlanQualityBanner from '@/components/PlanQualityBanner';
 import { useAutoLogout } from '@/hooks/useAutoLogout';
 import { calculateTSS, calculateFitnessMetrics, interpretTSB } from '@/lib/fitnessMetrics';
 import { spacing, typography, colors, components, layout } from '@/styles/designSystem';
@@ -45,9 +46,11 @@ export default function DashboardPage() {
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [fitnessMetrics, setFitnessMetrics] = useState({ ctl: 0, atl: 0, tsb: 0 });
   const [trainingPlan, setTrainingPlan] = useState<any>(null);
+  const [currentWeekPlan, setCurrentWeekPlan] = useState<WeeklyPlan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [generatingPlan, setGeneratingPlan] = useState(false);
   const [currentPlanWeek, setCurrentPlanWeek] = useState(0);
+  const [dismissedPlanWarnings, setDismissedPlanWarnings] = useState<Set<string>>(new Set());
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -67,6 +70,10 @@ export default function DashboardPage() {
       try {
         const userProfile = await getUserProfile(user.uid);
         setProfile(userProfile);
+        
+        // Load dismissed plan warnings from localStorage
+        const dismissed = JSON.parse(localStorage.getItem('dismissedPlanWarnings') || '[]');
+        setDismissedPlanWarnings(new Set(dismissed));
         
         // Show tutorial for new users (no FTP set = new user)
         if (!userProfile?.ftp) {
@@ -260,6 +267,27 @@ export default function DashboardPage() {
               : 'bg-coral-50 dark:bg-coral-900/30 border border-coral-200 dark:border-coral-700 text-coral-800 dark:text-coral-200'
           }`}>
             {stravaMessage}
+          </div>
+        )}
+
+        {/* Plan Quality Banner */}
+        {!profile?.preferences?.hideTimeSlotWarnings && 
+         currentWeekPlan?.quality && 
+         currentWeekPlan.quality.warnings.length > 0 &&
+         !dismissedPlanWarnings.has(currentWeekPlan.id) && (
+          <div className={spacing.contentBlock}>
+            <PlanQualityBanner 
+              quality={currentWeekPlan.quality} 
+              planId={currentWeekPlan.id}
+              onDismiss={() => {
+                // Add to dismissed set
+                setDismissedPlanWarnings(prev => new Set(prev).add(currentWeekPlan.id));
+                // Optional: Save to localStorage for persistence
+                const dismissed = JSON.parse(localStorage.getItem('dismissedPlanWarnings') || '[]');
+                dismissed.push(currentWeekPlan.id);
+                localStorage.setItem('dismissedPlanWarnings', JSON.stringify(dismissed));
+              }}
+            />
           </div>
         )}
 
